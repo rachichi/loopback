@@ -5,6 +5,7 @@ Loopback is a React portal prototype for Manhattan Community Board 3 (CB3). It b
 ## Contents
 
 - [Portal Guide](#portal-guide)
+- [Staging](#staging)
 - [Future State](#future-state)
 - [MIT License](#mit-license)
 
@@ -106,6 +107,10 @@ pnpm build    # Production build
 pnpm preview  # Serve the production build locally
 pnpm format   # Format files with oxfmt
 ```
+
+## Staging
+
+The `staging` branch is intended for Netlify branch deploys; `main` remains the production branch. In Netlify, enable a branch deploy for `staging` under **Project configuration → Developer settings → Continuous deployment → Branches and deploy contexts**. Once enabled, pushes to `staging` deploy to a branch-specific URL, typically `staging--<site-name>.netlify.app`.
 
 ## Current Prototype Boundaries
 
