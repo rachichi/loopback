@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import loopbackLogo from "./assets/logo.png";
 import {
   BarChart3,
   Bell,
@@ -178,8 +179,7 @@ const typeClass: Record<TicketType, string> = {
 function Logo() {
   return (
     <div className="loopback-logo" aria-label="Loopback">
-      <i />
-      <span>LOOP<br />BACK</span>
+      <img src={loopbackLogo} alt="Loopback logo" className="loopback-logo-image" />
     </div>
   );
 }
@@ -209,7 +209,7 @@ function PortalHeader() {
       </nav>
       <div className="title-band">
         <div><h1>Tickets</h1><span>Community Board 3 service tracker</span></div>
-        <Tag className="sample">Sample data</Tag>
+        <Tag className="sample">Community Board 3</Tag>
       </div>
     </>
   );
@@ -308,34 +308,14 @@ function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: 
   return (
     <div className="map-view">
       <div className="map-canvas">
-        <svg className="street-map" viewBox="0 0 600 720" preserveAspectRatio="none" aria-hidden="true">
-          <rect width="600" height="720" fill="#edf1ed" />
-          <path className="water" d="M0 0h88l42 100-30 110 48 120-62 110 15 130L50 720H0zM600 0h-70l-30 130 42 125-35 165 43 130-20 170h70z" />
-          <g className="minor-roads">
-            <path d="M105 50L520 690M150 18L555 630M90 130L480 715M210 0L575 570M65 240L440 720" />
-            <path d="M80 110L535 60M90 175L520 125M100 245L530 195M92 320L520 270M100 400L530 345M95 485L520 420M90 570L525 500M75 650L520 585" />
-          </g>
-          <g className="major-roads">
-            <path d="M120 0L470 720M255 0L535 665M70 360L540 285M85 535L530 455" />
-          </g>
-          <path className="park" d="M245 224l105-30 65 105-112 48z" />
-          <path className="park" d="M145 480l80-28 45 80-88 36z" />
-          <text x="275" y="275">COMMUNITY DISTRICT 3</text>
-          <text x="300" y="305">MANHATTAN</text>
-        </svg>
-        {tickets.map((ticket, index) => (
-          <button
-            className={`map-marker ${selected.number === ticket.number ? "active" : ""}`}
-            key={ticket.number}
-            style={{ left: `${ticket.coordinates[0]}%`, top: `${ticket.coordinates[1]}%` }}
-            onClick={() => onSelect(ticket)}
-            aria-label={`Show ${ticket.title}`}
-          >
-            <MapPin size={selected.number === ticket.number ? 30 : 24} fill="currentColor" />
-            <span>{index + 1}</span>
-          </button>
-        ))}
-        <div className="map-key"><MapPin size={15} /> {tickets.length} ticket locations <Tag className="sample">Sample data</Tag></div>
+        <iframe
+          title="NYC Boundaries map for Community Board 3"
+          src="https://boundaries.beta.nyc/?"
+          className="map-embed"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+        />
+        <div className="map-embed-label"><MapPin size={14} /> Community Board 3</div>
       </div>
       <div className="map-record">
         <span className="marker-number">{tickets.findIndex((item) => item.number === selected.number) + 1}</span>
@@ -358,7 +338,7 @@ function SummaryView({ rows }: { rows: Ticket[] }) {
   const maxType = Math.max(...types.map((item) => item.count), 1);
   return (
     <div className="summary-view">
-      <div className="summary-heading"><div><h2>Ticket overview</h2><p>Dashboard for the current left-hand view</p></div><Tag className="sample">Sample data</Tag></div>
+      <div className="summary-heading"><div><h2>Ticket overview</h2><p>Dashboard for the current left-hand view</p></div><Tag className="sample">Community Board 3</Tag></div>
       <div className="metric-row">
         <article><span>VISIBLE TICKETS</span><strong>{rows.length}</strong><small>Current filtered view</small></article>
         <article><span>IN PROGRESS</span><strong>{statuses.find((item) => item.status === "In progress")?.count || 0}</strong><small>Need staff follow-up</small></article>

@@ -21,12 +21,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .portal { min-height: 100vh; display: flex; flex-direction: column; background: #f5f6f7; }
 .portal-header { height: 108px; position: relative; display: flex; align-items: center; justify-content: center; background: white; border-bottom: 1px solid #9299a5; }
-.loopback-logo { width: 66px; height: 66px; position: relative; display: grid; place-items: center; border: 3px solid #11182c; border-radius: 50%; background: #2bb7d5; transform: rotate(-2deg); }
-.loopback-logo::before, .loopback-logo::after { content: ""; width: 14px; height: 14px; position: absolute; border-color: #11182c; border-style: solid; transform: rotate(38deg); background: white; }
-.loopback-logo::before { top: -7px; left: 5px; border-width: 3px 0 0 3px; }
-.loopback-logo::after { right: 4px; bottom: -7px; border-width: 0 3px 3px 0; }
-.loopback-logo i { position: absolute; inset: -5px; border: 2px solid transparent; border-top-color: #11182c; border-bottom-color: #11182c; border-radius: 50%; }
-.loopback-logo span { font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 14px; font-weight: 700; line-height: .8; letter-spacing: -.6px; text-align: center; }
+.loopback-logo { width: 52px; height: 52px; position: relative; display: grid; place-items: center; }
+.loopback-logo-image { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 12px; filter: drop-shadow(0 4px 12px rgba(17, 24, 44, 0.12)); }
 .header-actions { position: absolute; right: 28px; display: flex; align-items: center; gap: 10px; }
 .header-actions button, .mobile-menu { width: 34px; height: 34px; display: grid; place-items: center; border: 0; background: transparent; cursor: pointer; }
 .header-actions > span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #e6f6f9; color: #14718a; font-size: 11px; font-weight: 700; }
@@ -116,13 +112,9 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .insights-tabs .pane-settings { width: 36px; margin-left: auto; padding: 0; justify-content: center; }
 .map-view { min-height: 0; flex: 1; display: flex; flex-direction: column; }
 .map-canvas { min-height: 0; flex: 1; position: relative; overflow: hidden; background: #edf1ed; }
-.street-map { width: 100%; height: 100%; position: absolute; inset: 0; }
-.street-map .water { fill: #b9e0e9; }.street-map .minor-roads { fill: none; stroke: #fff; stroke-width: 12; }.street-map .major-roads { fill: none; stroke: #f5d79d; stroke-width: 17; }.street-map .park { fill: #b9ddad; }.street-map text { fill: #96a29b; font-family: 'Noto Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
-.map-marker { width: 30px; height: 34px; padding: 0; position: absolute; transform: translate(-50%, -100%); display: grid; place-items: center; border: 0; background: transparent; color: #2bb7d5; filter: drop-shadow(0 2px 2px rgba(17,24,44,.25)); cursor: pointer; transition: transform .15s; }
-.map-marker:hover, .map-marker.active { z-index: 2; transform: translate(-50%, -100%) scale(1.18); color: #e83f62; }
-.map-marker span { position: absolute; top: 7px; color: white; font-size: 7px; font-weight: 700; }
-.map-key { position: absolute; left: 14px; bottom: 14px; padding: 8px 10px; display: flex; align-items: center; gap: 6px; border: 1px solid #d0d5d9; border-radius: 5px; background: rgba(255,255,255,.94); box-shadow: 0 3px 10px rgba(17,24,44,.1); color: #4e5762; font-size: 9px; }
-.map-key > svg { color: #2bb7d5; }.map-key .tag { margin-left: 4px; }
+.map-embed { width: 100%; height: 100%; border: 0; display: block; background: #edf1ed; }
+.map-embed-label { position: absolute; left: 14px; top: 12px; padding: 8px 10px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(17, 24, 44, 0.08); border-radius: 999px; background: rgba(255,255,255,0.92); box-shadow: 0 3px 10px rgba(17,24,44,.1); color: #1a2234; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.map-embed-label svg { color: #2bb7d5; }
 .map-record { min-height: 72px; padding: 10px 14px; display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 9px; border-top: 1px solid #bbc1c7; background: white; }
 .marker-number { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50% 50% 50% 4px; transform: rotate(-45deg); background: #e83f62; color: white; font-size: 9px; font-weight: 700; }.marker-number::first-line { transform: rotate(45deg); }
 .map-record strong { font-size: 10px; }.map-record p { margin: 4px 0 0; display: flex; align-items: center; gap: 3px; color: #7a828c; font-size: 8px; }
