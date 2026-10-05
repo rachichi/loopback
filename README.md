@@ -26,9 +26,11 @@ Every section ends with a shared black footer containing the Loopback logo and a
 
 ### Common workflows
 
+**Upload meetings:** Upload meeting transcript and drafts for tickets, documents, and outreach posts are generated based on discussion topics.
+
 **Find tickets:** Open Tickets, search by ticket number, title, type, or location, and optionally filter by status. Use List, Kanban board, or Roadmap to change the view. Select a row, card, roadmap event, or map pin to open the ticket detail page. Use Back to tickets to return to the ticket workspace. The List view's Map and Summary tabs switch the right-hand panel.
 
-**Search from Home:** Enter a phrase in the Home search field and submit. The portal opens Tickets with the query applied.
+**Search from Home:** Enter a phrase in the Home search field and submit.
 
 **Prepare outreach:** Select an outreach record. Toggle the icons in its Channels column to choose where that record should be prepared. Enabled channels appear available in the composer tabs. Edit the copy directly inside the post preview and use Post to mark the local draft as posted.
 
