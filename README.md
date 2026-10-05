@@ -2,6 +2,12 @@
 
 Loopback is a React portal prototype for Manhattan Community Board 3 (CB3). It brings together meeting preparation, ticket tracking, a meeting calendar, document templates, outreach drafting, and a board-to-board forum in one responsive interface.
 
+## Contents
+
+- [Portal Guide](#portal-guide)
+- [Future State](#future-state)
+- [MIT License](#mit-license)
+
 ## Portal Guide
 
 The top navigation contains seven sections:
@@ -109,6 +115,25 @@ pnpm format   # Format files with oxfmt
 - Calendar entries are curated sample events. They are not synchronized with the live CB3 calendar.
 - The ticket map embeds NYC Boundaries, an external service. Its availability and map data are outside this app's control.
 - There is no authentication or authorization layer. Do not enter confidential or personally identifying information into this prototype.
+
+## Future State
+
+The long-term vision is to connect the portal's workflows to real, board-managed data and make the platform straightforward to replicate across all 59 New York City community boards. A shared foundation could support consistent workflows citywide while allowing each board to configure its own committees, services, events, and outreach.
+
+Potential capabilities include:
+
+- **Ticket intake and tracking:** Accept requests from residents, route them to the right board or committee, and track status and follow-up through resolution.
+- **Meeting and event calendar:** Publish and manage current meetings and events, with updates available to residents and board members.
+- **Personalized login experience:** Give residents, board members, and staff appropriate views, saved items, and permissions based on their roles.
+- **Outreach channels:** Prepare and manage communications across web, email, social, and other board-approved channels.
+- **Onboarding process:** Help residents and new board members find relevant services, understand the process, and get started with the portal.
+- **Metrics:** Provide useful, privacy-conscious reporting on requests, response times, participation, and outreach.
+
+These workflows would rely on secure APIs and durable storage rather than frontend sample data. Shared platform capabilities and board-specific configuration would make each deployment adaptable without duplicating the product.
+
+## MIT License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
 
 ## Engineering Practices
 
