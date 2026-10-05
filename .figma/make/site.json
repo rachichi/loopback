@@ -1,0 +1,8 @@
+{
+  "title": "Loopback",
+  "description": "Community board service tracker",
+  "language": "en",
+  "accessibility": {
+    "addBypassLinks": true
+  }
+}
