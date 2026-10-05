@@ -11,6 +11,8 @@ import {
   ClipboardList,
   FileText,
   Filter,
+  FolderOpen,
+  House,
   LayoutDashboard,
   Link2,
   Mail,
@@ -23,6 +25,7 @@ import {
   Search,
   Settings2,
   SlidersHorizontal,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -52,118 +55,74 @@ type Ticket = {
   created: string;
 };
 
+const mapBounds = {
+  minLat: 40.719,
+  maxLat: 40.737,
+  minLng: -73.997,
+  maxLng: -73.972,
+};
+
+const projectMapCoordinates = (lat: number, lng: number) => ({
+  x: ((lng - mapBounds.minLng) / (mapBounds.maxLng - mapBounds.minLng)) * 100,
+  y: ((mapBounds.maxLat - lat) / (mapBounds.maxLat - mapBounds.minLat)) * 100,
+});
+
 const tickets: Ticket[] = [
   {
-    number: "T-0042",
-    title: "Pickleball court on vacant lot",
-    type: "Proposal",
-    status: "To do",
-    source: "SMS",
-    document: "Resident summary",
-    owner: "A. Torres",
-    role: "Parks Committee Chair",
-    nextSteps: ["Add to Oct 14 committee agenda", "Confirm lot ownership", "Contact NYC Parks borough office"],
-    location: "3rd Ave & E 14th St",
-    coordinates: [67, 69],
-    created: "Oct 2",
+    number: "CB3-001",
+    title: "Third Avenue L stop closure proposal",
+    type: "Service request",
+    status: "In progress",
+    source: "Transcript",
+    document: "CB3 meeting transcript",
+    owner: "Transportation Committee",
+    role: "Transit advocacy",
+    nextSteps: ["Request MTA review", "Add to transportation agenda", "Measure rider impact"],
+    location: "Third Ave & 14th St",
+    coordinates: [40.7341, -73.9873],
+    created: "Sep 30",
   },
   {
-    number: "T-0041",
-    title: "New on-premises license at 123 Sample St",
+    number: "CB3-002",
+    title: "Delivery worker bike congestion on 11th Street",
+    type: "Complaint",
+    status: "In progress",
+    source: "Transcript",
+    document: "Public speaking comment",
+    owner: "9th Precinct",
+    role: "Enforcement coordination",
+    nextSteps: ["Renew enforcement on 11th St", "Coordinate sanitation cleanup", "Monitor corridor conditions"],
+    location: "11th St & Avenue A",
+    coordinates: [40.7288, -73.9805],
+    created: "Sep 30",
+  },
+  {
+    number: "CB3-003",
+    title: "Illegal bike storage in the East Village corridor",
+    type: "Complaint",
+    status: "To do",
+    source: "Transcript",
+    document: "Public speaking comment",
+    owner: "Community board liaison",
+    role: "Neighborhood operations",
+    nextSteps: ["Distribute flyers", "Coordinate with DOT and NYPD", "Track repeat violations"],
+    location: "East Village / 11th Street corridor",
+    coordinates: [40.7275, -73.9848],
+    created: "Sep 30",
+  },
+  {
+    number: "CB3-004",
+    title: "Beer and wine license stipulation review",
     type: "Liquor license",
     status: "In progress",
     source: "Transcript",
-    document: "License application",
-    owner: "M. Chen",
-    role: "Licenses Committee Chair",
-    nextSteps: ["Send applicant questionnaire", "Schedule public hearing", "Notify nearby residents"],
-    location: "123 Sample St",
-    coordinates: [43, 39],
-    created: "Oct 1",
-  },
-  {
-    number: "T-0040",
-    title: "Broken streetlight near Avenue C",
-    type: "Service request",
-    status: "Complete",
-    source: "Transcript",
-    document: "311 service record",
-    owner: "D. Morales",
-    role: "District Manager",
-    nextSteps: ["Confirm repair with resident", "Close service record"],
-    location: "Avenue C & E 6th St",
-    coordinates: [77, 82],
-    created: "Oct 1",
-  },
-  {
-    number: "T-0039",
-    title: "Recurring rooftop noise after midnight",
-    type: "Complaint",
-    status: "In progress",
-    source: "Email",
-    document: "Noise log.pdf",
-    owner: "M. Chen",
-    role: "Licenses Committee Chair",
-    nextSteps: ["Log complaint with operator", "Request enforcement history", "Follow up in seven days"],
-    location: "Orchard St & Rivington St",
-    coordinates: [58, 58],
+    document: "Licensing motion",
+    owner: "Licensing Committee",
+    role: "Licensing review",
+    nextSteps: ["Confirm stipulation details", "Follow up with applicant", "Record board recommendation"],
+    location: "E 11th St & 2nd Ave",
+    coordinates: [40.7299, -73.9861],
     created: "Sep 30",
-  },
-  {
-    number: "T-0038",
-    title: "Rezoning application at 400 Sample Ave",
-    type: "Land use",
-    status: "To do",
-    source: "Email",
-    document: "Application packet",
-    owner: "J. Williams",
-    role: "Land Use Committee Chair",
-    nextSteps: ["Request agency presentation", "Schedule public hearing", "Publish application materials"],
-    location: "400 Sample Ave",
-    coordinates: [30, 28],
-    created: "Sep 30",
-  },
-  {
-    number: "T-0037",
-    title: "Capital request for playground renovation",
-    type: "Budget",
-    status: "To do",
-    source: "Transcript",
-    document: "Cost estimate.xlsx",
-    owner: "A. Torres",
-    role: "Parks Committee Chair",
-    nextSteps: ["Add to FY28 priorities", "Request current condition assessment", "Estimate community reach"],
-    location: "Seward Park",
-    coordinates: [48, 73],
-    created: "Sep 29",
-  },
-  {
-    number: "T-0036",
-    title: "Unsafe crossing time near senior center",
-    type: "Service request",
-    status: "Complete",
-    source: "SMS",
-    document: "DOT response",
-    owner: "D. Morales",
-    role: "District Manager",
-    nextSteps: ["Share completion update", "Archive DOT response"],
-    location: "East Broadway & Rutgers St",
-    coordinates: [35, 88],
-    created: "Sep 28",
-  },
-  {
-    number: "T-0035",
-    title: "Outdoor dining structure blocks sightline",
-    type: "Complaint",
-    status: "In progress",
-    source: "SMS",
-    document: "3 resident photos",
-    owner: "K. Patel",
-    role: "Transportation Committee",
-    nextSteps: ["Review curb regulations", "Request DOT inspection", "Update reporting residents"],
-    location: "Grand St & Essex St",
-    coordinates: [52, 67],
-    created: "Sep 27",
   },
 ];
 
@@ -193,14 +152,17 @@ function PortalHeader() {
     <>
       <header className="portal-header">
         <button className="mobile-menu" aria-label="Open navigation"><Menu size={20} /></button>
-        <Logo />
+        <div className="brand-block">
+          <Logo />
+          <div className="brand-text">Community Board 3 Portal</div>
+        </div>
         <div className="header-actions">
           <button aria-label="Notifications"><Bell size={17} /></button>
-          <span>DM</span>
+          <span>CB3</span>
         </div>
       </header>
       <nav className="portal-nav">
-        <div className="nav-spacer" />
+        <button className="nav-home" aria-label="Home"><House size={16} /></button>
         <button className="active"><ClipboardList size={15} /> Tickets</button>
         <button><CalendarDays size={15} /> Calendar</button>
         <button><Users size={15} /> Roles</button>
@@ -305,17 +267,36 @@ function TicketInspector({ ticket, onClose }: { ticket: Ticket; onClose: () => v
 }
 
 function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: Ticket) => void }) {
+  const pinPositions = tickets.map((ticket) => {
+    const { x, y } = projectMapCoordinates(ticket.coordinates[0], ticket.coordinates[1]);
+    return { ...ticket, x, y };
+  });
+
   return (
     <div className="map-view">
       <div className="map-canvas">
-        <iframe
-          title="NYC Boundaries map for Community Board 3"
-          src="https://boundaries.beta.nyc/?"
-          className="map-embed"
-          loading="lazy"
-          referrerPolicy="no-referrer-when-downgrade"
-        />
-        <div className="map-embed-label"><MapPin size={14} /> Community Board 3</div>
+        <div className="map-embed-shell">
+          <iframe
+            title="NYC Boundaries map for Community Board 3"
+            src="https://boundaries.beta.nyc/?map=cd&dist=103"
+            className="map-embed"
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
+        </div>
+        <div className="map-pin-layer">
+          {pinPositions.map((ticket, index) => (
+            <button
+              key={ticket.number}
+              className={`map-pin ${selected.number === ticket.number ? "active" : ""}`}
+              style={{ left: `${ticket.x}%`, top: `${ticket.y}%` }}
+              onClick={() => onSelect(ticket)}
+              aria-label={`Show ${ticket.title}`}
+            >
+              <span>{index + 1}</span>
+            </button>
+          ))}
+        </div>
       </div>
       <div className="map-record">
         <span className="marker-number">{tickets.findIndex((item) => item.number === selected.number) + 1}</span>
@@ -338,7 +319,7 @@ function SummaryView({ rows }: { rows: Ticket[] }) {
   const maxType = Math.max(...types.map((item) => item.count), 1);
   return (
     <div className="summary-view">
-      <div className="summary-heading"><div><h2>Ticket overview</h2><p>Dashboard for the current left-hand view</p></div><Tag className="sample">Community Board 3</Tag></div>
+      <div className="summary-heading"><div><h2>Ticket overview</h2><p>Dashboard for the current left-hand view</p></div></div>
       <div className="metric-row">
         <article><span>VISIBLE TICKETS</span><strong>{rows.length}</strong><small>Current filtered view</small></article>
         <article><span>IN PROGRESS</span><strong>{statuses.find((item) => item.status === "In progress")?.count || 0}</strong><small>Need staff follow-up</small></article>
@@ -398,7 +379,6 @@ export default function App() {
           <div className="insights-tabs">
             <button className={sideTab === "map" ? "active" : ""} onClick={() => setSideTab("map")}><Map size={15} /> Map</button>
             <button className={sideTab === "summary" ? "active" : ""} onClick={() => setSideTab("summary")}><BarChart3 size={15} /> Summary</button>
-            <button className="pane-settings" aria-label="Panel settings"><Settings2 size={15} /></button>
           </div>
           {sideTab === "map" ? <MapView selected={selected} onSelect={selectTicket} /> : <SummaryView rows={rows} />}
         </aside>
