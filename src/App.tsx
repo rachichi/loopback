@@ -33,6 +33,7 @@ import {
   SlidersHorizontal,
   Upload,
   Users,
+  X,
 } from "lucide-react";
 
 type TicketType =
@@ -277,12 +278,18 @@ const tabDetails: Partial<Record<TabName, { title: string; subtitle: string }>> 
 };
 
 function PortalHeader({ activeTab, setActiveTab }: { activeTab: TabName; setActiveTab: (tab: TabName) => void }) {
+  const [showHomeNotice, setShowHomeNotice] = useState(true);
+
   return (
     <>
-      <header className="portal-header">
+      <header className={`portal-header ${showHomeNotice ? "notice-header" : ""}`}>
         <button className="mobile-menu" aria-label="Open navigation"><Menu size={20} /></button>
-        <div className="brand-block">
+        <div className="brand-block notice-brand">
           <Logo />
+          {showHomeNotice && <div className="construction-notice" role="status">
+            <span>⚠️ This portal is under construction and currently only uses sample data.</span>
+            <button type="button" aria-label="Dismiss construction notice" onClick={() => setShowHomeNotice(false)}><X size={18} /></button>
+          </div>}
         </div>
         <div className="header-actions">
           <button aria-label="Notifications"><Bell size={17} /></button>
