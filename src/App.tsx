@@ -1,5 +1,6 @@
 import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import loopbackLogo from "./assets/logo.png";
+import { siBlogger, siFacebook, siInstagram, siX } from "simple-icons";
 import {
   BarChart3,
   Bell,
@@ -14,6 +15,7 @@ import {
   Filter,
   FolderOpen,
   House,
+  Image as ImageIcon,
   LayoutDashboard,
   Link2,
   Mail,
@@ -23,6 +25,7 @@ import {
   Menu,
   MoreHorizontal,
   Paperclip,
+  Play,
   Plus,
   Search,
   Send,
@@ -209,6 +212,46 @@ function Tag({ children, className = "" }: { children: ReactNode; className?: st
 
 type TabName = "home" | "meetings" | "tickets" | "calendar" | "templates" | "outreach" | "forum";
 type TicketView = "list" | "kanban" | "roadmap";
+type OutreachChannel = "Instagram" | "Facebook" | "X" | "Blog" | "Newsletter";
+
+type OutreachEntry = {
+  number: string;
+  title: string;
+  type: "Resolution" | "Community event" | "District win";
+  status: "Ready" | "Posted";
+  source: string;
+  attachments: Array<{ name: string; kind: "Image" | "Video" }>;
+};
+
+const outreachEntries: OutreachEntry[] = [
+  { number: "001", title: "Resolution supporting safer school streets", type: "Resolution", status: "Ready", source: "Full Board Meeting · Sep 24", attachments: [{ name: "School streets photo.jpg", kind: "Image" }] },
+  { number: "002", title: "Lower East Side community cleanup", type: "Community event", status: "Ready", source: "Sanitation Committee · Sep 18", attachments: [{ name: "Cleanup highlights.mp4", kind: "Video" }, { name: "Volunteer group.jpg", kind: "Image" }] },
+  { number: "003", title: "New cooling resources shared with residents", type: "District win", status: "Posted", source: "Health Committee · Sep 12", attachments: [{ name: "Cooling center.jpg", kind: "Image" }] },
+  { number: "004", title: "Resolution calling for protected bike lanes", type: "Resolution", status: "Ready", source: "Transportation Committee · Sep 09", attachments: [{ name: "Avenue corridor.mp4", kind: "Video" }] },
+];
+
+const outreachChannels: OutreachChannel[] = ["Instagram", "Facebook", "X", "Blog", "Newsletter"];
+
+const outreachChannelIconData = {
+  Instagram: siInstagram,
+  Facebook: siFacebook,
+  X: siX,
+  Blog: siBlogger,
+};
+
+const defaultOutreachCopy = (channel: OutreachChannel, entry: OutreachEntry) => {
+  const opening = `A community update from Manhattan Community Board 3: ${entry.title}.`;
+  const detail = "Thank you to the neighbors, volunteers, and city partners who helped move this work forward.";
+  if (channel === "X") return `${opening} ${detail} #ManhattanCB3`;
+  if (channel === "Blog") return `${opening}\n\n${detail} Read the meeting notes and learn how to get involved at our next community board meeting.`;
+  if (channel === "Newsletter") return `${opening}\n\n${detail}\n\nStay connected with Manhattan CB3 for meeting updates, public events, and ways to participate.`;
+  return `${opening}\n\n${detail}\n\nLearn more and join the conversation at an upcoming community board meeting. #ManhattanCB3`;
+};
+
+function OutreachChannelIcon({ channel }: { channel: OutreachChannel }) {
+  const iconData = channel === "Newsletter" ? undefined : outreachChannelIconData[channel as keyof typeof outreachChannelIconData];
+  return iconData ? <svg viewBox="0 0 24 24" aria-hidden="true"><path d={iconData.path} /></svg> : <Mail className="outreach-newsletter-icon" size={15} aria-hidden="true" />;
+}
 
 const tabDetails: Partial<Record<TabName, { title: string; subtitle: string }>> = {
   meetings: { title: "Meetings", subtitle: "Upload meeting assets to generate drafts for tickets, documents, and outreach posts." },
@@ -634,6 +677,129 @@ function MeetingsView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }
   );
 }
 
+function OutreachView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
+  const [selected, setSelected] = useState(outreachEntries[0]);
+  const [channel, setChannel] = useState<OutreachChannel>("Instagram");
+  const [enabledChannels, setEnabledChannels] = useState<Record<string, OutreachChannel[]>>(() => Object.fromEntries(outreachEntries.map((entry) => [entry.number, [...outreachChannels]])));
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [posted, setPosted] = useState<Record<string, boolean>>({});
+  const selectedChannels = enabledChannels[selected.number] ?? outreachChannels;
+  const draftKey = `${selected.number}:${channel}`;
+  const currentDraft = drafts[draftKey] ?? defaultOutreachCopy(channel, selected);
+  const primaryMedia = selected.attachments[0];
+
+  const updateDraft = (value: string) => setDrafts((current) => ({ ...current, [draftKey]: value }));
+  const selectEntry = (entry: OutreachEntry) => {
+    setSelected(entry);
+    const available = enabledChannels[entry.number] ?? outreachChannels;
+    if (available.length && !available.includes(channel)) setChannel(available[0]);
+  };
+  const toggleChannel = (event: React.MouseEvent<HTMLButtonElement>, entry: OutreachEntry, target: OutreachChannel) => {
+    event.stopPropagation();
+    const current = enabledChannels[entry.number] ?? [...outreachChannels];
+    const next = current.includes(target) ? current.filter((item) => item !== target) : [...current, target];
+    setEnabledChannels((existing) => ({ ...existing, [entry.number]: next }));
+    setSelected(entry);
+    if (entry.number === selected.number && !next.includes(channel)) setChannel(next[0] ?? target);
+  };
+
+  return (
+    <div className="portal">
+      <PortalHeader activeTab="outreach" setActiveTab={setActiveTab} />
+      <main className="outreach-workspace">
+        <section className="outreach-records">
+          <div className="outreach-toolbar">
+            <div><strong>Community wins</strong><span>{outreachEntries.length} records</span></div>
+          </div>
+          <div className="outreach-table-scroll">
+            <table className="outreach-table">
+              <thead><tr><th>Outreach #</th><th>Title</th><th>Type</th><th>Status</th><th>Source</th><th>Supporting attachments</th><th>Channels</th></tr></thead>
+              <tbody>
+                {outreachEntries.map((entry) => (
+                    <tr key={entry.number} className={selected.number === entry.number ? "selected" : ""} onClick={() => selectEntry(entry)} tabIndex={0} onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") selectEntry(entry); }}>
+                    <td className="outreach-number">{entry.number}</td>
+                    <td className="outreach-title-cell">{entry.title}</td>
+                    <td><span className={`outreach-type ${entry.type === "Resolution" ? "resolution" : "event"}`}>{entry.type}</span></td>
+                    <td><span className={`outreach-status ${entry.status.toLowerCase()}`}><i />{entry.status}</span></td>
+                    <td className="outreach-source">{entry.source}</td>
+                    <td>
+                      <div className="outreach-attachments">
+                        {entry.attachments.map((attachment) => (
+                          <span key={attachment.name} className="outreach-attachment" title={attachment.name}>
+                            <span className="outreach-attachment-thumb"><img src="/cb3_hero.jpg" alt="" />{attachment.kind === "Video" ? <Play size={12} fill="currentColor" /> : <ImageIcon size={12} />}</span>
+                            <span>{attachment.name}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="outreach-row-channels" aria-label={`Channels for outreach ${entry.number}`}>
+                        {outreachChannels.map((item) => {
+                          const iconData = item === "Newsletter" ? undefined : outreachChannelIconData[item as keyof typeof outreachChannelIconData];
+                          const isEnabled = (enabledChannels[entry.number] ?? outreachChannels).includes(item);
+                          return (
+                            <button
+                              key={item}
+                              type="button"
+                              className={`outreach-channel-toggle ${item.toLowerCase()} ${isEnabled ? "enabled" : ""}`}
+                              aria-label={`${isEnabled ? "Disable" : "Enable"} ${item} for outreach ${entry.number}`}
+                              aria-pressed={isEnabled}
+                              title={`${item}: ${isEnabled ? "included" : "not included"}`}
+                              onClick={(event) => toggleChannel(event, entry, item)}
+                            >
+                              <OutreachChannelIcon channel={item} />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section className="outreach-composer" aria-label="Social media post composer">
+          <div className="outreach-channel-tabs" role="tablist" aria-label="Social channels">
+            {outreachChannels.map((item) => {
+              const enabled = selectedChannels.includes(item);
+              return (
+                <button key={item} role="tab" aria-selected={channel === item} aria-disabled={!enabled} disabled={!enabled} className={`${channel === item ? `active ${item.toLowerCase()}` : ""} ${enabled ? "enabled" : "disabled"}`} onClick={() => setChannel(item)}>
+                  <OutreachChannelIcon channel={item} /><span>{item}</span>
+                </button>
+              );
+            })}
+          </div>
+          {!selectedChannels.length && <div className="outreach-no-channels"><Mail size={22} /><strong>No channels selected</strong><span>Turn on at least one channel in this outreach row to prepare a post.</span></div>}
+          <div className="outreach-preview-heading" hidden={!selectedChannels.length}><div><h2>{channel} preview</h2><span>Editable draft · preview only</span></div><span className="outreach-preview-record">#{selected.number}</span></div>
+          <div className={`social-preview ${channel.toLowerCase()}`} hidden={!selectedChannels.length}>
+            {(channel === "Instagram" || channel === "Facebook") && <div className="social-preview-account"><span className="social-avatar">CB3</span><span><strong>Manhattan Community Board 3</strong><small>{channel === "Instagram" ? "manhattancb3" : "Community organization"}</small></span><button type="button" aria-label="More post options">···</button></div>}
+            {channel === "X" && <div className="social-preview-account"><span className="social-avatar">CB3</span><span><strong>Manhattan CB3</strong><small>@ManhattanCB3 · now</small></span><button type="button" aria-label="More post options">···</button></div>}
+            {(channel === "Instagram" || channel === "Facebook") && <div className="social-preview-image"><img src="/cb3_hero.jpg" alt="Preview of the attached CB3 community image" />{primaryMedia.kind === "Video" && <span className="social-video-play"><Play size={20} fill="currentColor" /></span>}</div>}
+            {channel === "Blog" && <div className="social-preview-image blog-image"><img src="/cb3_hero.jpg" alt="Preview of the attached CB3 community image" /></div>}
+            {channel === "Newsletter" && <div className="newsletter-brand"><span>MANHATTAN COMMUNITY BOARD 3</span><strong>District Notes</strong><small>Community updates and ways to take part</small></div>}
+            <div className="social-preview-copy">
+              {(channel === "Blog" || channel === "Newsletter") && <strong className="social-preview-title">{selected.title}</strong>}
+              {(channel === "Instagram" || channel === "Facebook") && <strong className="social-preview-profile">{channel === "Instagram" ? "manhattancb3" : "Manhattan Community Board 3"}</strong>}
+              <textarea className="social-preview-editor" aria-label={`${channel} post text`} value={currentDraft} onChange={(event) => updateDraft(event.target.value)} />
+              {channel === "X" && <small>manhattancb3.gov · {selected.source}</small>}
+            </div>
+            {(channel === "Facebook" || channel === "Blog" || channel === "Newsletter") && <div className="social-preview-link"><span>{channel === "Facebook" ? "MANHATTANCB3" : "MANHATTANCB3.ORG"}</span><strong>{selected.title}</strong><small>{selected.source}</small></div>}
+            <div className="social-preview-actions"><span>{channel === "Instagram" ? "♡　◯　➤" : channel === "X" ? "◯　↻　♡" : "Like　·　Comment　·　Share"}</span><small>Sample platform preview</small></div>
+          </div>
+          <div className="outreach-compose-footer" hidden={!selectedChannels.length}>
+            <span>{currentDraft.length} characters</span>
+            <button className={posted[draftKey] ? "posted" : ""} type="button" onClick={() => setPosted((current) => ({ ...current, [draftKey]: true }))}>
+              {posted[draftKey] ? <><Check size={15} /> Posted</> : <><Send size={14} /> Post</>}
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+}
+
 function CalendarView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
   const monthLabel = "October 2026";
   const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -965,14 +1131,7 @@ export default function App() {
   }
 
   if (activeTab === "outreach") {
-    return (
-      <div className="portal">
-        <PortalHeader activeTab={activeTab} setActiveTab={setActiveTab} />
-        <div className="placeholder-panel">
-          <p>Section content coming soon.</p>
-        </div>
-      </div>
-    );
+    return <OutreachView setActiveTab={setActiveTab} />;
   }
 
   if (detailTicket) {
