@@ -9,17 +9,17 @@
 :root {
   font-family: 'Noto Sans', sans-serif;
   color: #11182c;
-  background: #f5f6f7;
+  background: #ffffff;
   font-synthesis: none;
 }
 
 * { box-sizing: border-box; }
-body { margin: 0; min-width: 320px; min-height: 100vh; }
+body { margin: 0; min-width: 320px; min-height: 100vh; background: #ffffff; }
 button, input, select { font: inherit; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(42, 183, 214, .28); outline-offset: 1px; }
 
-.portal { min-height: 100vh; display: flex; flex-direction: column; background: #f5f6f7; }
+.portal { min-height: 100vh; display: flex; flex-direction: column; background: #ffffff; }
 .portal-header {
   height: 108px;
   position: relative;
@@ -53,10 +53,13 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   height: 40px;
   display: grid;
   grid-template-columns: 42px repeat(4, 190px) minmax(240px, 1fr);
-  background: white;
+  background: #ffffff;
   border-bottom: 1px solid #818995;
   width: min(1040px, calc(100% - 40px));
   margin: 0 auto;
+  position: sticky;
+  top: 0;
+  z-index: 20;
 }
 .portal-nav > button {
   border: 0;
