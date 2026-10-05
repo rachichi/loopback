@@ -76,25 +76,25 @@ Most page components currently live in `src/App.tsx`; shared design and responsi
 
 ## Development
 
-Requirements: Node.js and npm. Install dependencies and start Vite:
+Requirements: Node.js 22.12 or later and pnpm 10. Install dependencies and start Vite:
 
 ```bash
-npm install
-npm run dev
+pnpm install --frozen-lockfile
+pnpm dev
 ```
 
 The Vite configuration binds to `0.0.0.0` and uses `PORT` when set; the default port is `8443`. Open the URL printed by Vite. If the port is already taken, choose another one:
 
 ```bash
-PORT=8444 npm run dev
+PORT=8444 pnpm dev
 ```
 
 Available scripts:
 
 ```bash
-npm run build    # Production build
-npm run preview  # Serve the production build locally
-npm run format   # Format files with oxfmt
+pnpm build    # Production build
+pnpm preview  # Serve the production build locally
+pnpm format   # Format files with oxfmt
 ```
 
 ## Current Prototype Boundaries
