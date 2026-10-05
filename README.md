@@ -16,6 +16,8 @@ The top navigation contains seven sections:
 | **Outreach** | Sample resolutions and community wins, their attachments, per-record channel toggles, and editable post previews for Instagram, Facebook, X, Blog, and Newsletter. |
 | **Forum** | Sample board-to-board questions and replies, with community resource links in a side rail. |
 
+Every section ends with a shared black footer containing the Loopback logo and a static Contact Us label.
+
 ### Common workflows
 
 **Find tickets:** Open Tickets, search by ticket number, title, type, or location, and optionally filter by status. Use List, Kanban board, or Roadmap to change the view. Select a row, card, roadmap event, or map pin to open the ticket detail page. Use Back to tickets to return to the ticket workspace. The List view's Map and Summary tabs switch the right-hand panel.

@@ -20,6 +20,27 @@ button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(42, 183, 214, .28); outline-offset: 1px; }
 
 .portal { min-height: 100vh; display: flex; flex-direction: column; background: #ffffff; }
+.portal-footer {
+  min-height: 116px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  background: #fff;
+  color: #111;
+}
+.portal-footer-inner {
+  width: min(1120px, calc(100% - 40px));
+  min-height: 116px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.portal-footer img { width: 64px; height: 64px; flex: 0 0 auto; display: block; object-fit: contain; }
+.portal-footer-contact { max-width: 580px; display: grid; justify-items: end; gap: 4px; text-align: right; }
+.portal-footer-contact p { margin: 0; color: #111; font-size: 12px; line-height: 1.5; }
+.portal-footer-contact strong { font-weight: 700; }
 .portal-header {
   height: 108px;
   position: relative;
@@ -69,14 +90,27 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .portal-nav {
   height: 40px;
   position: sticky;
+  isolation: isolate;
   display: grid;
   grid-template-columns: 42px repeat(6, minmax(0, 1fr)) minmax(180px, 1.3fr);
-  background: #ffffff;
+  background: transparent;
   border-bottom: 0;
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto;
   top: 0;
   z-index: 20;
+}
+.portal-nav::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  height: 100%;
+  transform: translateX(-50%);
+  background: #fff;
+  pointer-events: none;
 }
 .portal-nav::after {
   content: "";
@@ -125,12 +159,16 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 
 .home-view {
   width: 100%;
-  min-height: calc(100vh - 148px);
+  flex: 1;
+  min-height: 0;
+  display: flex;
   background: #dfe8f1;
 }
 .hero-banner {
   position: relative;
-  min-height: calc(100vh - 148px);
+  width: 100%;
+  flex: 1;
+  min-height: calc(100vh - 20px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -190,7 +228,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   align-content: center;
   align-items: stretch;
   gap: 32px 36px;
-  min-height: calc(100vh - 148px);
+  min-height: calc(100vh - 196px);
   padding: 32px 0 42px;
   margin: 0 auto;
 }
@@ -1194,7 +1232,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .outreach-records { min-height: 360px; border-right: 0; }
   .outreach-composer { min-height: 650px; border-top: 1px solid #cbd1d5; }
   .social-preview { flex: 0 0 auto; }
-  .hero-content { width: calc(100% - 40px); min-height: calc(100vh - 120px); grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 36px; }
+  .hero-content { width: calc(100% - 40px); min-height: calc(100vh - 168px); grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 36px; }
   .hero-primary { justify-content: flex-start; gap: 18px; }
   .hero-copy h1 { max-width: 680px; font-size: 48px; }
   .hero-actions { width: 100%; min-height: 225px; grid-template-rows: repeat(3, minmax(58px, 1fr)); margin: 0; }
@@ -1233,5 +1271,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .hero-search { height: 54px; }
   .hero-search input { padding: 0 14px; font-size: 16px; }
   .hero-search button { width: 64px; }
+  .portal-footer,.portal-footer-inner { min-height: 116px; }
+  .portal-footer-inner { width: calc(100% - 32px); gap: 16px; }
+  .portal-footer img { width: 48px; height: 48px; }
+  .portal-footer-contact { max-width: 260px; gap: 6px; }
+  .portal-footer-contact p { font-size: 10px; }
   .forum-view { padding: 19px 14px; }.forum-resources .resource-links { grid-template-columns: 1fr; }.forum-heading { align-items: flex-start; flex-direction: column; gap: 7px; }.forum-heading h2 { font-size: 21px; }.forum-compose { padding: 12px; grid-template-columns: 29px minmax(0, 1fr); gap: 8px; }.compose-avatar { width: 29px; height: 29px; font-size: 8px; }.forum-post { padding: 12px; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }.post-avatar { width: 28px; height: 28px; }.post-meta { gap: 4px; }.tag.forum-category { margin-left: 0; }.reply-form { margin-left: 0; }
 }

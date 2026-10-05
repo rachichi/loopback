@@ -206,6 +206,20 @@ function Logo() {
   );
 }
 
+function PortalFooter() {
+  return (
+    <footer className="portal-footer">
+      <div className="portal-footer-inner">
+        <img src={loopbackLogo} alt="Loopback" />
+        <div className="portal-footer-contact">
+          <p>The Loopback portal was launched in 2026 by community members<br />to empower the community boards that serve them.</p>
+          <p><strong><u>Contact us</u></strong> for questions, feedback, or feature requests.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
 function Tag({ children, className = "" }: { children: ReactNode; className?: string }) {
   return <span className={`tag ${className}`}>{children}</span>;
 }
@@ -257,8 +271,8 @@ const tabDetails: Partial<Record<TabName, { title: string; subtitle: string }>> 
   meetings: { title: "Meetings", subtitle: "Upload meeting assets to generate drafts for tickets, documents, and outreach posts." },
   tickets: { title: "Tickets", subtitle: "Check, edit, and update status of existing tickets" },
   calendar: { title: "Calendar", subtitle: "Keep track of upcoming proposed and confirmed events" },
-  templates: { title: "Templates", subtitle: "view the templates created by other community board members" },
-  outreach: { title: "Outreach", subtitle: "share your community board's wins with your community" },
+  templates: { title: "Templates", subtitle: "View document templates created by fellow community board members." },
+  outreach: { title: "Outreach", subtitle: "Share your community board's wins. You deserve it" },
   forum: { title: "Forum", subtitle: "Post questions and answers to fellow community board members." },
 };
 
@@ -673,6 +687,7 @@ function MeetingsView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }
           </div>
         </section>
       </main>
+      <PortalFooter />
     </div>
   );
 }
@@ -796,6 +811,7 @@ function OutreachView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }
           </div>
         </section>
       </main>
+      <PortalFooter />
     </div>
   );
 }
@@ -864,6 +880,7 @@ function CalendarView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }
           </div>
         </section>
       </main>
+      <PortalFooter />
     </div>
   );
 }
@@ -931,6 +948,7 @@ function TemplatesView({ setActiveTab }: { setActiveTab: (tab: TabName) => void 
           </div>
         </section>
       </main>
+      <PortalFooter />
     </div>
   );
 }
@@ -1069,6 +1087,7 @@ function ForumView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
           </div>
         </section>
       </main>
+      <PortalFooter />
     </div>
   );
 }
@@ -1110,6 +1129,7 @@ export default function App() {
       <div className="portal">
         <PortalHeader activeTab={activeTab} setActiveTab={setActiveTab} />
         <HomeView setActiveTab={setActiveTab} onSearch={searchTicketsFromHome} />
+        <PortalFooter />
       </div>
     );
   }
@@ -1139,6 +1159,7 @@ export default function App() {
       <div className="portal">
         <PortalHeader activeTab="tickets" setActiveTab={navigateToTab} />
         <TicketDetailView ticket={detailTicket} onBack={() => setDetailTicket(null)} onOpenTicket={openTicket} />
+        <PortalFooter />
       </div>
     );
   }
@@ -1170,6 +1191,7 @@ export default function App() {
           {sideTab === "map" ? <MapView selected={selected} onSelect={openTicket} /> : <SummaryView rows={rows} />}
         </aside>}
       </main>
+      <PortalFooter />
     </div>
   );
 }
