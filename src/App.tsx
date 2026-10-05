@@ -1,10 +1,11 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import loopbackLogo from "./assets/logo.png";
 import {
   BarChart3,
   Bell,
   CalendarDays,
   Check,
+  ChevronLeft,
   ChevronDown,
   ChevronRight,
   CircleHelp,
@@ -29,7 +30,6 @@ import {
   SlidersHorizontal,
   Upload,
   Users,
-  X,
 } from "lucide-react";
 
 type TicketType =
@@ -346,54 +346,71 @@ function TicketBoard({ rows, selected, onSelect }: { rows: Ticket[]; selected: T
   );
 }
 
-function TicketRoadmap({ rows, selected, onSelect }: { rows: Ticket[]; selected: Ticket; onSelect: (ticket: Ticket) => void }) {
-  const statuses: Status[] = ["To do", "In progress", "Complete"];
+function TicketRoadmap({ rows, selected, onSelect, onOpenCalendar }: { rows: Ticket[]; selected: Ticket; onSelect: (ticket: Ticket) => void; onOpenCalendar: () => void }) {
+  const [weekOffset, setWeekOffset] = useState(0);
+  const referenceDate = new Date(2026, 8, 30);
+  const referenceSunday = new Date(referenceDate);
+  referenceSunday.setDate(referenceDate.getDate() - referenceDate.getDay() + weekOffset * 7);
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(referenceSunday);
+    date.setDate(referenceSunday.getDate() + index);
+    return date;
+  });
+  const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const monthLabel = days[3].toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const ticketDay = (ticket: Ticket) => {
+    const [month, day] = ticket.created.split(" ");
+    const monthNumber = new Date(`${month} 1, 2026`).getMonth();
+    return new Date(2026, monthNumber, Number(day));
+  };
+  const ticketDayIndex = (ticket: Ticket) => days.findIndex((date) => date.toDateString() === ticketDay(ticket).toDateString());
 
   return (
-    <div className="ticket-roadmap">
-      {statuses.map((ticketStatus, index) => {
-        const statusRows = rows.filter((ticket) => ticket.status === ticketStatus);
-        return (
-          <section className="roadmap-stage" key={ticketStatus}>
-            <div className="roadmap-marker"><span>{index + 1}</span></div>
-            <div className="roadmap-stage-content">
-              <header><div><span className="roadmap-kicker">STAGE {index + 1}</span><h2>{ticketStatus}</h2></div><strong>{statusRows.length} tickets</strong></header>
-              {statusRows.map((ticket) => (
-                <button key={ticket.number} className={`roadmap-ticket ${selected.number === ticket.number ? "selected" : ""}`} onClick={() => onSelect(ticket)}>
-                  <span className="roadmap-ticket-meta">#{ticket.number} <span>{ticket.created}</span></span>
-                  <strong>{ticket.title}</strong>
-                  <span className="kanban-location"><MapPin size={12} />{ticket.location}</span>
-                  <ul>{ticket.nextSteps.map((step) => <li key={step}>{step}</li>)}</ul>
+    <section className="ticket-roadmap" aria-label="Ticket calendar roadmap">
+      <header className="roadmap-toolbar">
+        <h2>{monthLabel}</h2>
+        <div className="roadmap-calendar-actions">
+          <button className="roadmap-manage" onClick={onOpenCalendar}><CalendarDays size={13} /> Manage in Calendar</button>
+          <span className="roadmap-view-label">Week</span>
+          <button className="roadmap-arrow" aria-label="Previous week" onClick={() => setWeekOffset((offset) => offset - 1)}><ChevronLeft size={15} /></button>
+          <button className="roadmap-today" onClick={() => setWeekOffset(0)}>Today</button>
+          <button className="roadmap-arrow" aria-label="Next week" onClick={() => setWeekOffset((offset) => offset + 1)}><ChevronRight size={15} /></button>
+        </div>
+      </header>
+      <div className="roadmap-calendar-scroll">
+        <div className="roadmap-calendar-grid" style={{ "--roadmap-days": days.length } as CSSProperties}>
+          <div className="roadmap-calendar-header">
+            <div className="roadmap-corner">Tickets</div>
+            {days.map((date, index) => (
+              <div className="roadmap-day-heading" key={date.toISOString()}>
+                <span>{weekdays[index]}</span><strong>{date.getDate()}</strong>
+              </div>
+            ))}
+          </div>
+          {rows.map((ticket) => {
+            const dateIndex = ticketDayIndex(ticket);
+            return (
+              <div className="roadmap-calendar-row" key={ticket.number}>
+                <button className={`roadmap-row-label ${selected.number === ticket.number ? "selected" : ""}`} onClick={() => onSelect(ticket)}>
+                  <span className="roadmap-row-number">{ticket.number}</span>
+                  <span className="roadmap-row-copy"><strong>{ticket.title}</strong><small>{ticket.status} · {ticket.created}</small></span>
                 </button>
-              ))}
-              {!statusRows.length && <p className="roadmap-empty">No tickets at this stage.</p>}
-            </div>
-          </section>
-        );
-      })}
-    </div>
-  );
-}
-
-function TicketInspector({ ticket, onClose }: { ticket: Ticket; onClose: () => void }) {
-  return (
-    <section className="ticket-inspector">
-      <div className="inspector-heading">
-        <div><Tag className={`type ${typeClass[ticket.type]}`}>{ticket.type}</Tag><span>{ticket.number}</span><h2>{ticket.title}</h2></div>
-        <button onClick={onClose} aria-label="Close ticket details"><X size={17} /></button>
-      </div>
-      <div className="inspector-content">
-        <div className="owner-block">
-          <span className="owner-avatar">{ticket.owner.split(" ").map((part) => part[0]).join("")}</span>
-          <div><small>SUGGESTED OWNER</small><strong>{ticket.owner}</strong><p>{ticket.role}</p></div>
-        </div>
-        <div className="steps-block">
-          <small>SUGGESTED NEXT STEPS</small>
-          <ul>{ticket.nextSteps.map((step) => <li key={step}><span><Check size={10} /></span>{step}</li>)}</ul>
-        </div>
-        <div className="record-actions">
-          <button className="primary-action">Open ticket <ChevronRight size={14} /></button>
-          <button><Mail size={14} /> Contact owner</button>
+                {days.map((date, index) => <div className={`roadmap-day-cell ${index % 2 ? "alternate" : ""}`} key={`${ticket.number}-${date.toISOString()}`} />)}
+                {dateIndex >= 0 && (
+                  <button
+                    className={`roadmap-event ${ticket.status.toLowerCase().replace(" ", "-")} ${selected.number === ticket.number ? "selected" : ""}`}
+                    style={{ "--event-day": dateIndex } as CSSProperties}
+                    onClick={() => onSelect(ticket)}
+                    title={`${ticket.title} · Created ${ticket.created}`}
+                  >
+                    <span>{ticket.title}</span>
+                    <Tag className={`status ${ticket.status.toLowerCase().replace(" ", "-")}`}>{ticket.status}</Tag>
+                  </button>
+                )}
+              </div>
+            );
+          })}
+          {!rows.length && <div className="roadmap-no-results">No tickets match the current filters.</div>}
         </div>
       </div>
     </section>
@@ -441,6 +458,73 @@ function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: 
   );
 }
 
+function TicketDetailView({ ticket, onBack, onOpenTicket }: { ticket: Ticket; onBack: () => void; onOpenTicket: (ticket: Ticket) => void }) {
+  const milestones = [
+    { title: "Ticket received", date: ticket.created, state: "complete" },
+    { title: "Current status", date: ticket.status, state: ticket.status === "Complete" ? "complete" : "current" },
+  ];
+
+  return (
+    <main className="ticket-detail-page">
+      <button className="ticket-back-button" onClick={onBack}><ChevronLeft size={16} /> Back to tickets</button>
+      <div className="ticket-detail-layout">
+        <div className="ticket-detail-main">
+          <header className="ticket-detail-heading">
+            <div className="ticket-detail-heading-meta"><span>Ticket {ticket.number}</span><Tag className={`status ${ticket.status.toLowerCase().replace(" ", "-")}`}><i />{ticket.status}</Tag></div>
+            <h1>{ticket.title}</h1>
+          </header>
+
+          <section className="ticket-detail-owner">
+            <span className="ticket-detail-avatar">{ticket.owner.split(" ").map((part) => part[0]).join("").toUpperCase()}</span>
+            <div><strong>Assigned team</strong><span>{ticket.owner}</span><small>{ticket.role}</small></div>
+            <Tag className={`type ${typeClass[ticket.type]}`}>{ticket.type}</Tag>
+          </section>
+
+          <section className="ticket-detail-brief">
+            <h2>Ticket brief</h2>
+            <p>Recorded from {ticket.source.toLowerCase()} as {ticket.type.toLowerCase()}. The reported location is <strong>{ticket.location}</strong>. Supporting documentation: {ticket.document}.</p>
+          </section>
+
+          <section className="ticket-detail-document">
+            <h2>Supporting documentation</h2>
+            <div><Paperclip size={16} /><span><strong>{ticket.document}</strong><small>Source: {ticket.source}</small></span></div>
+          </section>
+
+          <div className="ticket-detail-columns">
+            <section className="ticket-detail-actions">
+              <h2>Recommended actions</h2>
+              <ul>{ticket.nextSteps.map((step) => <li key={step}><span><Check size={12} /></span>{step}</li>)}</ul>
+            </section>
+            <section className="ticket-detail-milestones">
+              <h2>Milestones</h2>
+              <ol>{milestones.map((milestone) => (
+                <li className={milestone.state} key={milestone.title}>
+                  <span className="milestone-icon">{milestone.state === "complete" ? <Check size={12} /> : <span />}</span>
+                  <div><strong>{milestone.title}</strong><small>{milestone.date}</small></div>
+                </li>
+              ))}</ol>
+            </section>
+          </div>
+        </div>
+
+        <aside className="ticket-detail-aside">
+          <div className="ticket-detail-map"><MapView selected={ticket} onSelect={onOpenTicket} /></div>
+          <section className="ticket-detail-facts">
+            <h2>Location & record</h2>
+            <dl>
+              <div><dt>Borough</dt><dd>Manhattan</dd></div>
+              <div><dt>Community district</dt><dd>3</dd></div>
+              <div><dt>Address</dt><dd>{ticket.location}</dd></div>
+              <div><dt>Created</dt><dd>{ticket.created}, 2026</dd></div>
+              <div><dt>Source</dt><dd>{ticket.source}</dd></div>
+            </dl>
+          </section>
+        </aside>
+      </div>
+    </main>
+  );
+}
+
 function SummaryView({ rows }: { rows: Ticket[] }) {
   const statuses = (["To do", "In progress", "Complete"] as Status[]).map((status) => ({
     status,
@@ -480,7 +564,8 @@ function SummaryView({ rows }: { rows: Ticket[] }) {
   );
 }
 
-function HomeView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
+function HomeView({ setActiveTab, onSearch }: { setActiveTab: (tab: TabName) => void; onSearch: (query: string) => void }) {
+  const [searchTerm, setSearchTerm] = useState("");
   const actions: Array<{ label: string; icon: typeof Upload; tab: TabName }> = [
     { label: "Upload Meeting Assets", icon: Upload, tab: "meetings" },
     { label: "Look Up Tickets", icon: Search, tab: "tickets" },
@@ -491,10 +576,15 @@ function HomeView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
     <main className="home-view">
       <div className="hero-banner" aria-label="Home page banner">
         <div className="hero-content">
-          <div className="hero-copy">
-            <h1>What would you like to do?</h1>
+          <div className="hero-primary">
+            <div className="hero-copy">
+              <h1>hey cb3 👋,<br />how can we<br />help you?</h1>
+            </div>
+            <form className="hero-search" role="search" onSubmit={(event) => { event.preventDefault(); onSearch(searchTerm.trim()); }}>
+              <input aria-label="Search tickets" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="I want to..." />
+              <button aria-label="Search" type="submit"><Search size={24} strokeWidth={3} /></button>
+            </form>
           </div>
-
           <div className="hero-actions">
             {actions.map(({ label, icon: Icon, tab }, index) => (
               <button key={label} className={index === 0 ? "primary" : ""} onClick={() => setActiveTab(tab)}>
@@ -819,10 +909,10 @@ function ForumView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
 
 export default function App() {
   const [selected, setSelected] = useState(tickets[0]);
+  const [detailTicket, setDetailTicket] = useState<Ticket | null>(null);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | Status>("All");
   const [sideTab, setSideTab] = useState<"map" | "summary">("map");
-  const [showInspector, setShowInspector] = useState(true);
   const [ticketView, setTicketView] = useState<TicketView>("list");
   const [activeTab, setActiveTab] = useState<TabName>("home");
 
@@ -833,16 +923,27 @@ export default function App() {
     return matchesStatus && matchesQuery;
   }), [query, status]);
 
-  const selectTicket = (ticket: Ticket) => {
+  const openTicket = (ticket: Ticket) => {
     setSelected(ticket);
-    setShowInspector(true);
+    setDetailTicket(ticket);
+  };
+
+  const navigateToTab = (tab: TabName) => {
+    setDetailTicket(null);
+    setActiveTab(tab);
+  };
+
+  const searchTicketsFromHome = (value: string) => {
+    setQuery(value);
+    setStatus("All");
+    setActiveTab("tickets");
   };
 
   if (activeTab === "home") {
     return (
       <div className="portal">
         <PortalHeader activeTab={activeTab} setActiveTab={setActiveTab} />
-        <HomeView setActiveTab={setActiveTab} />
+        <HomeView setActiveTab={setActiveTab} onSearch={searchTicketsFromHome} />
       </div>
     );
   }
@@ -874,10 +975,19 @@ export default function App() {
     );
   }
 
+  if (detailTicket) {
+    return (
+      <div className="portal">
+        <PortalHeader activeTab="tickets" setActiveTab={navigateToTab} />
+        <TicketDetailView ticket={detailTicket} onBack={() => setDetailTicket(null)} onOpenTicket={openTicket} />
+      </div>
+    );
+  }
+
   return (
     <div className="portal">
       <PortalHeader activeTab={activeTab} setActiveTab={setActiveTab} />
-      <main className="workspace">
+      <main className={ticketView === "list" ? "workspace" : "workspace ticket-full-view"}>
         <section className="records-pane">
           <Toolbar query={query} setQuery={setQuery} status={status} setStatus={setStatus} />
           <div className="ticket-subnav" role="tablist" aria-label="Ticket views">
@@ -889,18 +999,17 @@ export default function App() {
             <strong>{rows.length} tickets</strong>
             <button className="ticket-add"><Plus size={14} /> Add ticket</button>
           </div>
-          {ticketView === "list" && <TicketTable rows={rows} selected={selected} onSelect={selectTicket} />}
-          {ticketView === "kanban" && <TicketBoard rows={rows} selected={selected} onSelect={selectTicket} />}
-          {ticketView === "roadmap" && <TicketRoadmap rows={rows} selected={selected} onSelect={selectTicket} />}
-          {showInspector && <TicketInspector ticket={selected} onClose={() => setShowInspector(false)} />}
+          {ticketView === "list" && <TicketTable rows={rows} selected={selected} onSelect={openTicket} />}
+          {ticketView === "kanban" && <TicketBoard rows={rows} selected={selected} onSelect={openTicket} />}
+          {ticketView === "roadmap" && <TicketRoadmap rows={rows} selected={selected} onSelect={openTicket} onOpenCalendar={() => setActiveTab("calendar")} />}
         </section>
-        <aside className="insights-pane">
+        {ticketView === "list" && <aside className="insights-pane">
           <div className="insights-tabs">
             <button className={sideTab === "map" ? "active" : ""} onClick={() => setSideTab("map")}><Map size={15} /> Map</button>
             <button className={sideTab === "summary" ? "active" : ""} onClick={() => setSideTab("summary")}><BarChart3 size={15} /> Summary</button>
           </div>
-          {sideTab === "map" ? <MapView selected={selected} onSelect={selectTicket} /> : <SummaryView rows={rows} />}
-        </aside>
+          {sideTab === "map" ? <MapView selected={selected} onSelect={openTicket} /> : <SummaryView rows={rows} />}
+        </aside>}
       </main>
     </div>
   );

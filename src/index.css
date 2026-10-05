@@ -173,36 +173,47 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 }
 .hero-content {
   width: min(1200px, calc(100% - 64px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  align-content: center;
+  align-items: stretch;
+  gap: 32px 36px;
+  min-height: calc(100vh - 148px);
+  padding: 32px 0 42px;
+  margin: 0 auto;
+}
+.hero-primary {
+  min-width: 0;
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 36px;
-  padding-top: 40px;
-  margin-top: -30px;
+  gap: 20px;
 }
 .hero-copy {
-  flex: 1;
+  min-width: 0;
 }
 .hero-copy h1 {
   margin: 0;
-  max-width: 520px;
+  max-width: 760px;
   font-family: 'Clash Grotesk', 'Noto Sans', sans-serif;
-  font-size: clamp(4.2rem, 6vw, 8.2rem);
-  line-height: 0.9;
-  letter-spacing: -0.06em;
+  font-size: 60px;
+  line-height: 1.02;
+  letter-spacing: 0;
   font-weight: 800;
   color: rgba(255,255,255,0.97);
   text-transform: uppercase;
 }
 .hero-actions {
   width: min(420px, 100%);
-  display: flex;
-  flex-direction: column;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
   gap: 14px;
-  margin-top: 80px;
+  margin: 0;
 }
 .hero-actions button {
   width: 100%;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -217,6 +228,40 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   box-shadow: 0 5px 16px rgba(17,24,44,0.16);
 }
 .hero-actions button.primary { background: #25BDE3; }
+.hero-search {
+  width: 100%;
+  height: 58px;
+  display: flex;
+  overflow: hidden;
+  border: 3px solid #111;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(17,24,44,.18);
+}
+.hero-search input {
+  min-width: 0;
+  flex: 1;
+  padding: 0 26px;
+  border: 0;
+  outline: 0;
+  background: #fff;
+  color: #111;
+  font-size: 18px;
+  font-weight: 600;
+}
+.hero-search input::placeholder { color: #969696; opacity: 1; }
+.hero-search button {
+  width: 86px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-left: 3px solid #111;
+  background: #111;
+  color: #fff;
+  cursor: pointer;
+}
+.hero-search button:hover { background: #2b3034; }
 .upload-view,
 .resources-view,
 .templates-view {
@@ -394,7 +439,6 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   background: rgba(255,255,255,0.9);
   box-shadow: 0 18px 40px rgba(17,24,44,0.05);
 }
-.templates-header-row,
 .recent-documents-header {
   display: flex;
   align-items: center;
@@ -788,7 +832,57 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   border-top: 1px solid #818995;
   overflow: hidden;
 }
+.workspace.ticket-full-view { grid-template-columns: minmax(0, 1fr); }
+.ticket-full-view .records-pane { border-right: 0; }
 .records-pane { min-width: 0; position: relative; display: flex; flex-direction: column; border-right: 1px solid #aeb4bc; background: white; overflow: hidden; }
+.ticket-detail-page { min-height: calc(100vh - 264px); flex: 1; padding: 22px max(28px, calc((100vw - 1240px) / 2)); overflow: auto; background: #f7f8f9; }
+.ticket-back-button { height: 32px; margin-bottom: 18px; padding: 0 9px; display: inline-flex; align-items: center; gap: 5px; border: 1px solid #d8dde1; border-radius: 4px; background: white; color: #41515b; font-size: 11px; font-weight: 600; cursor: pointer; }
+.ticket-back-button:hover { background: #f1f7f8; }
+.ticket-detail-layout { max-width: 1240px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, .85fr); align-items: start; gap: 38px; }
+.ticket-detail-main { min-width: 0; }
+.ticket-detail-heading { padding: 0 0 20px; border-bottom: 1px solid #d8dde1; }
+.ticket-detail-heading-meta { display: flex; align-items: center; gap: 9px; color: #77828a; font-size: 10px; font-weight: 600; }
+.ticket-detail-heading h1 { max-width: 760px; margin: 10px 0 0; color: #17252d; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 32px; line-height: 1.16; font-weight: 700; }
+.ticket-detail-owner { min-height: 72px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #d8dde1; }
+.ticket-detail-avatar { width: 38px; height: 38px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: #e4f3f6; color: #23798d; font-size: 10px; font-weight: 700; }
+.ticket-detail-owner > div { min-width: 0; display: grid; gap: 3px; }
+.ticket-detail-owner > div strong { color: #293940; font-size: 12px; }
+.ticket-detail-owner > div span { color: #384851; font-size: 12px; }
+.ticket-detail-owner > div small { color: #7b878d; font-size: 10px; }
+.ticket-detail-owner > .tag { margin-left: auto; }
+.ticket-detail-brief,.ticket-detail-document { padding: 18px 0; border-bottom: 1px solid #d8dde1; }
+.ticket-detail-brief h2,.ticket-detail-document h2,.ticket-detail-columns h2,.ticket-detail-facts h2 { margin: 0 0 10px; color: #202f37; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 20px; }
+.ticket-detail-brief p { max-width: 760px; margin: 0; color: #43535b; font-size: 13px; line-height: 1.7; }
+.ticket-detail-brief p strong { color: #1c596a; }
+.ticket-detail-document > div { min-height: 48px; display: flex; align-items: center; gap: 10px; color: #347d8d; }
+.ticket-detail-document > div > span { display: grid; gap: 3px; }
+.ticket-detail-document > div strong { color: #31515c; font-size: 11px; }
+.ticket-detail-document > div small { color: #7d888e; font-size: 9px; }
+.ticket-detail-columns { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px; padding: 20px 0; }
+.ticket-detail-columns h2 { margin-bottom: 14px; font-size: 22px; }
+.ticket-detail-actions ul,.ticket-detail-milestones ol { margin: 0; padding: 0; list-style: none; }
+.ticket-detail-actions ul { display: grid; gap: 11px; }
+.ticket-detail-actions li { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 8px; color: #45545b; font-size: 11px; line-height: 1.5; }
+.ticket-detail-actions li > span { width: 19px; height: 19px; display: grid; place-items: center; border: 1px solid #b8c7cb; border-radius: 50%; color: #20859a; }
+.ticket-detail-milestones ol { position: relative; display: grid; gap: 0; }
+.ticket-detail-milestones ol::before { content: ""; position: absolute; left: 12px; top: 25px; bottom: 25px; width: 2px; background: #d8e0e2; }
+.ticket-detail-milestones li { position: relative; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; padding: 0 0 19px; }
+.milestone-icon { z-index: 1; width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: #278b3e; color: white; }
+.ticket-detail-milestones li.current .milestone-icon { background: #f1be24; color: #fff; }
+.ticket-detail-milestones li.current .milestone-icon > span { width: 7px; height: 7px; border-radius: 50%; background: white; }
+.ticket-detail-milestones li > div { display: grid; align-content: center; gap: 4px; min-height: 25px; }
+.ticket-detail-milestones li strong { color: #293940; font-size: 12px; }
+.ticket-detail-milestones li small { color: #7d888e; font-size: 10px; }
+.ticket-detail-aside { min-width: 0; }
+.ticket-detail-map { height: 360px; overflow: hidden; border: 1px solid #d4dade; background: #edf1ed; }
+.ticket-detail-map .map-view { width: 100%; height: 100%; }
+.ticket-detail-map .map-canvas { min-height: 0; }
+.ticket-detail-facts { margin-top: 18px; padding-top: 16px; border-top: 1px solid #d8dde1; }
+.ticket-detail-facts h2 { margin-bottom: 12px; font-size: 18px; }
+.ticket-detail-facts dl { margin: 0; display: grid; gap: 0; }
+.ticket-detail-facts dl > div { min-height: 35px; display: grid; grid-template-columns: 145px minmax(0, 1fr); align-items: center; gap: 10px; border-bottom: 1px solid #e4e7e9; }
+.ticket-detail-facts dt { color: #77828a; font-size: 10px; font-weight: 600; }
+.ticket-detail-facts dd { margin: 0; color: #33444d; font-size: 11px; }
 .table-toolbar { min-height: 48px; padding: 0 10px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d9dde2; background: #fafbfc; }
 .view-name { height: 34px; padding: 0 9px; display: flex; align-items: center; gap: 6px; border: 0; border-radius: 5px; background: white; box-shadow: 0 1px 3px rgba(17,24,44,.1); font-size: 11px; cursor: pointer; }
 .view-name svg:first-child { color: #2bb7d5; }
@@ -825,20 +919,40 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .kanban-location { display: flex; align-items: center; gap: 4px; color: #77838a; font-size: 9px; }
 .kanban-owner { padding-top: 7px; border-top: 1px solid #edf0f1; color: #617078; font-size: 9px; }
 .kanban-empty,.roadmap-empty { margin: 0; padding: 14px 9px; color: #8a949a; font-size: 9px; }
-.ticket-roadmap { min-height: 0; flex: 1; padding: 16px 18px 24px; overflow: auto; background: #f7f8f8; }
-.roadmap-stage { position: relative; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 13px; padding-bottom: 21px; }
-.roadmap-stage:not(:last-child)::before { content: ""; position: absolute; left: 14px; top: 28px; bottom: 0; width: 2px; background: #d7e0e3; }
-.roadmap-marker { z-index: 1; width: 30px; height: 30px; display: grid; place-items: center; border: 1px solid #c8d7db; border-radius: 50%; background: white; color: #287b8b; font-size: 10px; font-weight: 700; }
-.roadmap-stage-content { min-width: 0; }
-.roadmap-stage-content > header { min-height: 32px; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
-.roadmap-stage-content > header h2 { margin: 1px 0 0; color: #263941; font-size: 13px; }
-.roadmap-stage-content > header > strong { color: #7d888e; font-size: 9px; font-weight: 500; }
-.roadmap-kicker { color: #859198; font-size: 7px; font-weight: 700; letter-spacing: .6px; }
-.roadmap-ticket { width: 100%; margin-bottom: 7px; padding: 10px 12px; display: grid; gap: 5px; border: 1px solid #dce1e4; border-radius: 5px; background: white; color: #263941; text-align: left; cursor: pointer; }
-.roadmap-ticket-meta { display: flex; gap: 9px; color: #25889d; font-size: 8px; font-weight: 700; }
-.roadmap-ticket-meta span { color: #8c969b; font-weight: 400; }
-.roadmap-ticket > strong { font-size: 10px; }
-.roadmap-ticket ul { margin: 2px 0 0; padding-left: 16px; display: flex; flex-wrap: wrap; gap: 3px 20px; color: #67757c; font-size: 8px; }
+.ticket-roadmap { min-height: 0; flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+.roadmap-toolbar { min-height: 46px; padding: 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid #d9dde2; background: #fff; }
+.roadmap-toolbar h2 { margin: 0; color: #293640; font-size: 13px; font-weight: 700; white-space: nowrap; }
+.roadmap-calendar-actions { display: flex; align-items: center; gap: 6px; }
+.roadmap-calendar-actions button { height: 28px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid #d9dde2; border-radius: 4px; background: white; color: #47545d; font-size: 9px; cursor: pointer; }
+.roadmap-manage { padding: 0 8px; gap: 5px; }
+.roadmap-view-label { padding: 0 8px; color: #78848b; font-size: 9px; }
+.roadmap-calendar-actions .roadmap-arrow { width: 28px; padding: 0; }
+.roadmap-calendar-actions .roadmap-today { padding: 0 9px; font-weight: 600; }
+.roadmap-calendar-scroll { min-height: 0; flex: 1; overflow: auto; }
+.roadmap-calendar-grid { --roadmap-days: 7; min-width: 890px; position: relative; background: #fff; }
+.roadmap-calendar-header,.roadmap-calendar-row { width: 100%; min-width: 890px; display: grid; grid-template-columns: 230px repeat(var(--roadmap-days), minmax(94px, 1fr)); }
+.roadmap-calendar-header { position: sticky; top: 0; z-index: 5; }
+.roadmap-calendar-row { height: 56px; position: relative; }
+.roadmap-corner,.roadmap-day-heading { height: 48px; display: flex; align-items: center; border-bottom: 1px solid #cfd5d9; background: #f8f9fa; color: #65717a; }
+.roadmap-corner { position: sticky; left: 0; z-index: 7; padding: 0 13px; border-right: 1px solid #d9dde2; font-size: 9px; font-weight: 700; }
+.roadmap-day-heading { justify-content: center; gap: 6px; border-right: 1px solid #e2e6e8; font-size: 9px; }
+.roadmap-day-heading strong { color: #283943; font-size: 12px; }
+.roadmap-row-label { position: sticky; left: 0; z-index: 3; min-width: 0; padding: 0 10px; display: flex; align-items: center; gap: 9px; border: 0; border-right: 1px solid #d9dde2; border-bottom: 1px solid #e5e8ea; background: #fff; color: #273740; text-align: left; cursor: pointer; }
+.roadmap-row-label:hover,.roadmap-row-label.selected { background: #f1fafb; }
+.roadmap-row-number { width: 25px; height: 25px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: #edf2f3; color: #42717b; font-size: 8px; font-weight: 700; }
+.roadmap-row-copy { min-width: 0; display: grid; gap: 4px; }
+.roadmap-row-copy strong { overflow: hidden; color: #283740; font-size: 9px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.roadmap-row-copy small { color: #879198; font-size: 8px; }
+.roadmap-day-cell { z-index: 0; border-right: 1px solid #e6e9eb; border-bottom: 1px solid #e5e8ea; background: #fff; }
+.roadmap-day-cell.alternate { background: #fafbfb; }
+.roadmap-event { position: absolute; z-index: 2; left: calc(230px + (100% - 230px) / var(--roadmap-days) * var(--event-day) + 4px); top: 50%; width: max-content; max-width: 320px; height: 28px; padding: 0 7px; display: flex; align-items: center; gap: 7px; overflow: hidden; transform: translateY(-50%); border: 1px solid transparent; border-radius: 5px; color: #24343d; text-align: left; white-space: nowrap; cursor: pointer; }
+.roadmap-event > span:first-child { overflow: hidden; font-size: 8px; font-weight: 600; text-overflow: ellipsis; }
+.roadmap-event.in-progress { border-color: #bddbe4; background: #e3f1f5; }
+.roadmap-event.to-do { border-color: #e7d7a8; background: #f6efd9; }
+.roadmap-event.complete { border-color: #bcdcc7; background: #e4f1e8; }
+.roadmap-event.selected { outline: 2px solid #52abc0; outline-offset: 1px; }
+.roadmap-event .tag.status { padding: 2px 4px; font-size: 7px; }
+.roadmap-no-results { grid-column: 1 / -1; padding: 24px; color: #78848b; font-size: 11px; text-align: center; }
 .table-scroll { min-height: 0; flex: 1; overflow: auto; }
 .ticket-grid { min-width: 960px; display: grid; grid-template-columns: 34px 92px minmax(210px,1.35fr) 112px 105px 82px minmax(145px,1fr); align-items: stretch; }
 .ticket-grid > div { padding: 8px 9px; display: flex; align-items: center; border-right: 1px solid #e2e5e8; overflow: hidden; }
@@ -951,6 +1065,15 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .forum-view { grid-template-columns: 1fr; gap: 22px; padding: 24px 22px; }
   .forum-resources .resource-links { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 18px; }
   .forum-main { max-width: none; }
+  .ticket-detail-page { min-height: calc(100vh - 244px); padding: 20px 22px; }
+  .ticket-detail-layout { grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  .ticket-detail-aside { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(240px, .9fr); align-items: start; gap: 20px; }
+  .ticket-detail-map { height: 300px; }
+  .ticket-detail-facts { margin-top: 0; }
+  .hero-content { width: calc(100% - 40px); min-height: calc(100vh - 120px); grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 36px; }
+  .hero-primary { justify-content: flex-start; gap: 18px; }
+  .hero-copy h1 { max-width: 680px; font-size: 48px; }
+  .hero-actions { width: 100%; min-height: 225px; grid-template-rows: repeat(3, minmax(58px, 1fr)); margin: 0; }
 }
 
 @media (max-width: 560px) {
@@ -960,5 +1083,21 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
   .metric-row { grid-template-columns: 1fr; }.summary-view { padding: 12px; }
   .ticket-subnav { padding: 0 6px; }.ticket-subnav > button:not(.ticket-add) { padding: 0 7px; font-size: 9px; }.ticket-subnav > strong { font-size: 8px; }.ticket-subnav > .ticket-add { margin-left: 4px; padding: 0 5px; font-size: 8px; }
   .kanban-board { grid-template-columns: repeat(3, minmax(210px, 1fr)); padding: 10px; }
+  .ticket-detail-page { padding: 16px 14px; }
+  .ticket-detail-heading h1 { font-size: 25px; }
+  .ticket-detail-owner { gap: 8px; }
+  .ticket-detail-owner > .tag { font-size: 8px; }
+  .ticket-detail-columns { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+  .ticket-detail-aside { grid-template-columns: minmax(0, 1fr); }
+  .ticket-detail-map { height: 260px; }
+  .ticket-detail-facts dl > div { grid-template-columns: 120px minmax(0, 1fr); }
+  .hero-content { width: calc(100% - 32px); gap: 22px; padding: 24px 0 30px; }
+  .hero-primary { gap: 14px; }
+  .hero-copy h1 { font-size: 36px; line-height: 1.05; }
+  .hero-actions { min-height: 210px; gap: 10px; }
+  .hero-actions button { padding: 13px 16px; font-size: 15px; }
+  .hero-search { height: 54px; }
+  .hero-search input { padding: 0 14px; font-size: 16px; }
+  .hero-search button { width: 64px; }
   .forum-view { padding: 19px 14px; }.forum-resources .resource-links { grid-template-columns: 1fr; }.forum-heading { align-items: flex-start; flex-direction: column; gap: 7px; }.forum-heading h2 { font-size: 21px; }.forum-compose { padding: 12px; grid-template-columns: 29px minmax(0, 1fr); gap: 8px; }.compose-avatar { width: 29px; height: 29px; font-size: 8px; }.forum-post { padding: 12px; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; }.post-avatar { width: 28px; height: 28px; }.post-meta { gap: 4px; }.tag.forum-category { margin-left: 0; }.reply-form { margin-left: 0; }
 }
