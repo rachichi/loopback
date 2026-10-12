@@ -1,0 +1,895 @@
+﻿para_id,text,annotator_tickets,gold_tickets,A_cited,B_cited,para_agree,Gold Tickets
+P1,Okay.,,,0,0,,
+P2,"before we officially begin the meeting, I just wanted to acknowledge anyone.",,,0,0,,
+P3,"That's from the public, that's here.",,,0,0,,
+P4,"If you choose or need to speak or want to speak, you'll have to sign in on a sign in form up front.",,,0,0,,
+P5,"as the meeting once we pass public session or public speaking, We do not take questions from the public.",,,0,0,,
+P6,It'll only be board members that are able to ask questions to either public officials or anyone else that is speaking.,,,0,0,,
+P7,"So, I just wanted to give everyone the opportunity.",,,0,0,,
+P8,"If you are from the public or the community, and you have a item or concern that you want to address the community board, This is the time to fill out a public speaking form.",,,0,0,,
+P9,"So, when it's the time for public speaking, you're able to voice your opinion, and we should be starting in a couple of a minute or two.",,,0,0,,
+P10,"Okay, good evening and welcome to community board 3 full board.",,,0,0,,
+P11,Meeting.,,,0,0,,
+P12,I want to welcome everyone here as we once again.,,,0,0,,
+P13,"As we begin, the meeting.",,,0,0,,
+P14,"It is first public speaking. So, all those that are from the community that would like to address the community board and or have a matter they want to speak on.",,,0,0,,
+P15,"Hopefully, everyone is already signed in because we're going to begin. Joshua Walk, WK, you have two minutes.","T1 - Claude Sonnet 5.5,T1 - Claude Opus 5.5",,2,2,,G1
+P16,Good evening.,,,0,0,,
+P17,"I'm, Joshua, Wul and I ride the El train every day.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P18,"And every day during rush hour, That train is packed to the brim, shoulder-to-shoulder with people who just want to get home.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P19,"But. Then the train rolls to a stop at Third Avenue. And. If you ride the L, you know where I'm going with this. Barely anyone gets on or off. And. It got me thinking, like, okay, how many?","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P20,How much time does this stop?,"T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P21,"Actually cost? Us? I'm a software engineer. I've worked with the MTA's data. Before. So, I created a simulation based on 700 million real trips from the MTA. And I simulated, the closure of each and every stop in New York City.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P22,"Closing most stops would definitely cost New Yorkers a lot of time, but Third Avenue LTOP has an interesting property.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P23,"Where closing, it would actually save New Yorkers a significant amount of time, and it's not even close.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P24,"So, um, Here's why.","T1 - Claude Sonnet 5.5,T1 - Claude Opus 5.5",,2,2,,G1
+P25,"Basically, at the third, a stop, only 5% of people are actually getting on or off.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P26,"The rest of people, uh, The rest of the people are just waiting.","T1 - Claude Sonnet 5.5,T1 - Claude Opus 5.5",,2,2,,G1
+P27,"And. The crazy thing is that the third, a stop is not a transfer station, it is not wheelchair accessible.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P28,"Unlike its neighbors, the Union Square and First Avenue stops. And, you know getting rid of. It would only add, on average 2 minutes in walking time to current third, a riders. Now, um, If we even like make that if we even count walking as twice as costly as, um riding time, we still save New Yorkers 1,800 hours every single day by closing the third, a stop.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P29,"Put, another way, that's 195,000 trips, faster every single day, So, I guess. My two requests are just one to put this up to the transportation committee and two, perhaps pilot cutting the third a stop with the MTA.","T1 - Claude Sonnet 5.5,T1 - GPT-5.6 Luna,T1 - Claude Opus 5.5",,3,3,,G1
+P30,Thank.,,,0,0,,
+P31,You very much. Full reports on stop the stop.com. Thank you.,"T1 - Claude Sonnet 5.5,T1 - Claude Opus 5.5",,2,2,,G1
+P32,"Can I have Janine Masbar? I messed up. Mesa, H, Sorry, Okay, Yeah.",T2 - Claude Sonnet 5.5,,1,1,,
+P33,How about so Chris Messb live on U 11th Street and Avenue A. Go ahead.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P34,"Sorry, Oh, sure, Okay.",,,0,0,,
+P35,"I apologize to interrupt. We have State Assembly, Keith, Powers, here, Good, evening, I'm, sorry to take your time, but I might actually touch upon your topic if I think I know what you're talking about.",T2 - Claude Opus 5.5,,1,1,,G2
+P36,I'm State Assembly Member Keith Powers representing the 74th Assembly District.,,,0,0,,
+P37,"Thank, you always for having us and accommodating us, because, as you well, let me take a step.",,,0,0,,
+P38,"Back. As you might know, I was a City Council member for eight years representing the community north of 14th Street, the fourth council district.",,,0,0,,
+P39,"In February, I took over for our now council member Harvey Epstein and got thrown right into session.",,,0,0,,
+P40,"So, I was not able to be with you guys earlier in the year, but so happy to be here.",,,0,0,,
+P41,"Now. I mostly wanted to come by, and just say hello and always to offer our office.",,,0,0,,
+P42,"Joanna from my office is here as well, who you know from any issue, large or small, in the neighborhood, legislative, otherwise.",,,0,0,,
+P43,We had a successful legislative session last year.,,,0,0,,
+P44,"One of the bills we were fighting for is actually to expand housing, artist, housing in places like the East Village to allow for artists who I think are a big fabric of our community here in Manhattan and beyond, to continue to have an opportunity to stay.",,,0,0,,
+P45,Here.,,,0,0,,
+P46,"We also fought very hard for some of our small businesses to get legislation passed, to make it easier for them to operate. fighting for more gun control and gun safety, with some legislation that we introduced and much more. I won't bore you with all the details. I wanted to touch on a few topics. One is I just wanted to talk about 11th Street, which has come up. I don't know what you're talking about, but the continuous concerns we hear from neighbors and landlords, and businesses about that. Corridor. I just want to give Susan Cestor a shout out because she has been on top of this issue deeply.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P47,"With the ninth precinct, there is going to be continued, You know, renewed enforcement out there on all the. If you don't know, what's going on there, it's just been completely taken over that block by delivery workers who are using that block as basically a hub. We use those delivery.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P48,"Workers. We understand we have to make sure they have safe. Conditions. we've been trying to work with many of the groups representing them, but also it's very untenable.","T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,2,2,,G2
+P49,"If you I don't know, if that's what you came here for, but if you live there, it is completely untenable.","T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,2,2,,G2
+P50,"Situation. we did hear from the 9th precinct that they are going to be out. There, I think starting next week, doing renewed enforcement, confiscation of bikes, um, and other if you are illegally fixing to a city, property or anything like that, and we have been in communication with them, the ninth priest and others, while also increasing services like sanitation to that block to get more regular cleanups, because it is not fair to the residents around that neighborhood that they have to live on a block that is so tickly taken.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P51,"Over. we're trying to do it in a kind of a humane way, while also recognizing enforcement is just absolutely part of the equation.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P52,"Susan and the community board 3, You guys have been fantastic on staying on top of it, getting us out, people out there and really trying to figure this out.","T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,2,2,,G2
+P53,So I just want to come say thank you in person for that.,,,0,0,,
+P54,"other issues that we deal with on St, Marks and other blocks as well.",,,0,0,,
+P55,making sure we can tackle these quality of life issues that are there.,,,0,0,,
+P56,"on any issue, Please reach out to our office.",,,0,0,,
+P57,"If there's anything that we could be helpful, with. We took over Harvey's assembly office on 7th and B.",,,0,0,,
+P58,"So, You can walk right over there if you want to come in and say hello or talk to us, directly.",,,0,0,,
+P59,"But, um, more than anything, just wanted to say. Thank you.",,,0,0,,
+P60,"Every day, too.",,,0,0,,
+P61,"I'm, a former community board member before I was a council.",,,0,0,,
+P62,Member.,,,0,0,,
+P63,"So, um, always know how important and this work is done and not people always come to say.",,,0,0,,
+P64,Thank you for what you do.,,,0,0,,
+P65,"So, wanted to do, that as well. I know. Yeah.",,,0,0,,
+P66,You have a question.,,,0,0,,
+P67,Sure. Yeah.,,,0,0,,
+P68,"What. Are they going to do? Susan probably, can give me a better and full comprehensive on this. They are going to basically I'll read you. Let me read for a second. The update.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P69,They are I believe going to go out soon to give people advanced notice that they're coming out so that people can voluntarily leave if they want.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P70,"they are going to take any bikes that are attached to poles or scaffolding. and starting on the 7. So. If people have locked their bike up there or fixed their bike, they will come and begin the process of confiscating those bikes who are illegally set up.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P71,"There. I believe so, And I believe that's where the I don't think it's a commercial, bike. I think it's so the seventh they're going to start that process.","T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P72,"What we have asked them to do is before they just show up and start confiscating bikes to start working with those groups that represent the workers that work with the workers and, frankly, to give them a little.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P73,"They can voluntarily leave if they want, but also we don't want to show up and just start taking their bikes. We do want to give them some notice. Yes. Right.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P74,"So, Let me do this just because I know we got an agenda.",,,0,0,,
+P75,"Here, too.",,,0,0,,
+P76,"I'll, give you my card. Let's talk on the phone tomorrow, the day after, before they go out there on the 7th.","T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,2,2,,G2
+P77,"And Joanna from my office is here as well, but I'll just give you.",,,0,0,,
+P78,My card. We can set up time to talk about it.,,,0,0,,
+P79,"We'll, get you clarifying the laws and what the process is over the next week or.","T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,2,2,,G2
+P80,"So you guys, and I agree with what you said, These workers are important to the ecosystem of our city and we want to make sure we take care of them, but also what you guys are living with, doesn't feel appropriate, right, or safe or fair.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P81,"Yeah, I understand.",,,0,0,,
+P82,I got you. Yep. Okay.,,,0,0,,
+P83,"Before Okay, not to interrupt not to rudely interrupt.",,,0,0,,
+P84,You. I just want to go over some norms when it comes to community boards.,,,0,0,,
+P85,"First, This is the public speaking portion. Public speaking is those that filled out a form are able to come up and speak.",,,0,0,,
+P86,"Second, This is the elected official. That's speaking, Elected official speaks. Third, If you would like to be heard, you wait for the chair to acknowledge you and then you speak.",,,0,0,,
+P87,"That's, my fault. I don't want to jump in front of you, guys.",,,0,0,,
+P88,"I'm, sorry for that, That's, fine.",,,0,0,,
+P89,That's. Why I stopped. I appreciate it. a heads up as and we're also you I can stick around in the back too for a few minutes after if you want to chat.,,,0,0,,
+P90,So Okay.,,,0,0,,
+P91,as time allows I'm going to allow two other people to speak.,,,0,0,,
+P92,"Susan, you don't want to speak? Okay.",,,0,0,,
+P93,"So, yes, ma'am. Are, you on the board, as well?",,,0,0,,
+P94,"Yes, ma'am. Go, ahead. Susan, is all over it. She will cover it. She'll, be aware of everything going on and I trust, we'll report back. So, you are in good. You are in good standing. Yeah.",,,0,0,,
+P95,"Thank, you.",,,0,0,,
+P96,"again, We are here not in session until back into January.",,,0,0,,
+P97,I am home and around.,,,0,0,,
+P98,"My office is here, Please, come say: hello.",,,0,0,,
+P99,"Please come talk to us about neighborhood, issues, legislative issues, anything that might be top of mind.",,,0,0,,
+P100,and I don't want to take up the rest.,,,0,0,,
+P101,"Your whole entire night, So, I'll, leave it at that, but just nice to see everyone and please stay in touch. Thanks, so much.",,,0,0,,
+P102,"Thank, you.",,,0,0,,
+P103,"Thank you for stopping by, Okay.",,,0,0,,
+P104,I don't know you did you want to take the two minutes or you feel like Okay.,T2 - Claude Sonnet 5.5,,1,1,,
+P105,Sorry.,,,0,0,,
+P106,"What was going on? 11, Street. Oh, that's okay, I'm, not gonna, say too much. More. I got you. Sorry.","T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P107,Okay.,T2 - Claude Sonnet 5.5,,1,1,,
+P108,"If you're, not on in near the ne neighborhood, You might not really understand what's going on here, but these are aerial pictures of actually all of the numerous over 100 bikes that are in the street and the sidewalk every single day and night on the corner of 11th Street and 1St Avenue.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P109,"It's now bleeding onto 1 Avenue and 12th and First 11th, Street and Second Avenue. If you're nearby, you understand the severity of the situation. Again, we're not talking about people.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P110,"We're. Talking about the storage of the bikes. That, these bikes are here 24/7, and the number of workers that are around for these bikes are a fraction of these bikes.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P111,"So, That either leaves one to assume that these bikes are abandoned for whatever reason, um, but they're here.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P112,"They're, electric bikes. They might pose a fire hazard, if, god forbid, something happens, but three or four businesses on this corner of 11 Street have closed. People, have moved out.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P113,"landlords can't rent out their units because it's just the obstruction is overwhelming. So, Just putting a visual picture against everything. We've been talking about the past few minutes.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P114,"Thank, you very much.",T2 - Claude Sonnet 5.5,,1,1,,
+P115,Thank you.,,,0,0,,
+P116,Okay.,,,0,0,,
+P117,"Next up we have God, My mother should spent money on phonics for me. A, you a UD, a U I mean A N E U D I DS, Okay.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,
+P118,"Hello, My name is Analdi Diaz and the core thesis addresses a huge cultural urban gap of the decline of the New York City's historical indoor, roller skating, rinks.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,G6
+P119,"Over, the last decades, iconic spots like Empire roller skating, center, the Roxy, and Roller Jam USA all shut down due to astronomical commercial, real estate. Cost. Today, The city is left with a massive demand for adult and community roller skating, but almost no dedicated indoor venues.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,G6
+P120,"My pitch is to help build a 300,000 square foot. Threetory multi-use building constructed on the East River Pier across from the Katherine Slip Mall.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,G6
+P121,"The location sits between Manhattan and Brooklyn Bridge. The key is accessible. Pricing. To keep the facility community focused, The proposal sets admission to$8, including skate rentals and bring your own skates.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,G6
+P122,"The strategy relies on a high volume and multi-tiered revenue rather than high ticket costs. The economic impact is that the facility is projected to create 250 to 400 direct jobs across building operations, retail, skating staff, with higher estimates reaching up to 500 local jobs, including anchor tenants like Nike or Adidas on the ground, floor. Thank you.","T7 - Claude Sonnet 5.5,T3 - Claude Opus 5.5",,2,2,,G6
+P123,"Next, we're moving on speakers that are currently online. We have Dakota Scott, Oh, she's, actually here.",,,0,0,,
+P124,"Victoria, Hi, everybody, I'm Dakota, and this is Victoria.",,,0,0,,
+P125,"We're from FABN NYC, otherwise stands for Fourth Arts, Block. We're, a arts and culture community, organizing group in the Lower East Side.",,,0,0,,
+P126,"We just have a couple upcoming programs coming to the neighborhood we wanted to share with you all, so one, uh, first and foremost, is a new series that we're launching in Sarah Roosevelt Park.",,,0,0,,
+P127,"It will be in the Pit, which is essentially a, um, uh, it's at the crossing of Broom Street. and it's a slightly, You know, uh, underused space in the evenings and we're trying to bring some more light and community programming to the area, so we'll be doing we'll be partnering with Think Chinatown.",,,0,0,,
+P128,"On a couple of upcoming programs, including a Chinese Fujian opera night, which should be very fun, uh, with subtitles.",,,0,0,,
+P129,"Don't worry if you need translation, and as well as a swing night, and we will be installing a lighting installation along the back fence by artist Raul Ayala, who has done a lot of public lighting in the neighborhood.",,,0,0,,
+P130,"We're really hoping that the community can support this effort to help this space uh, launch itself as a little bit more of a community space moving forward for programming, arts and culture programming, but also very open to ideas and planning, as we've been looking at the space oursel as an organization and trying to think about how it can best serve the surrounding neighborhood.",,,0,0,,
+P131,"So, um, I'm here to invite you all.",,,0,0,,
+P132,"There's flyers at the front. and then everything's online, at fabnyc.org or on think chinatown's website, but also welcome to any conversations, pitches that you have for this space.",,,0,0,,
+P133,"As we continue to build out, the series. Okay, Victoria is going to share another program.",,,0,0,,
+P134,"We also have our big ales arts and culture openhouse on Saturday, October 17th on East 4th Street between Bowie and Second A. We are bringing together 25 organizations to celebrate arts and culture in the Lower East Side, with free programming on Forest Street.",,,0,0,,
+P135,"There will be games, Performances, arts, activities, and more. In addition, many organizations around the neighborhood are opening up their spaces for free drop-in, classes, tours, more class o open, programming.",,,0,0,,
+P136,"So, and many of these programs are open and cater to families and kids. So, please, Everyone is welcome, I hope you can come by and enjoy free arts and culture. Programming, learn about future activities in the neighborhood, and meet the leaders of local organizations.",,,0,0,,
+P137,Here.,,,0,0,,
+P138,You can stay uptodate on our website at fabnyc.org or our Instagram_Fabnyc. Thank you so much.,,,0,0,,
+P139,Thank you.,,,0,0,,
+P140,"Next up, We have Vincent Jenkins, who should be online. Okay, we're calling on Vincent now.",T4 - Claude Opus 5.5,,1,1,,
+P141,Vincent Jenkins. Hi.,,,0,0,,
+P142,"Yes, I'm, here, Okay, Hello. Can.",,,0,0,,
+P143,You hear me? Hello.,,,0,0,,
+P144,Good evening.,,,0,0,,
+P145,Everyone. I wanted to bring attention to the NYCHA.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P146,"Housing. I have been struggling and struggling for so long and it's been very awful. But I'm, sorry.","T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P147,"Give me one second, I'm, sorry.",T9 - Claude Sonnet 5.5,,1,1,,
+P148,The interpreter is speaking. I'm. Having a little bit trouble seeing him.,T9 - Claude Sonnet 5.5,,1,1,,
+P149,Give me one second. Is there anything we can do? the community.,"T9 - Claude Sonnet 5.5,T4 - Claude Opus 5.5",,2,2,,
+P150,"The that's povertish is suffering. How. Are they going to get food? How? Are they going to get the necessities? It is a big struggle. We have to show humanity. God bless the great people, the great Christian people.","T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P151,"It's, very hard to depend on people.",T9 - Claude Sonnet 5.5,,1,1,,
+P152,"We just have to survive. Again, I thank you.",T9 - Claude Sonnet 5.5,,1,1,,
+P153,"Have, a wonderful evening.",T9 - Claude Sonnet 5.5,,1,1,,
+P154,for the wait. I just want to ask for Vincent. I didn't hear Vincent a piece of what you said. Food and I didn't get the other part for the minutes.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P155,Okay.,T9 - Claude Sonnet 5.5,,1,1,,
+P156,"Lack of food, lack of water and necessities and acquate work and communication access is very important for deaf people, Not just me.","T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P157,I am not fully deaf.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P158,I am hard of hearing.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P159,"I switch between speaking and signing. If I have my hearing aid on, If I don't have my hearing aid on, I'm not able to hear, but I can still read lips. With my hearing, aid, I'm, able to hear everything that people are speaking.","T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P160,Communication access is paramount for me. I want to rid our community of drugs and the toxicity.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P161,Just. The things that people need to survive is all and the ability to work.,"T9 - Claude Sonnet 5.5,T3 - GPT-5.6 Luna,T4 - Claude Opus 5.5",,3,3,,
+P162,"Okay, Thank, you.",T9 - Claude Sonnet 5.5,,1,1,,
+P163,"Thank you so much, Vincent, Next, It's, very difficult.",,,0,0,,
+P164,These days.,,,0,0,,
+P165,I'm sorry.,,,0,0,,
+P166,Thank you.,,,0,0,,
+P167,"We're Thank, you very much.",,,0,0,,
+P168,"there's somebody that has a hand raised, but we're calling on people who submitted speaker forms by I think was early afternoon, Thank you.",,,0,0,,
+P169,"Okay, to reiterate, the public speaking session is now closed.",,,0,0,,
+P170,We're. Moving on to the agenda for elected officials.,,,0,0,,
+P171,"We. Do we have OB for Mayor Mandani's Yes. I feel Okay.[Snorts] seem to have lost you. Oh, they declined. So, I guess you don't want to give a report. Then. So, we'll go on to the next one. Next, We have public advocate, Jamani, Williams, office, Curtis, Is, Curtis here?",,,0,0,,
+P172,"No. Controller Mark, Lavine's, office, Okay, Brit, Brad, Homeman, singer.",,,0,0,,
+P173,Okay.,,,0,0,,
+P174,Good evening everyone.,,,0,0,,
+P175,Thank you for coming out.,,,0,0,,
+P176,I am filling in for Miss E. E Wang.,,,0,0,,
+P177,She unfortunately can not make it. My name is Niles Robinson. I am also a liaison for the president's office.,,,0,0,,
+P178,So I'll be giving our reports. Thank you all once again for coming out today.,,,0,0,,
+P179,All right.,,,0,0,,
+P180,"Together this morning with Nilag NYC Care and Cababrini Immigrant Services, We open the Manhattan Immigrant Welcome Center today, September 30th.","T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,2,2,,
+P181,"The center is a one-stop shop connecting immigrant New Yorkers with legal referrals, social services, city resources, and the support they need to thrive.","T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,2,2,,
+P182,"No matter. Where you come from, you belong in Manhattan. The. Immigrant welcome center is housed in our northern Manhattan office at 431 West 125th Street.","T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,2,2,,
+P183,"The closest train station is the one train. and it's about five minute walk from there, Very very vicinity in the area, and it's a really good.",,,0,0,,
+P184,It's really good and we offering a multitude of services. So. Thank you for that.,,,0,0,,
+P185,"New York's, Medical, Aid and Dying Act, Also known as MADE, recently went into effect. as a former state senator, I was proud to sponsor this legislation, which is supported by over 70% of New Yorkers, and a broad coalition of doctors, nurses, patients, and legal advocates. terminally ill New Yorkers with fever and with fewer sorry than six months to live, deserve the right to die with dignity.",,,0,0,,
+P186,"I'm, deeply grateful to the hundreds of patients, families, physicians, and faith leaders who bravely shared their stories and helped shape and deliver this legislation. All right, happy back to school for all of our parents.",,,0,0,,
+P187,"As. We celebrate the return of our kids to the classroom, Our office put together a back to school guide filled with information on local organizations.",,,0,0,,
+P188,"Please, go to our website to check out our resources for back to school, All right, Let me see.",,,0,0,,
+P189,Okay.,,,0,0,,
+P190,Now I will go over CP3 specific talking points.,,,0,0,,
+P191,our office is aware of the drug activity in Sewward Park and around the district.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P192,The office is monitoring the situation and are following up with the seventh precinct.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P193,"As we speak. Meltzer Towers RAD packed RAD pack is moving forward to the interior design. Phase. Our new colleague Amanda, who joined the office as an urban designer in our land use unit, will attend the design, shirt.",,,0,0,,
+P194,All right.,,,0,0,,
+P195,"Yeah, that's about it, All, right.",,,0,0,,
+P196,Does. Anyone have any questions for me on our office?,,,0,0,,
+P197,"Yes. Oh, wait, wait. Sorry about that.",,,0,0,,
+P198,"please, so I had a question.","T8 - Claude Sonnet 5.5,T5 - Claude Opus 5.5",,2,2,,
+P199,"Congratulations on opening that immigrant center uptown. They talked about it for like 30 years or more, You know.","T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P200,Yes. So. They have been talking about a long time and they always said the Manhattan burrow or the burough presidents.,"T8 - Claude Sonnet 5.5,T5 - Claude Opus 5.5",,2,2,,
+P201,"Should you know it should be at a burough pres. You know coordinated by the burough president at least, so it is uptown. If organizations I don't know if you're ever going to open a downtown office.","T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P202,"Probably, not because it's only one per burrow. But. If are there any opportunities for downtown organizations to maybe partner with that office?","T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P203,So? The question was in case.,T8 - Claude Sonnet 5.5,,1,1,,
+P204,"Anyone here couldn't hear was: are there any opportunities for downtown organizations to partner or collab with our office on 125th, Street?","T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P205,I would say: yes. Please contact e as your normal community liaison when you are trying to do these connections and convenings for these multiple organizations.,"T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P206,"I'm sure that our office is more than happy to support local business organizations all with the aim to help Manhattanites across the island, Hi.","T8 - Claude Sonnet 5.5,T4 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P207,"I think it's a good idea for you guys to get a flyer together and um, put it around those bikes on Atlanta Street, because some of those people might be immigrants and may need your service.","T8 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,4,4,,
+P208,Both recommendation and question.,T8 - Claude Sonnet 5.5,,1,1,,
+P209,"Appreciate you, my man. for exactly what was just shared. Will there be either these days not MTA cards, but omniards or other means to help folk who need support for transportation costs to get up to one well to get to from here to 125th, because I take that train up.","T8 - Claude Sonnet 5.5,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P210,Often. That's 60 minutes easy.,"T8 - Claude Sonnet 5.5,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P211,"If you get stuck on the local, the whole way up and folk will really need to get two to three transfers in order to make it up.","T8 - Claude Sonnet 5.5,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P212,"There. So, will there be transportation costs offset? to be honest? I am not sure, and I would love to bring that up, because I need a metro card from time to go up town because I live in Harlem.","T8 - Claude Sonnet 5.5,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P213,"So, um, I will definitely raise your question to E, but that's definitely a good point.","T8 - Claude Sonnet 5.5,T5 - GPT-5.6 Luna,T5 - Claude Opus 5.5",,3,3,,
+P214,"Raised. Thank, you, sir, Anyone, else?",T8 - Claude Sonnet 5.5,,1,1,,
+P215,"Thank, you all so much.",,,0,0,,
+P216,Y'all have a great evening and thank you for coming out and supporting your community.,,,0,0,,
+P217,Thank you.,,,0,0,,
+P218,"Okay, Next we have District Attorney Alvin Bag's office.",,,0,0,,
+P219,Anyone is Sherman here?,,,0,0,,
+P220,"Alvin, yeah, hello.",,,0,0,,
+P221,"Sorry I was not able to join in person, tonight.",,,0,0,,
+P222,I'm glad to be back with community board three.,,,0,0,,
+P223,It's been a good summer. I've. Seen a lot of you.,,,0,0,,
+P224,Guys.,,,0,0,,
+P225,I feel like I've seen Susan almost every week.,,,0,0,,
+P226,I do not have too many announcements.,,,0,0,,
+P227,Only that our office announced the indictment of Kevin Maxwell for allegedly assaulting a 12-year-old boy in an anti-gay attack in Baroo Playground on the Lower East Side in April of 2026.,,,0,0,,
+P228,"Maxwell is charged in New York State Supreme Court, with this incident in the second degree as a hate, crime, assault and the third degree as a hate crime endangering child welfare. The office also announced earlier this month the guilty plea of Jonathan Morales for fatally shooting 18-year-old Elias Brazaban on the Lower East Side in June of 2023.",,,0,0,,
+P229,"Morales plead guilty to one count of murder, the second degree and, under the terms of his p, expected to be sentenced to 20 years to life in state prison, beginning November 20th.",,,0,0,,
+P230,That is all from our office today.,,,0,0,,
+P231,"If anyone has any questions about those cases, I would refer you to the press releases that can be found at our website.",,,0,0,,
+P232,"Having the virtual option. Thank, you Sherman.",,,0,0,,
+P233,Does. Anyone have any questions?,,,0,0,,
+P234,Okay.,,,0,0,,
+P235,Thank you.,,,0,0,,
+P236,"Next up, We have Congressman Dan Goldman Wesley. good evening.",,,0,0,,
+P237,Everyone. I am Wesley from Congressman Goldman's office.,,,0,0,,
+P238,"First of all, I'd like to congratulate to our board chair.",,,0,0,,
+P239,I am sorry.,,,0,0,,
+P240,I missed the last committee.,,,0,0,,
+P241,Meeting.,,,0,0,,
+P242,I have a family emergency. Last minute. I was on my way here and then I got called away.,,,0,0,,
+P243,"So, um, on the legislative side, there really not much going on. I mean, as you know, the speaker of the house, literally sent everyone home instead of having them stay, work and vote on a couple, pretty important legislation that was coming up.",,,0,0,,
+P244,There was a couple of impeachment proceedings.,,,0,0,,
+P245,"There was also a legislation that would one limit the Iran war Powers that the that was the president claimed he has whichever. There was also allegation to force the government to spend the money that the Congress has appropriated like last fiscal year, but instead they had sat on it and apparently almost a billion dollars of funding that was supposed to go out.",,,0,0,,
+P246,"It's just not happening anymore, which is complete completely ridiculous. I don't want to curse at a public setting, but you know, um, back in the districts, There are a couple things that I want to: let people know, a couple: of, um, Concerning things that's happening in immigration, court right, now.",,,0,0,,
+P247,"As, you have know, um, There are federal courts, saying that ICE can not conduct arrest at immigration, court, However, ICE and your IR. The department of justice apparently doing this new thing where they have set up a new floor in the immigration court.",,,0,0,,
+P248,"Building. they don't call a court. What happens is that they are sending anyone that show up that doesn't have an attorney accompanying them to a separate floor where they go where they now have them. Do a teleconference with a judge where, basically, they go into a room with a computer screen and talk to someone.",,,0,0,,
+P249,"We, don't know who they're talking to. Supposedly. They are immigration, judges that in the same building. Why they are doing this, We don't know. But. It's very concerning at this point, because this is specifically targeted at people who show up to immigration courts without an attorney.",,,0,0,,
+P250,"People who have a training, are going through the proceeding normally, but whereas people who are post where they show up by themselves they're sending to this separate floor, that is how do I say: this?",,,0,0,,
+P251,"I don't know if you guys seen the show Severance, but it's a very labyrinth setting where they need to like find the room where they're supposed to go.",,,0,0,,
+P252,Like our office have tried to go there like the congressman himself has tried to go there to find where they they're supposed to go.,,,0,0,,
+P253,"And. Then, when you go to the floor, there are like lot of different hallway, lots of different rooms.",,,0,0,,
+P254,"And, the people who work there.",,,0,0,,
+P255,"Supposedly they don't know what is happening. The yo the floor I believe is technically operated by USCIS and supposedly they're leasing it to EOIR, but their ICE agent, who are posted there. Who does not report to EOIR, which is Department of Justice. So. The whole thing is very dystopian.",,,0,0,,
+P256,": We, don't know what is happening. There. I'm sure you guys heard on the news about, like ICE and immigration court having these black sides.",,,0,0,,
+P257,"We are worried that they're turning the immigration one floor in the building into one of these black sides. We are the comments themselves is going there regularly to make sure everything is up to code like in the up and up, but so far this we have limited access and this whole thing I'm.",,,0,0,,
+P258,"We have worked with organization, NAC, New York immigration coalition, I think they are getting ready to file a lawsuit. On this very topic on the last note, our office is holding a resource fair.",,,0,0,,
+P259,"This Saturday, October 3rd, at the Ruckers Community Center, 200 Madison Street.",,,0,0,,
+P260,"We are giving the they're going to have giving a free haircuts, um, dental screening, blood pressure, screening, all that. And. We also have 100 book bags and um, bubbles for the one, the first 100 kids, children that show up. Does anyone have any question for me before I leave?",,,0,0,,
+P261,"Nope. Thank, you very much and congratulations.",,,0,0,,
+P262,"Thank you, Yeah, Oh, yeah, Sorry.",,,0,0,,
+P263,"I have a fly for the event. I also have about 10:15 copies on the table: outside. Okay. Moving next to Assembly, Member Grace, Lee's, office, Fanny, Hi, everyone.",,,0,0,,
+P264,"Fanny from Assembly Member, Grace, Lee's office, just a couple of updates.",,,0,0,,
+P265,"As we remember, the 25th anniversary of 911, Assembly Member Lee is fighting to ensure that first responders and survivors, who are still impacted by the related illnesses, get the care that they deserve.",,,0,0,,
+P266,"Assembly Member Lee, Secured$2 million in the state budget for the Einstein Medical for Life Saving, Cancer Research for first responders to identify cancer risk and to get them.",,,0,0,,
+P267,"Treatment. The governor recently signed legislation, including a bill led by the assembly member to extend World, Trade, Center, death and disability benefits to National Guard members and their families.",,,0,0,,
+P268,We are also grateful that the mayor released the long hidden reports that confirmed that the city knew about the air quality after 911.,,,0,0,,
+P269,We will continue to work to ensure our community gets the truth so that we can address 911 related illnesses and continue to heal.,,,0,0,,
+P270,"Other legislations that Assembly Member Lee passed that are waiting for the governor's signature are a bill to protect New York's drinking water by setting strict, science-based limits on forever chemicals in drinking water, The federal EPA, recently rolled back these limits.",,,0,0,,
+P271,"So, we are putting some of these limits back for New York State. There was also a bill to ensure that baby hygiene products, such as baby powder and shampoos, have clearly labeled ingredients and display warning labels for par for possible carcin carcinogens. Assembly Member Lee also reintroduced a bill formerly introduced by Assembly Member Mandani.",,,0,0,,
+P272,"That requires big universities like NYU and Colombia to pay property taxes, preventing them from continuing to buy buildings without paying their fair share. This year the state approved an expansion to the SCRE and DRE.",,,0,0,,
+P273,"Raising the income threshold levels from 50,000 to 75,000. The city must authorize these changes before the new income thresholds can be implemented, and it will be retroactive to July of this year.",,,0,0,,
+P274,"So. Whenever it's passed, it's going to be retroactive to July. recent coming up upcoming events. We're doing a shredding. I have flyers out front. it's going to be located on Grand Street across from the CVS, which is East Broadway and Grand. Yep. And, that's it, Thank, you, Fanny.",,,0,0,,
+P275,Yeah.,,,0,0,,
+P276,"for those elect officials, representative that are here, Instead of prolonging, we're going to I'm going to ask if you have a question that you meet with them in the back, so that we can move it along.",,,0,0,,
+P277,"Next, we have Oie from Mayor's, office, Hi, good, evening, Sorry, again for not being able to join in person and the earlier technical problems.",T10 - Claude Sonnet 5.5,,1,1,,
+P278,"Obviously, the mayor has been incredibly busy past couple weeks, but just wanted to highlight just a few topics relevant for the district.",T10 - Claude Sonnet 5.5,,1,1,,
+P279,A couple weeks.,T10 - Claude Sonnet 5.5,,1,1,,
+P280,"Ago, the mayor, released his vision, zero reimagined, a 10-year plan to bring traffic debts and serious injuries down to zero. includes over 100 commitments across 19 agencies, um, including more 50 mph speed, limits, near 100, more schools.","T10 - Claude Sonnet 5.5,T6 - GPT-5.6 Luna,T7 - Claude Opus 5.5",,3,3,,
+P281,"This is a program that's being led, but community engagement will be led, mostly by DOT and your fellow local officials.","T10 - Claude Sonnet 5.5,T6 - GPT-5.6 Luna,T7 - Claude Opus 5.5",,3,3,,
+P282,"But if there's any intersections of no, please do reach out to us as well. We would like to make sure that it's included within the plan. Additionally, around a couple weeks ago, the city filed a lawsuit in federal court, along with cities and counties na n nationwide to block the new public charge.","T10 - Claude Sonnet 5.5,T6 - GPT-5.6 Luna,T7 - Claude Opus 5.5",,3,3,,
+P283,"Rule. It took effect, Friday, September 18th, and would let immigration officers count Medicaid, SNAP, or housing assistance, among other things, against green card applicants, and the mayor's position is clear.",,,0,0,,
+P284,"No family should have to choose between feeding their kids and their immigration. Status. So, if you know someone afraid to use benefits, they're entitled to, please have them call 311 and say public charge.",,,0,0,,
+P285,"and they'll be able to for free to get different legal help, so yes, please, Again, 311 and all they have to say is public charge, lastly, uh, around I think a week and a half ago, uh, The city also began installing 17 new, uh, free public bathrooms across the five burrows as part of our one-year pilot with Rome Labs.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P286,"There will be one within, uh, within the district, around Delansancy Plaza.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P287,we're still working with different community partners to ensure that they're accessible.,"T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P288,"So, um, if folks know different, um, nonprofits or just good locations in general, uh, for these different tap cards, which are used to then enter the bathrooms, uh, please, uh, Do let us know.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P289,"addition to the tap cards, folks can also use text, QR, codes, um, and app to be able to enter them.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P290,"U, but we want to make sure that these bathrooms are obviously meeting the different communities that need them.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P291,"The most. and finally, our office, office mass engagement, is continuing to knock doors through our talk to tenants, campaign.",,,0,0,,
+P292,"We're, mostly conducting that work of town, but we are having or continuing our 101 education series about renters's rights.",,,0,0,,
+P293,"We have one tomorrow uptown in Washington Heights, and the idea is again hopefully that we'll expand this campaign to hopefully include also downtown, as well. also just wanted to give a shout out, and just my thanks to Susan who's done an amazing job, organizing the community. making sure that different workers in community are getting prepared and aware of the different potential enforcement actions.",T2 - Claude Opus 5.5,,1,1,,G2
+P294,"and just look forward to working with her and other community partners here too, to make sure that folks have a fair and safe ability to make sure that they can continue their livelihood.",T2 - Claude Opus 5.5,,1,1,,G2
+P295,Thanks.,,,0,0,,
+P296,"So much, the fire. Thank you.",,,0,0,,
+P297,"If. There's any questions for OB since he's not in person, any questions?",,,0,0,,
+P298,Okay.,,,0,0,,
+P299,"Thank you, Obie, Thank, you, State, Senator, Brian, Kavanagh's, office, Patricia, Okay, Christopher, Marte's, office, Simon, Once again, in the interest of time, If there's quite a if there's a question, Simon, would you mind answering in the back if Okay, cool, Good, evening, CB3, I hope everyone is doing well.",,,0,0,,
+P300,"so, just to recap the last month, So the council member attended a number of 911 events and shared his own thoughts about growing up in lower Manhattan during this time, and he himself was a student.",,,0,0,,
+P301,"And. So we have legislation that would require a report on outreach by the Department of Education and the Department of Health and Mental Hygiene to in to individuals who were students, teachers, and staff in at schools near the World Trade Center during 2001 and 2002. They have been a group.",,,0,0,,
+P302,"That's been overlooked by a lot of the outreach efforts so far, so we are pushing that legislation.",,,0,0,,
+P303,"Additionally, The council member, has attended a number of community actions over the past month relating to ice being in different parking lots around lower Manhattan and the icon parking on Recctor Street, I believe.",,,0,0,,
+P304,"So, That's just something: we've been monitoring as well. Over, the last month, the council member, has also reintroduced one of our biggest legislative priorities, which is to protect traditional Medicare for city retirees.",,,0,0,,
+P305,"So, The bill is now known under the number intro 1008, and we are at 20 co-sponsors as of today, and we expect more to join on soon.",,,0,0,,
+P306,"We are optimistic that we can get this past the finish line, this session, the in related lower Manhattan news, The council member also reintroduced his bill to reform the ticket vending in Battery Park, because it affects a lot of New Yorkers and tourists, and it's just kind of running rampant.",,,0,0,,
+P307,"So, We had a press conference with community board members, the Burough President, Statue, City Cruises, and a lot of organizations.",,,0,0,,
+P308,and we're in conversations with the speaker's office about scheduling hearing in the fall.,,,0,0,,
+P309,"So, we'll have more information on that.",,,0,0,,
+P310,once or we'll have more to share. Once we have that information.,,,0,0,,
+P311,"this past Friday, We also the council had a big hearing on screed dri shiki and he so as Fanny was saying, this was authorized in the state budget, but it still has to be authorized at the local level, and so we are supporting, of course, the scree aspect of, but we are also the primary co-sponsors for the shiki dehy bill, and so we had a successful hearing and we hope that will be passing soon as well.",,,0,0,,
+P312,"regarding budget, so participatory budgeting launched yesterday. So. Our office is partnering with localists to promote PB.",,,0,0,,
+P313,"This year, idea collection will take place until November 6th.",,,0,0,,
+P314,"So. Our office sent information to the community boards with our new idea, submission platform and just information about the new PB cycle.",,,0,0,,
+P315,What else do I have here?,,,0,0,,
+P316,Our office has been helping people file for exemptions for the Pieta tax.,,,0,0,,
+P317,"If they have been wrongfully assessed, we hosted a an exemption intake session with the department of finance in our office today, and we sent information about it.",,,0,0,,
+P318,"If. There is interest in having another one of those sessions, we're happy to accommodate. Just. Let me know. And, that's it from me. Thank, you, Sammy, Once again, If there's any questions for Chris Monte's office, he'll be in the back.",,,0,0,,
+P319,"Next up, we have Council Member Harvey Epstein's office.",,,0,0,,
+P320,"Hi everyone, My name is Tene from Council Member Harvey Epstein's office.",,,0,0,,
+P321,I was a newly appointed community liaison taking over a GN.,,,0,0,,
+P322,"My colleague's position. He's, here today.",,,0,0,,
+P323,"He'll, be there the new budget, director. So, still staying with us and I was the legislative fellow for the past year doing a fellowship with the City Council.",,,0,0,,
+P324,A lot of my background is constituent: services.,,,0,0,,
+P325,"So, the transition has been pretty smooth. Just will be working on. Obviously, the more bigger community projects.",,,0,0,,
+P326,So excited to be here.,,,0,0,,
+P327,This is my first community board meeting and it's great to see everybody and looking forward to getting to know you.,,,0,0,,
+P328,"We have created a fall events October calendar, for you guys to make it more clear about what the events are coming up in our office.",,,0,0,,
+P329,"So, We have coming up a local law. 97 workshop on October 6th. We also have New Wiz in the Park. We'll be playing Shrek on October 8th, October 11th, we'll be doing bench painting with NYC H2O at Tomkins, October 28th, we'll be doing the District 2 housing summit with Friend Seminary.",,,0,0,,
+P330,"and then October 28th, we'll do a food giveaway with Grand Street from 4 to 6. So, We created a link tree. That's on the flyer here, where you can easily RSVP to learn more about the events and get all the details.",,,0,0,,
+P331,"and, if you're having trouble, feel free to call the office and we're happy to help you.",,,0,0,,
+P332,"A lot of these coffees are outside, so feel free to grab one before you leave.",,,0,0,,
+P333,"other than that, We have a lot going on in the office on the ledge side.",,,0,0,,
+P334,"at the by the end of the summer, we introduced about 18 bills, four of which we had hearings for and six of which are set to be heard.",,,0,0,,
+P335,"This fall. So, lots of bills.",,,0,0,,
+P336,"the details of them are in the newsletter. Feel free to take a look. There's, a lot that has been going on, especially in the past summer, with events and with budget or sorry, with ledge.",,,0,0,,
+P337,"lastly, If you, by any chance, see an empty tree, pit, a pothole, or a location that needs a trash, can, um, On the back of the newsletter, we have a QR code where you can basically just upload the photo in the location so that we can take a look into it.",,,0,0,,
+P338,"and lastly, We do have, I don't know if you guys know, we have a new district office, we'll be having soon.",,,0,0,,
+P339,"Our team. Is really, really excited to welcome you? There. We're, not moving far. We'll be at 55, Avenue C, so just a little above. So, we're excited to see you guys there.",,,0,0,,
+P340,and more news to come. Thank you for your time and welcome and congratulations to you both.,,,0,0,,
+P341,Okay.,,,0,0,,
+P342,"Before we begin roll call, I just want to announce and acknowledge our newest board.","T17 - Claude Sonnet 5.5,T19 - GPT-5.6 Luna,T9 - Claude Opus 5.5",,3,3,,G9
+P343,"Member, Leila Mahia.","T17 - Claude Sonnet 5.5,T19 - GPT-5.6 Luna,T9 - Claude Opus 5.5",,3,3,,G9
+P344,Welcome. Stand up. Okay.,"T17 - Claude Sonnet 5.5,T19 - GPT-5.6 Luna,T9 - Claude Opus 5.5",,3,3,,G9
+P345,"We will be assigning a mentor for you in the near future. And, once again, welcome, Okay.","T17 - Claude Sonnet 5.5,T19 - GPT-5.6 Luna,T9 - Claude Opus 5.5",,3,3,,G9
+P346,"Now, Let's begin with the roll call.",,,0,0,,
+P347,Hi everyone.,,,0,0,,
+P348,"Okay, we're also going to be doing an election today and we have vote sheets for everyone.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P349,"So, for it to be easier for Diane and I to hand out these vote.",T18 - Claude Sonnet 5.5,,1,1,,
+P350,"Sheets, it'd be helpful. If you could raise your hand after I say your name so that I know which aisle to distribute the vote.",T18 - Claude Sonnet 5.5,,1,1,,
+P351,Sheet. Thank you.,,,0,0,,
+P352,"All right, Adam Algalith, excellent. present.",,,0,0,,
+P353,"Steven, Ballinger, Absent, Tanya, Bates, present, Lee, Berman, absent, Carlin, Chan, where? Okay, great, Present, Ariad, Nachua, present, Vincent, Cerrito, great, Claudia, De, La, Cruz, Eric, Diaz, Alistister, Konamakus, absent, Tahesha, Fields.",,,0,0,,
+P354,This is out. Present. Perfect. Naima Fana present. Thank you.,,,0,0,,
+P355,"John Foul present. That, way, Katherine, Freed, absent, Sean, Garcia, Present, Thank, you, Ryan, Gillum, absent, Charlie, Golden, present, Herman, Hewitt, present, yes, please.",,,0,0,,
+P356,"Do you need a pen? Oh? You have one. No, no, I'm looking for This is an absent. This is absent: pile. Trevor, Holland absent. Mary Jang, present. Nancy Kong. Michelle Cooper Smith. Diane Lake. Over here.",,,0,0,,
+P357,"Francis, Francisco, Lebron, Present, May, Lee, Llaya, Mayhe, Okay, Present, Michael Lavario.",,,0,0,,
+P358,"Over there. This is you, Molly. Molly Lou, present, Troy Mack, Campbell, Mun, John, Naid, present, And, Johnny, Nicas, Rivera, absent, Grain, Olivarez, Did, someone say: here?",,,0,0,,
+P359,"Oh, here, Okay, Present, Daisy, PZ, Present.",,,0,0,,
+P360,"Thank, you very much.",,,0,0,,
+P361,"Anna Perez, present. Thank, you, Rod, Romanian, present, Ramia, Ralph, absent, Okay, Dear, Reyes, absent, Tal, Roed, present, Okay, John, here, Yes.",,,0,0,,
+P362,"These are absent. Jayen Rodriguez, Absent, Arnett, Scott, present, Clint, Smeltzer, present. Clint is there. Sandra Strer, present. Daniel Tau, present, Zachary, Thomas, perfect, Serenetti, Tamonga, Alejandro, Torres, Julie Velasquez, that's you, Did I say that right?",,,0,0,,
+P363,Julie Zuli. Perfect. Thank you.,,,0,0,,
+P364,"Present. Josephine BZ. Yes. Present. Kathleen, Webster, I'm, sorry, No, Absent, Okay, they're, out.",,,0,0,,
+P365,"Josephine, This is yours. This person's out.",,,0,0,,
+P366,"This is me, I think Diane might have yours. Okay, perfect.",,,0,0,,
+P367,"Tal's. did Tal have one? That's you. I saw his You saw his No. Zachary Thomas. I did. Arnett. Arnette. Do. You have Tal Rods? Oh, you have it. Okay, great.",,,0,0,,
+P368,"Michael's, not here.",,,0,0,,
+P369,"No. Where's, Michael's, here?",,,0,0,,
+P370,"Oh, Michael's, here.",,,0,0,,
+P371,Does. Everyone have a vote: sheet?,,,0,0,,
+P372,"Go, team. That was great. Wow, papers, flying. Okay, Next up we have speeches to give.","T18 - Claude Sonnet 5.5,T10 - Claude Opus 5.5",,2,2,,G11
+P373,"So we can hear from our candidates. We'll go in alphabetical, order. Daniel Tano, you have two minutes.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P374,I can give you a timer. I am not going to call time.,T18 - Claude Sonnet 5.5,,1,1,,
+P375,I'm just going to put the clock in front of you. Unless. If you want me to call time.,T18 - Claude Sonnet 5.5,,1,1,,
+P376,"What, do you want me to do? What? Do you prefer? Yeah, it'll, just go off.",T18 - Claude Sonnet 5.5,,1,1,,
+P377,"Okay, two minutes.",T18 - Claude Sonnet 5.5,,1,1,,
+P378,"And, good evening, CB3, I'm, Daniel, Teno and I'm running to be your second vice chairperson.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P379,I hope you all had the opportunity to read my candidate statement.,T18 - Claude Sonnet 5.5,,1,1,,
+P380,"so, I'll just give the highlights right.",T18 - Claude Sonnet 5.5,,1,1,,
+P381,"Now, I'm running on the strength of my experience, as well as my institutional knowledge of working with and on CB3. I've, been participating in community board 3 meetings for almost 20 years.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna",,2,2,,
+P382,"First as a resident advocating to protect our quality of life on the Lower East Side. I was appointed to community board 3 in 2021 and have served on the parks, recreation, waterfront, and resiliency committee for my full time on the board, on the nominating committee for the past two years and have been occasionally appointed to the SLA and DCA licensing committee.",T18 - Claude Sonnet 5.5,,1,1,,
+P383,"When needed. I also often attend the land, use, zoning, and housing, as well as the transportation and environment committee, meetings.",T18 - Claude Sonnet 5.5,,1,1,,
+P384,I look out to the board and see a lot of new members here on the board.,T18 - Claude Sonnet 5.5,,1,1,,
+P385,And. One of my key efforts on the board has been to help new members learn about how the board works so that you can quickly contribute your experience to the board.,T18 - Claude Sonnet 5.5,,1,1,,
+P386,"To that effect, I have volunteered to mentor new board members for the past two years, assisted with the community board picnic in Tomkins, Square, Park last year, and I table at events to outreach for community board.",T18 - Claude Sonnet 5.5,,1,1,,
+P387,"Other than representing the board and running meetings when the chair and the first vice chair are not available, The main role of the second vice chair is the responsibility of maintaining records and reporting attendance, which I currently do as a supervisor for the city, employees.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P388,"I hope to serve as your second vice chair, to bring my experience on to the executive committee and to contribute my institutional knowledge to the board, while contributing continuing to bring in new members ideas and efforts to the forefront.",T18 - Claude Sonnet 5.5,,1,1,,
+P389,How. Do you stop? Oh shoot. I don't know. I got All right.,T18 - Claude Sonnet 5.5,,1,1,,
+P390,"Thank you, Daniel.",T18 - Claude Sonnet 5.5,,1,1,,
+P391,"And. Now we have here, Zachary Thomas.","T18 - Claude Sonnet 5.5,T10 - Claude Opus 5.5",,2,2,,G11
+P392,"Let me reset this, And, cool, Hey everyone.",T18 - Claude Sonnet 5.5,,1,1,,
+P393,Thank you to the board leadership and route for coordinating tonight's election.,T18 - Claude Sonnet 5.5,,1,1,,
+P394,"For. Those of you who haven't met, I'm, Zachary, Thomas and I'm running for second vice chair.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P395,"And. Since joining the board in 2024, I've been serving on the parks.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna",,2,2,,
+P396,Committee.,T18 - Claude Sonnet 5.5,,1,1,,
+P397,"I've, seen firsthand how much collective effort goes into making this community board a reality, If elected second vice chair, I know that my job is not about pushing my own agenda or anything like that.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna",,2,2,,
+P398,"It's, about state support for our leadership, including our net and Susan, and ensuring that every board member here has a positive experience.",T18 - Claude Sonnet 5.5,,1,1,,
+P399,That will be my number one.,T18 - Claude Sonnet 5.5,,1,1,,
+P400,Priority. That collaborative and consistent approach is also how I show up as a leader outside of the community board.,T18 - Claude Sonnet 5.5,,1,1,,
+P401,"Over, the past year, independent of the community board, I've published nine public meeting summaries in an online newsletter so that community board members, so community members who can't make these meetings can actually keep up with what's going on.",T18 - Claude Sonnet 5.5,,1,1,,
+P402,That writing has actually inspired members of the public to attend.,T18 - Claude Sonnet 5.5,,1,1,,
+P403,Meetings.,T18 - Claude Sonnet 5.5,,1,1,,
+P404,And I've even met someone who applied and joined the board as a result of those writings in Thompson.,T18 - Claude Sonnet 5.5,,1,1,,
+P405,Square Park independent of the community board.,T18 - Claude Sonnet 5.5,,1,1,,
+P406,"Earlier, this year, fellow parks, member Tal and I partnered local groups to raise$2,000 and install a long need tree guard for a GKO tree near Avenue, B and East 7th Street.",T18 - Claude Sonnet 5.5,,1,1,,
+P407,We work with the Parks Department to make this happen.,T18 - Claude Sonnet 5.5,,1,1,,
+P408,"You can go see it next time, you're at the park.",T18 - Claude Sonnet 5.5,,1,1,,
+P409,"And as treasure of Graffiti Church, also known as East 7th Street, Baptist Church, a church and community organization that has been serving Alphabet City for over 50 years, I deliver monthly financial updates to church members.",T18 - Claude Sonnet 5.5,,1,1,,
+P410,"That has reinforced for me that transparent communication and consistent follow-through are the foundations of trust. Just, showing up and doing the quiet, practical work counts for a lot.",T18 - Claude Sonnet 5.5,,1,1,,
+P411,That's. The mindset I'll bring to board leadership every single month.,T18 - Claude Sonnet 5.5,,1,1,,
+P412,"I'm, always inspired by the dedication in this room and I'll be honored to earn your vote. Tonight.",T18 - Claude Sonnet 5.5,,1,1,,
+P413,Thank you.,T18 - Claude Sonnet 5.5,,1,1,,
+P414,"Thank you so much to the both of you for your speeches and for giving your extra time to an executive, position.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P415,Everyone go ahead and vote and then Diane and I are going to collect your ballots and then we'll count them and then we'll announce the winner at the end.,"T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P416,Okay.,,,0,0,,
+P417,"Thank you, everyone.",,,0,0,,
+P418,"As, as you are contemplating your vote, we're going to continue with the meeting.",,,0,0,,
+P419,"Once again, Thank you for the candidates and just nominating yourself or having someone nominating you and accepting a nomination.",,,0,0,,
+P420,"We are appreciative of your contribution. next moving on next up, we have the board chair's report.",T17 - Claude Sonnet 5.5,,1,1,,
+P421,"My report is pretty short and sweet. What we're moving? What I'm, with the new thing that new project that we are embarking on would be trainings.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P422,"We're, going to implement trainings for SLA, as well as Robert's rules and office procedures.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P423,and the times and dates will be reported out to you.,"T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P424,"Right now, We don't have the time and dates, but those are the trainings that we're looking to implement in the near future.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P425,"Once again, SLA, Robert's, rules, and office procedures.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P426,"And hopefully, This would be something that would be good for, especially our new members, as well as a refresher for our older members.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P427,"If. You in fact have a item that you would like to have training on, Please email me at CB3, chair.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P428,"also, not only if you have items of training, If you have a question about anything that you want to learn more about or you're, not sure, of, feel free to email me and I will try to get back to you as soon as possible.","T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5,T17 - Claude Sonnet 5.5",,3,3,,G12
+P429,One of the things that I have seen as far as the board is concerned.,T17 - Claude Sonnet 5.5,,1,1,,
+P430,"Is that, unfortunately, we have a lot of conversations with each other and not necessarily asking out.",T17 - Claude Sonnet 5.5,,1,1,,
+P431,"So I'm, hoping that we are going to be able to start to ask more questions so that we can have more deliberate and conscientious conversations.","T17 - Claude Sonnet 5.5,T11 - Claude Opus 5.5",,2,2,,G12
+P432,"So feel free to ask any question, feel free to give me any feedback or any trainings that you would like to see.","T17 - Claude Sonnet 5.5,T18 - GPT-5.6 Luna,T11 - Claude Opus 5.5",,3,3,,G12
+P433,Okay.,,,0,0,,
+P434,And. Next we have the district managers report.,,,0,0,,
+P435,Okay.,,,0,0,,
+P436,"Thank you, so in October we're going to be voting on our district needs and budget priorities which I wanted to talk a little bit about, but it sounds like I have to talk about 11th, Street.","T2 - Claude Sonnet 5.5,T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T2 - Claude Opus 5.5,T12 - Claude Opus 5.5",,5,5,,"G2,G13"
+P437,"and uh, so I've personally been working on 11 Street, since February 2024 and um, with some of the agencies and other elected officials have um, come in since then. What we have on 11th. Street is probably over a hundred ebikes that food delivery workers use to make deliveries.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P438,"the food delivery. Workers live in outer burrows, mostly like in the Bronx. Many of them are in shared rooms, some in shelters, but most of them I think are in shared rooms. They take the subway into Manhattan, and you know the work that they do is in the East Village.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P439,So. They take the subways. Here.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P440,They have to leave the bikes. Here.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P441,They can't take the bikes back and forth. I'm going to say. The reason there is no place to accommodate them is a failure of the city to plan and govern.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P442,"you know, We do have loading areas and spots for Amazon, for other corporate deliveries, but we don't for these they're I think 100% immigrant men and we have no nothing for them. They have no place to be in between their deliveries. The our community has created a need for these deliveries.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P443,"The restaurants, local businesses make money with the food deliveries. The egg companies make lots of money on these deliveries, so one of the problems is a lot of garbage.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P444,"One of the things we tried to do was to get garbage cans in middle of the block, but sanitation will not do that because they don't do that.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P445,"I expect it has something to do with pickups, but you know, the men actually said they would use them if they were there.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P446,There are a lot of extra we're spending.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P447,"First of all, we're spending. The community board, elected officials, agencies are all spending a tremendous amount of time on this one block.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P448,so Harvey's con. The council office is paying for extra supplemental cleaning.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P449,The department of sanitation is doing extra cleaning. We have one of the churches on the block. Now. Cafe Wall operates out of the church. It's I think Hope Church. They're working with the men and trying to work with them.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P450,"as far as cleaning, It is not illegal to have the bikes overnight. There is just no law against that. The law says they have to be in a proper parking place or in a corral. There is not enough legal parking places or corral to fit all the bikes that are there. the reason they keep them there in that one spot is because when they tried spreading them around, they were stolen. They, each cost, over$1,000. They're the means of their livelihood, and they were stolen. So. They keep them in one spot. They keep people there to watch.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P451,"Them. The mosque actually on the corner, has cameras which is another help. So it is an unfair burden on the block. There is no question about it, but it's even a more unfair burden to the men that are forced to be in these conditions.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P452,"I mean, You all have heard about how they're forced to go at a certain speed. A report just came out this morning in the city reporter on how they have that the accident rate is the highest.","T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P453,Among other any other working group.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P454,They are people who may not have all their paperwork in order.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P455,"So, They are very vulnerable. everybody's thanking me for all my work, but I feel like I'm, just paint banging my head against the wall, because I can't get anything done.","T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P456,"We are Jooko, one of the companies that rents out bikes and things is actually looking for outdoor fenced in space and may there she's actually talking to someone now who the site was referred from.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P457,The council office.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P458,we've asked the city to help us look for sites it's not for lack of trying.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P459,"It's, just not for lack of trying. And I'm just going to say this whole thing has been totally heartbreaking that people are not focusing at all on human beings, so I won't say any more about that.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P460,"excuse, me. We I'm full of good news tonight, so we've had, you[clears throat] know, a lot of people.",T3 - Claude Sonnet 5.5,,1,1,,G3
+P461,"Speaking tonight and calling the office about drugs, particularly in Seward, Park, um, I think, has drugs and more homeless people there than they've ever had before.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P462,"There's a increase in Tomkins Square Park. There is a decrease in SDR park, because what has happened is that everybody complained about SDR Park. So. The precinct was told they had to have a task force and part of that task force. Is they have police stationed there, all the time.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P463,"So when you have police there all the time, which is a wonderful thing.","T3 - Claude Sonnet 5.5,T6 - Claude Opus 5.5",,2,2,,G3
+P464,"If you can have it, you have less crime, less drugs. So. They are now going over to Seward Park and Tomkins Square Park. The I get reports on needle collection. Every week.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P465,This is the state of how we live from the park. So from the Parks Department I get reports. So in SDR. The collection of needles has gone down in Tomkins Square. It has gone up. So. What we need is a policy other than moving things around.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P466,So that's just what I can give to all the comments and complaints that we get and there's not much else.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P467,"I can say about it. I do want to go back to 11th Street. The Police Department has decided. The precinct has decided that the way to cure this is to have an enforcement action on October, 7th and confiscate all the bikes that are not legally parked.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P468,"So then their voucher, they're taken and the men in order to retrieve them must show that the bikes belong to them, which is not I don't think terribly difficult. They could show keys that kind of thing.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P469,"However, They must then go to court with their paperwork in order to be able to get the bikes back. So what the police can do is say we wrote so when people complain and then the precinct is saying what is your response and then they're told?","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P470,"Well we wrote this many summons, so the police did what they were supposed to do and the problem is taken care of. So what else? I we will be voting going back to comm other community board.","T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P471,Work.,,,0,0,,
+P472,We will be voting on budget priorities and district needs in every committee except SLA.,"T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P473,The priorities are actually work done by committees throughout the year.,"T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P474,"In addition, we meaning district managers as a group from Manhattan, and we urge-you know, the committee chairs to be with us, and we meet with about over 20 agencies for a little over an hour, each three days in September, beginning of October, to get information about what programs are being cut, which have full funding, questions that we give them in advance.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P475,"We find out about problems such as staff vacancies, which impact an agency. When. We vote, our goal is to bring money to our community for programs or projects that are important to our community.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P476,"So, We're not necessarily voting for budget priority for the most popular program, but we vote for those that need funding, because, if something's already well funded, we have it, but there are some that need more funding.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P477,And I'll give an example.,T14 - Claude Sonnet 5.5,,1,1,,
+P478,"Summer youth employment, which is important in this community.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna",,2,2,,
+P479,"The agencies will tell us how much the funding has increased, which is true, but then we will we ask, well, how many youth were turned away because of lack of funding, and then you get another number.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P480,So that's the kind of thing we look at when the board votes.,"T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P481,"that we voting for expense, priorities and capital priorities for each agency and we rank them within each agency, So, we'll be say, ranking for our park, expense, priorities, our park, capital priority, then say: HPD, expense, HPD, capital and so on for each agency, and so we'll be doing.","T14 - Claude Sonnet 5.5,T16 - GPT-5.6 Luna,T12 - Claude Opus 5.5",,3,3,,G13
+P482,"That. We'll be talking about it. In each committee, we, the city, came out with a draft housing plan which we did comment on.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P483,"It was in much turnaround, time.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P484,So. We could only comment based on positions.,"T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P485,The board has already voted.,"T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P486,"On. So, we mostly took information from the district needs statement.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P487,"The plan for this for community board three is a little over 7,000 units in the next five years.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P488,"However, 75% of them are market rate. So, One of our comments was that when our top comment was that the highest priority in community board, 3 is affordable, housing and only getting 25%, affordable housing does not meet our highest need.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P489,but and I think that's probably enough for tonight.,,,0,0,,
+P490,Any questions? because we're hybrid so that we need the mic.,,,0,0,,
+P491,"When. When you mentioned Seward, Park is a target area about drugs, What Sew Park?","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P492,"Are you talking? About? Sewer Park Extension, the Nicha Houses or Sewer Park. The park. Sew, Park. Yeah.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P493,"Oh, that part. The oldest municipal playground in the country. Oh, okay.","T3 - Claude Sonnet 5.5,T6 - Claude Opus 5.5",,2,2,,G3
+P494,Okay.,,,0,0,,
+P495,"I thought you were talking about housing, complexes, Thank, you, Yes, first of all, Susan, Thank you for all your work.",,,0,0,,
+P496,This month.,,,0,0,,
+P497,"It's really been it's not just been rain, It's been hail. and God bless you for all that you've, done, Madam, Chair, I think a bit more context regarding 11th Street and some of the history.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P498,There is does warrant conversation with this board.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P499,because the majid was encouraged years ago by both the city and by business leaders to cultivate drivers and become a place that could help with the employment of drivers and also provide for their family and community needs.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P500,People go there for the worship.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P501,"People have gone there for family support back home, The majid itself and that entire community to include the drivers were explicitly and intentionally encouraged to exist by both city and business.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P502,"Interests. And under the previous administration in Gracie Mansion, interfaith work when money was available for expansion of resources to include capital projects and infrastructure did not come down in any substantive way to visit that community.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P503,"And. It is extraordinarily difficult. Having sat in some of those rooms, then watching them encourage the development of this community of drivers.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P504,"To now see those same, mostly young people be put in a economic hardship under for the possible threat of having their bike confiscated.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P505,When for years 11 street was encouraged.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P506,I am I trust our precinct.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P507,I trust. This enforcement action will be done as compassionately as possible. I do think. There is a conversation to be had afterwards between meetings and sessions.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P508,"More broadly, with members of this board to talk more about a bit of that history of how we got to this point and how it will be responded.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P509,"To, Thank, you, Troy, Okay.",,,0,0,,
+P510,"I feel like Vanna White, but yeah, we're going to try to keep the questions.",,,0,0,,
+P511,"You, don't want to say anything? Yeah.",,,0,0,,
+P512,"Oh, questions to about a minute or.",,,0,0,,
+P513,"My question for you, Susan, is what it besides, the police.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P514,"Being in that area near the library over by Su Park, is there any other Cuz when I walk by there?","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P515,"There's, not a lot of lighting in there and there's a lot of like dark spots in that park, not saying that will be helpful, but that does help deter the little spots that people won't see when people are or might be using drugs.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P516,"Now, that's actually really important. If you see lights that are out, they may have already been reported, but um, If you would both call 311-and let me know where they are, um, I will make sure, because it's a combination of both parks and DOT. U, but yes, We are concerned about lights that are out or areas that are dark. So, please let me know. Quick question, Susan, and, like everyone, else, really grateful for all the work you've done this month in particular.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P517,"on the housing plan. Engagement, Is that more of like a oneandone or is there going to be a it's? We just commented on the draft? Okay.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P518,"So any opportunities for the land use community to be weighing in on like an ongoing basis, or unfortunately, we had did not have enough time to put it on.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P519,The committee.,"T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P520,"Absolutely. It would have gone over, but that's I'm going to say one reason. The district needs is so important because you vote on those and we took things from there.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P521,"and I see with city of Yes and everything else, I actually periods and notifications, the community boards getting shorter and shorter.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P522,"So, It's really important that the committees take positions: proactively.","T9 - GPT-5.6 Luna,T13 - Claude Opus 5.5",,2,2,,G10
+P523,"Okay, Thanks, Sorry, hi, I just I had two questions.",T2 - Claude Sonnet 5.5,,1,1,,
+P524,"They're, both pretty short. the first question I had is, Is there any warning that can be given to the folks that are driving on 11th Street?","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P525,"So that way they could move their bikes if they aren't biked um, properly, especially if they are a vulnerable population.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P526,"It, wouldn't um, yeah, I'm sorry.",T2 - Claude Sonnet 5.5,,1,1,,
+P527,Start over the beginning. Okay.,T2 - Claude Sonnet 5.5,,1,1,,
+P528,"I was just wondering if it was possible to maybe give a warning to the drivers on 11 Street that law enforcement is doing a sweep just because they are a vulnerable population, Yeah.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P529,"Well, There are signs up now, but unfortunately they're only in English and these men are almost West African and speak various languages. We're. Trying in the process.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P530,"Also several organizations sent out a letter last night and was asking that instead of enforcement, that the bikes be tagged and say these are illegal and do that for two weeks.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P531,"This was signed by Community Board, 3, African, Communities, Together, uh, Workers, Justice, um, EV, Loves, Cafe, Walt, and Immigration Coalition.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P532,"Awesome. and then yeah, uh, My second question is that is there any?",,,0,0,,
+P533,"Are there any um, efforts beyond like heightened police presence in the parks to address the uh, higher usage of drugs? That has been seen? I don't know what kind of action you're you could be referring.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P534,"To. I mean there's homeless out, so there's a lot of outreach.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P535,We have excellent providers. So. We do have a city contracts with Goddard Riverside.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P536,So. They do homeless outreach multiple times a week.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P537,"housing does harm reduction, out. There's, two other organizations that do harm reduction.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P538,The city has a medical ban and SDR.,"T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P539,"I mean, There's a lot of outreach there.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P540,"but other there's outreach, there's police. I do have a followup on that. I don't know if my information is incredibly outdated at this point, but I was under the impression that we had mobile crisis teams that were that would be present to essentially like be there when someone is having like an a medical like mental health emergency, for example.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P541,"Instead of calling the police. And so I'm wondering if that is something that we do have, could it be expanded to also include things like reducing the amount of drug usage at Seward Park rather than police.","T3 - Claude Sonnet 5.5,T7 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P542,"And, then my second question had to do with you.",,,0,0,,
+P543,I don't think you finished your sentence when you said that the flyers were mainly in English. A lot of these West African.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P544,Only in English. Yeah.,"T2 - Claude Sonnet 5.5,T2 - Claude Opus 5.5",,2,2,,G2
+P545,"A lot of these West African drivers primarily speak French, but even then can not read French.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P546,"And. So you said so when we had the cleanups, we had them translated in five languages, right?","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P547,Right.,T2 - Claude Sonnet 5.5,,1,1,,
+P548,"And. So, but you were saying like you're in the process of what?","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P549,You said the city is in the process of having it translate.,"T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P550,Translate. Okay.,T2 - Claude Sonnet 5.5,,1,1,,
+P551,"But. Will they have someone go there? verbally, like so I'm, West, African I will say some of these people can't like they're literate, so really well organized as far as the nonprofits?","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P552,"Yes, African communities together and workers, justice and cafe wall.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P553,"All of them do outreach like verbal outreach, they're planning to do audible messaging and all that groups are wonderful. They're, just wonderful. Okay, great.","T2 - Claude Sonnet 5.5,T2 - GPT-5.6 Luna,T2 - Claude Opus 5.5",,3,3,,G2
+P554,Thank you.,,,0,0,,
+P555,"Okay, thank you.",,,0,0,,
+P556,"The next order we have is executive. Yeah, exact.",,,0,0,,
+P557,Okay.,,,0,0,,
+P558,in our in the sheets provided out front as well as up here.,,,0,0,,
+P559,"There is a revised bylaws. That's. What we went: over, Oh, crackerjack, Okay.",T23 - Claude Opus 5.5,,1,1,,
+P560,I don't think I have anything for exec. Okay.,,,0,0,,
+P561,"So, nothing from ex. Oh, that's right.",,,0,0,,
+P562,"That's, the bylaw task. Force. It was just we met the same day.",T23 - Claude Opus 5.5,,1,1,,
+P563,Okay.,,,0,0,,
+P564,"So, nothing from exec. So, we're going to move to SLA Clint. Okay.",,,0,0,,
+P565,"You'll, see in your packets that we had. We are the one committee that has a meeting in August.","T5 - Claude Sonnet 5.5,T14 - Claude Opus 5.5",,2,2,,G8
+P566,"So, We have two months worth of resolutions.","T5 - Claude Sonnet 5.5,T14 - Claude Opus 5.5",,2,2,,G8
+P567,There was Charlie was conscientious enough to point out to me that there was a mistake on one item.,"T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T14 - Claude Opus 5.5",,3,3,,G8
+P568,"It was number 10 on the August agenda, which is yes page five and it's soft hours.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T14 - Claude Opus 5.5",,3,3,,G8
+P569,"Tea, house. They were coming in for a beer and wine license which it says up above, but in the therefore it be resolved. There. It states recommends the denial of a full on premises license unless they agree to the following: stipulations.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T14 - Claude Opus 5.5",,3,3,,G8
+P570,"that should read recommends the denial of a beer and wine license. Unless they were, they agreed to the following: stipulations. So, it's just a minor. It was clearly it was just a clerical error on my part, but just making sure that everyone's aware of that it was a beer and wine license for number 10 softours tea, house, Oh, great.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T14 - Claude Opus 5.5",,3,3,,G8
+P571,I did I just did a great job. This month.,T5 - Claude Sonnet 5.5,,1,1,,G8
+P572,"Apparently number three, which is Cozy Cafe.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T15 - Claude Opus 5.5",,3,3,,G8
+P573,"Yes. Therefore, be resolved that community board 3 recommends denial of full on premises.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T15 - Claude Opus 5.5",,3,3,,G8
+P574,"License. That should actually also read, therefore be resolved. That community board 3 recommends the denial of a beer and wine license for the premises located unless the applicant agrees.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T15 - Claude Opus 5.5",,3,3,,G8
+P575,"So yes. So, two items, number three and number 10 from August.","T5 - Claude Sonnet 5.5,T10 - GPT-5.6 Luna,T15 - Claude Opus 5.5",,3,3,,G8
+P576,"And. Let me guess, Michelle, but there was there another one, Oh, I thought you had your hand.",,,0,0,,
+P577,"I was like, I did it again, probably. Okay.",,,0,0,,
+P578,"Anything, else? Does. Anyone else have any questions or any comments about anything that I Yes, I would like to make. A I would like to make a motion to deny August SLA number five Allen Grill.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P579,"Is there, a second for that motion?","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P580,"So. This operator is formerly of time again, which is on the corner of foresight and canal.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P581,"I don't think the resolution like fully explains the location that he was associated with, and this new location that he's applying for is unlicensed, which generally we do not give full liquor licenses to unlicensed locations.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P582,"I understand that it's on Allen Street, but it's becoming like kind of a saturated area and also like in conjunction with the fact that his last location has been very problematic and it's like w around the corner.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P583,That is why I made that motion to deny.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P584,"Now, I would say that if we're going to do that, we would need to bulk up the resolution a little bit more to tell the story.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P585,Like I don't see 311 complaints in here from time again.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P586,and I there weren't a lot of 311 complaints from through from time.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P587,"Again. And I think I'm sure that there are I think when it happened there wasn't we can check, but I mean Susan I you know that location. No. It was a huge problem, but I don't know that there were a lot of 311 complaints.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P588,I think was the issue.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P589,"I see. I can I'll check and I'll pull them, but not complaints, Right.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P590,"All, right.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P591,"So, so whatever context, if we vote this, I just maybe allow Susan and staff to fill in some of the context for the complaints from time.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P592,"Again. yeah, I think that's all I got. Okay.",,,0,0,,
+P593,Right.,,,0,0,,
+P594,The mo about I ask you to repeat the motion.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P595,"Michelle Michelle, Can you repeat the actual motion that we just voted?",T4 - Claude Sonnet 5.5,,1,1,,G4
+P596,"On? The motion is to make SLA August number five from a recommendation to deny unless stipulations are agreed to just recommendation to deny, which is for new members.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P597,"That's a denial recommendation to deny, unless is an approval as confusing as that sounds.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P598,So. This is to make it a denial so that they won't get community board support for this license.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P599,"If they choose to. They would have to go straight to the state liquor authority for approval. Okay, Molly, Did you get the motion?","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P600,No. Molly? Did you get the motion?,,,0,0,,
+P601,Okay.,,,0,0,,
+P602,before we move forward? Does anyone else have to any Okay.,,,0,0,,
+P603,"Just as a comment as a response to explain further, when we voted on this at the committee, it was split.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P604,It was a 3 to2 vote.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P605,It was kind of a. We spent a lot more time on it than we should have.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P606,"and just for those of you, and I'm not trying to sway anyone for or against. I'm. Just giving you the explanation of why the committee voted the way they did.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P607,"Yes, she's, right.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P608,"And. The community board voted on guidance, not to increase the impact of any application of any location with the new with the liquor, license.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P609,"So, and we do very rarely grant full liquor licenses in an unlicensed location. We have done it in the past. It's been H. It's happened on Avenue C last year, which is coming to us again next month, but another se separate.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P610,"We did it for this location simply because it's a very wide avenue. Allen Street is very wide. There's a there's, the median down there and she's right.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P611,"It's, it's close to Dime Square, which is becoming a problem, and we discussed that at the committee about extending the use further over that direction.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P612,"As far as it being next to the temple, The temples are not exclusively used as a church. They have other uses in the building. So. The state would not consider that for the 200 foot rule. So in the state's eyes, that's not an exclusive use.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P613,So. We can't use the 200 foot rule in this situation.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P614,"Even, though it's next door to an active temple, It's not exclusively used as a religious, building. So. We don't have that in our favor in this situation.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P615,It's a wide area.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P616,"They, they did agree to limit.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P617,"They originally were asking for DJs in later hours. They agreed to reduce their hours to 12 during the week, two on the weekends, and eliminate DJs.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P618,"In, the end, We decided to make that compromise, because if they go to the SLA, if we deny it outright, which was discussed, and they go to the SLA, the SLA could approve it without any of our stipulations, They could give them the DJs and the 4 a.m. hours that they asked for.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P619,"So, That's why we decided to make this compromise, for lack of a better word. And, given that it's not a major problem area at this point in time, that was it.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P620,"So. That I just wanted. To give you the background of why the committee voted, and we discussed it a long time.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P621,"So. Take that for what it's worth and Michelle's motion again was to deny it outright, So yes, so I want to understand the reason, because you guys have moved from having the stipulations to essentially proposing that it not that they don't that we deny entirely her motion.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P622,"So currently it was deny unless they agree to the stipulations and, like Michelle, said it's a little confusing, but it's the best way to deal with it for the state, because, if we just say approve or deny, then there's no stipulations.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P623,"So, It's deny unless they agree to the stipulations that are listed.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P624,"What Michelle's motion that she's made is to just flat out deny, which means it's not right.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P625,"Now. We, basically approve. Deny, unless they agree to stipulations, and they did agree to the stipulations means it's approved with those stipulations.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P626,Her motion is simply to just is to deny.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P627,Okay.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P628,"And. Will that stop them? How? Would that stop them from going to SLA? Well, no, they? So the community board is a recommendate.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P629,"We issue, a recommendation to the state liquor, authority, Okay, In terms of the application, So we are we're so when we say approve or deny, we're actually recommending that the state approve or deny.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P630,"So when they go. If they choose to go, they can go to the state liquor authority without our approval or in the case, if we deny, they can still go to the state liquor authority and the state liquor authority can choose to approve with stipulations. But in this case, If we're denying, Another method we often take is we'll put even more strict stipulations on that they refuse to sign, and then it's denied because they refused the stipulations. In this case, It didn't happen that way.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P631,"So, it would just a flatout denial without the stipulations. So, If it goes to the state, then the state would just either accept our denial or they could choose to approve. But. They don't have our stipulations, whether they would put any other stipulations, because the applicant asked for whatever they want at that point.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P632,Okay.,,,0,0,,
+P633,"Got, it, Thank, you, Hold, on.",,,0,0,,
+P634,"She, just asked me. I can Yeah.",,,0,0,,
+P635,"So in terms of the process, then, if they do go to the state, then the community board can go up to the state to support our denial and we would need community members, because if it's just the community board, the state is a little bit wishy-washy on whether they would support that.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P636,"If the community board is re or if the community members are willing to go up, and in this case we only had one community member in opposition at the meeting.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P637,"So, we didn't have a lot of opposition to this.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P638,"So. That was another reason why we kind of ended up not ending up approving it, because there wasn't a lot of community opposition to this.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P639,"I mean, so it wasn't so Carlin what Sorry.",,,0,0,,
+P640,And? Actually there was two. I think there was one person in person and there was Carlin on Zoom.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P641,Hello.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P642,"Yeah, That location is surrounded by Chinese families who are ESL. They can not attend these meetings like they signed stipulations for the time cafe when they opening a few years, back.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P643,They haven't adhereed to the stipulations they signed. So. What makes us think that they're going to keep their promise on these stipulations? Here?,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P644,"You, know, crowd. Control, If anybody's been by time cafe on a Thursday, Friday, Saturday or you know, Friday Yeah.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P645,"Thursday, Friday, Saturday, There are 150 people outside drinking.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P646,"That's, the corner of Foresight and Canal Street. Now I don't come out at night, too often, but I made four visits there within the last month.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P647,Right.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P648,I see no less than 100 people outside.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P649,Right.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P650,"So, so they are not keeping any kind of crowd.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P651,"Control. And just this applicator for this neighborhood. So, I think we take our chances with a straight denial. Depends, Okay.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P652,I don't want to belabor this one point.,,,0,0,,
+P653,"So, I'm, going to two more and please make the point to either add something that hasn't been said or ask a question for clarity.",,,0,0,,
+P654,"He mentioned time cafe, but this is Cozy Cafe.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P655,"So, Are they the same owners? Did I miss that? Or? He was just making Adam Oh, same manager. Okay, thank you.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P656,"Okay, the owner.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P657,The owners of Time Cafe are splitting up.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P658,One is at the moment still keeping Time Cafe and the other one joined or is leaving in his opening his own business.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P659,"In his explanation, He said he didn't like the problems in the way it was being run.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P660,So. That's why he's opening a new place was his explanation to us. And. We questioned at the committee his whole DJs and everything else.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P661,"He agreed not to do that was part of our whole negotiation. I'm, going to close it now. I'm, going close the debate and put out for the vote.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P662,Okay.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P663,"Ro, Can you do a roll call vote for me for community?","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P664,"So? This is on just to clarify, It's on Michelle's motion to deny just to clarify that the vote.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P665,"What you're going to be voting on, we're going to do a roll call vote for is the motion that was made for a straight and outright denial of item number five, Wasn't it?","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P666,Yes. Number five of the August agenda for 11 Allen Street.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P667,"Michelle, I just want to double check. Is that the motion?",T4 - Claude Sonnet 5.5,,1,1,,G4
+P668,Straight denial. Okay.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P669,Sorry about that.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P670,"So, The vote goes.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P671,"If you vote yes, is for straight denial.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna",,2,2,,G4
+P672,Vote no.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P673,"It is to move as is. So, That's what we're voting on right.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P674,"Now, yes, would mean. Deny. No would mean to move forward with the current resolution.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P675,fun. Okay.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P676,Adam Alolive. Yes. Steven Ballinger. Oh.,"T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P677,"He's absent. Tanya Bates. Lee Berman is absent. Carlin Chan, yes. Ariad Nachua, Vincent Cerrito, Claudia Perez, no Claud, Claudia Dea Cruz, Eric Diaz, sorry.","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P678,"No. Alistister is absent. Tahesha Fields. Yes. Naima Fana. John Foul. Yes. Katherine Fred is absent. Sean Garcia. Yes. Ryan Gillum absent. Charlie Golden. Yes. Herman Hewitt. Trevor Holland, absent, Mary, Jen, Nancy, Kong, yes, Michelle, Cooper, Smith, yes, Diane, Lake, Francisco, LeBron, yes, May, Llaya, Mayhei, Mahia abstain, Michael, Lavario, Molly, Lou, Troy, Mack, Campbell, Mun, John, Naid Andrroni is absent. Graven Olivarez. Daisy Paz. Elena Perez. Rod Romanian, Yes, Rama, Oh, she's absent. Deare is absent. Tal Roed. Jayen Rodriguez. Oh, she's absent. Arnett Scott. Clint Smeltzer. Sandra, Strer, Daniel, Tano, Zachary, Thomas, Yes, Herman, Oh, I'll, get back to him. Serenetti Timwa, Alejandro, Torres, Yes, Zulia, Okay, Did I say that right, though?","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P679,"No, What? How, do you say your name? Sorry.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P680,"Zuli. Zulai. Okay, perfect, Thank, you, Josephine, Vez, Epstein, Kathleen, Webster, absent, And, then Herman Huwitt, Would you like to vote deny, abstain, or no on the motion to deny SLA item number five?","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P681,"Abstain, Okay, And, I think. I think that closes. Was there anything else for SLA before I go sit: down? Okay, Thank, you everyone.!","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P682,Thank you.,,,0,0,,
+P683,"Everyone. Moving, moving on. We have land use, John, Oh, land use and EDC.",T17 - Claude Opus 5.5,,1,1,,
+P684,Good evening everyone.,,,0,0,,
+P685,So we had a joint meeting with economic development subcommittee and land use to discuss the RFP for the Essex market.,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P686,"Unfortunately, EDC wasn't very prepared to answer a lot of our questions.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P687,"As a brief reminder, the RFP was supposed to go out by end of this month.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P688,We have passed two resolutions trying to outline what we would want to see in the RFP so that to make sure whoever is going to run SX market is still running a community market.,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P689,"However, based on our conversations with them, They didn't have a clear answer on what was incorporated from our resolutions.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P690,"Instead, We'll have a meeting with them later this week to try to clarify that.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P691,So. The main thing for the resolution was that we asked them to postpone the issuance.,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P692,So we have a better answer in terms of what's going to be included and what's going to be asked of the manager.,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P693,Any questions?,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna",,2,2,,G5
+P694,Thank you.,,,0,0,,
+P695,"Moving, on to transportation. The question is about the meeting like who are the stakeholders?","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P696,"When is it open to the public? It's going to be me. Demaris, as chair of land use, I think Susan will be there as well and then the point of contact at EDC.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P697,"It won't be open to the public, but we can give an update, obviously to everyone.","T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P698,This is regarding market line or you're talking about the whole market. Great question.,"T6 - Claude Sonnet 5.5,T12 - GPT-5.6 Luna,T17 - Claude Opus 5.5",,3,3,,G5
+P699,"It's, just Essex Market, So it's the ground floor when you walk, in. The market line downstairs is separate. Hey everybody, no resolutions for tonight, but I do have just a few things that I want to just go over from the meeting.","T6 - Claude Sonnet 5.5,T17 - Claude Opus 5.5",,2,2,,G5
+P700,"First one was the RAT inspections and complaints. So this is this was a hybrid meeting, So if you're interested in any of this, you can go online and watch it, but if you have, it was actually a really good conversation with DO.",,,0,0,,
+P701,"If there's any rat issues that you're seeing, there is, if you Google or Yahoo or wherever you search for, uh, search for NYC rat map and it's a great map, that's all colorcoded and shows um, really every property in our district really across the city of like where rat sightings are, If there's open, investigations, those types of things.",,,0,0,,
+P702,"And, so it's a good place to start to see if you need to put in a complaint to 311, use it and very cool map.",,,0,0,,
+P703,"We also went over some transportation, equity, analysis, Susan and I met with IBO, which is independent budget office in the summer, and really what we're want we want to do is just like is CB3 from an equity standpoint, getting what we want?",T18 - Claude Opus 5.5,,1,1,,
+P704,"And. So there was a whole bunch of thing or not what we want, but what we need and what we should have compared to everybody else.",T18 - Claude Opus 5.5,,1,1,,
+P705,"we had a kind of like I had like 10 ideas we Susan and I discussed with them, based on like what they could do, research for us on. So at the committee we kind of called that down to like three top one was actually really cross.",T18 - Claude Opus 5.5,,1,1,,
+P706,"Town buses is something that we want to really look into. as well as neighborhood parking locations. and the third one escapes me. next, one up, uh, so we're getting two, uh, pilot public restrooms that are free, uh, in our district.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5,T18 - Claude Opus 5.5",,4,4,,G7
+P707,We there's only 17 across the whole city.,"T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P708,"we're getting two of them. It's really everything like I think south of 125 is where we're the only district that has it, Delansancy and Suffach is going to be one of those and Cooper Square at East, Sixth, Street, Third, Avenue.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P709,"DOT is the lead agency. They are working at putting them in there, There's, no utility costs, so they're actually going to be installed. Mid-Occtober. and they'll be there for a year, it's a private company that is actually contracted to keep them clean access.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P710,"We had a long conversation of just some of the concerns that we had just on access, who gets how to access it, emergency kind of calls.","T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P711,If you're in there. There's a few things.,"T11 - Claude Sonnet 5.5,T8 - GPT-5.6 Luna,T8 - Claude Opus 5.5",,3,3,,G7
+P712,"So, we're going to have a resolution next month that just kind of puts it all down in writing and just gives us what to do next during the pilot, period.","T11 - Claude Sonnet 5.5,T8 - Claude Opus 5.5",,2,2,,G7
+P713,"So, that'll come next month that we'll have a resolution for you.","T11 - Claude Sonnet 5.5,T8 - Claude Opus 5.5",,2,2,,G7
+P714,and then just as a FYI so Arnett and I also penned a letter based on all the resolutions that we approved here over the past year and a half specifically at Manhattan Bridge at the exits.,"T13 - Claude Sonnet 5.5,T14 - GPT-5.6 Luna,T19 - Claude Opus 5.5",,3,3,,G14
+P715,"So we reiterated to the mayor and to DOT where we stand as a community with our concerns at the foot of Manhattan Bridge and what's going on there, and especially with the most recent crash and death of one of our own folks, there. also.","T13 - Claude Sonnet 5.5,T14 - GPT-5.6 Luna,T19 - Claude Opus 5.5",,3,3,,G14
+P716,The letter asked for an update on the Canal Street redesign project.,"T13 - Claude Sonnet 5.5,T14 - GPT-5.6 Luna,T19 - Claude Opus 5.5",,3,3,,G14
+P717,"U, as that is we haven't, had an update since January, so that was sent out.","T13 - Claude Sonnet 5.5,T14 - GPT-5.6 Luna,T19 - Claude Opus 5.5",,3,3,,G14
+P718,"Any, questions?",,,0,0,,
+P719,"Great, Y, The transportation. Equity piece reminded me of the congestion pricing conversation we had like a year and change ago.","T12 - Claude Sonnet 5.5,T13 - GPT-5.6 Luna,T20 - Claude Opus 5.5",,3,3,,G15
+P720,I'm curious if MTA or DOT are planning to come back to talk about. Like because I know they released the air quality report and we had penned a resolution about potential impacts on the FDR.,"T12 - Claude Sonnet 5.5,T13 - GPT-5.6 Luna,T20 - Claude Opus 5.5",,3,3,,G15
+P721,"I think that was the only place where there was potentially increased congestion, projected. I'm curious, whether or not that actually bore out and if there's any reporting planned and if not whether we could request it.","T12 - Claude Sonnet 5.5,T13 - GPT-5.6 Luna,T20 - Claude Opus 5.5",,3,3,,G15
+P722,"Sure. that didn't that wasn't on one of our lists, but I think it's probably something that we could probably follow up on that specifically. Any other questions?","T12 - Claude Sonnet 5.5,T13 - GPT-5.6 Luna,T20 - Claude Opus 5.5",,3,3,,G15
+P723,Okay.,,,0,0,,
+P724,"I'm going to pass this to all. So. You can give us the Yes. So on the motion to deny SLA item number five, We have 20 yeses, 10 nos, and nine abstaining.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P725,So. The motion passes to deny.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P726,Oh. Okay.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P727,I just want to give a little information.,,,0,0,,
+P728,Out. I mean just a little caveat to the current vote.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P729,"Well, We just as a community board, decided that SLA once we deny.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P730,"If we are not there at SLA meeting, if the community isn't there at SLA meeting, they may have the permit without any stipulations, which would mean anything that they do, that we do not like, There is no tandem.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P731,Re enforcement on it. What we have at time is something that we can go back and say they're not doing based on the stipulations.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P732,"What we did just now was give a possible grant to a permit and they will not have any stipulations. That means it may be a DJ or anything else that they want. So, If you truly do not want this as a full bar or full license, I implore you to follow this and go to the SLA for the final vote.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P733,"Otherwise, what we did here would not matter.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P734,"So, This is just one step. Please follow up. Otherwise, We will have something else that we do not want. This is just phase one. Okay, All, right, Election, Yeah, If I could just add to that.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P735,"If you want to deny it, like Arnett said, you have to go up, The community board office will organize with people that do want to go.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P736,"Up. We'll, try for either Clint or myself to also go up and advise you on getting elected official support, that kind of thing.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P737,"So, um, It probably will take a while, but please let me know when it happen When it comes out. If you're willing to go up. I thought you announced it. Okay, I'm just going to interrupt and give the election results.","T4 - Claude Sonnet 5.5,T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,4,4,,G4
+P738,Okay.,T10 - Claude Opus 5.5,,1,1,,G11
+P739,"We have Zachary Thomas at 14 and Daniel Tal at 25. So, congratulations, Daniel, Okay, Next up, We have parks and recreation.","T18 - Claude Sonnet 5.5,T17 - GPT-5.6 Luna,T10 - Claude Opus 5.5",,3,3,,G11
+P740,"Oh, Carlin. Okay, Let me give you the.",,,0,0,,
+P741,"Let me give you the mic and try to make it as brief as possible, because I'm I don't want to take too much time.",,,0,0,,
+P742,I was just going to ask. Maybe Susan can send out an email when it when the this application comes is scheduled on the downstate SLA.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P743,"So, I'm not going to give you an answer. You like. I can't I can not everything. So, What I ask residents to do and people have been doing wonderfully?","T4 - Claude Sonnet 5.5,T16 - Claude Opus 5.5",,2,2,,G4
+P744,"Is they watch the SLA calendar. If I do get a notice and I will try to do that, but we do ask people, please watch the SLA calendar.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P745,It's just there's certain amount of things you can get done.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P746,"Enough. So, I'm sorry.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P747,"I wish we could do more. And I appreciate you saying that you would try. I honestly, would just tell you don't do it. You. Do a lot.",T4 - Claude Sonnet 5.5,,1,1,,G4
+P748,There's a lot on your plate.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P749,There may be something that's more urgent for the community board.,T4 - Claude Sonnet 5.5,,1,1,,G4
+P750,"If. You in fact believe that this is a denial, I implore you to check.","T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P751,You. Have this is phase one. You have to do the remaining of the work.,"T4 - Claude Sonnet 5.5,T11 - GPT-5.6 Luna,T16 - Claude Opus 5.5",,3,3,,G4
+P752,Hi everyone.,,,0,0,,
+P753,"I'm reporting for the parks, waterfront, and resiliency committee.",,,0,0,,
+P754,Trevor is not here: tonight.,,,0,0,,
+P755,"So, like transportation, We don't have any resolutions for you, this month, but we do have a couple of things: we'd like you to hear about.",T3 - Claude Sonnet 5.5,,1,1,,G3
+P756,"first of all, during the parks manager's report, both the Seward Park Conservancy and the Lower East Side Ecology Center, which is temporarily headquarters in Seward Park, complained about the increased drug use and the experiences that they are having both as members of the public and for the Lower East Sidecology Center, because they are in a building.","T3 - Claude Sonnet 5.5,T15 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P757,That is right.,"T3 - Claude Sonnet 5.5,T6 - Claude Opus 5.5",,2,2,,G3
+P758,"Next to a bathroom that is frequented by drug addicts. They've had some problems, and so we wanted to just get that on the radar and let you know that park users and other concerned people are also speaking up about the problems they're encountering.","T3 - Claude Sonnet 5.5,T15 - GPT-5.6 Luna,T6 - Claude Opus 5.5",,3,3,,G3
+P759,"and that was told to the Parks Department. In addition to the work that's being done with the Police,[Clears throat], we had an update on ESCR and BMCR.","T3 - Claude Sonnet 5.5,T15 - GPT-5.6 Luna,T6 - Claude Opus 5.5,T21 - Claude Opus 5.5",,4,4,,G3
+P760,Normally. We do those every other month.,T21 - Claude Opus 5.5,,1,1,,
+P761,Just wanted to. Let you know that team will be coming back in October. They didn't have a lot of detail for us on what's happening in BMCR.,"T15 - GPT-5.6 Luna,T21 - Claude Opus 5.5",,2,2,,
+P762,"So, that's the section down to the Brooklyn Bridge.","T15 - GPT-5.6 Luna,T21 - Claude Opus 5.5",,2,2,,
+P763,"and also they're, going to give us an update.","T15 - GPT-5.6 Luna,T21 - Claude Opus 5.5",,2,2,,
+P764,"part of the East River Park construction is going to be delayed, not the public amenities, but the new facility that they're building that will house the Lower East Side Ecology Center and be the headquarters of stewardship programs. they're having procurement challenges. They were not able to give us a lot of detail on that.","T15 - GPT-5.6 Luna,T21 - Claude Opus 5.5",,2,2,,
+P765,"So. They offered to come back and they hope to have more detail about what the procurement challenges are, What kind of delays we're looking at and to address some requests from the community to provide better support for park stewardship in the interim.","T15 - GPT-5.6 Luna,T21 - Claude Opus 5.5",,2,2,,
+P766,"and then finally, uh? Just if you haven't heard, the Tomkins Square dog parade is on again this year.",,,0,0,,
+P767,"In, uh, Avenue, B, Tomkins Square Park. they've been made some modifications to it to handle the crowds. It will be Saturday, October 17th. If you're curious about it, you can Look it up online and, uh, there's more detail there. And! There will also be information about how to contact the organizers in case you or your neighbors have any concerns about the crowds that will be attending or if you just want to find out how to get your dog in there.",,,0,0,,
+P768,"All right, that's it, Any, questions?",,,0,0,,
+P769,"All right, thank you, Thank, you, Diane, Moving on to Health and Human Services.",,,0,0,,
+P770,Okay.,,,0,0,,
+P771,"hi, good evening everyone.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P772,Today we do have a resolution for you to vote.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P773,On. It's on starts on page 20 of your vote.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P774,"Sheet. It's, quite long. It, goes to the end of the vote.","T15 - Claude Sonnet 5.5,T22 - Claude Opus 5.5",,2,2,,G16
+P775,"Sheet. So, it's about three pages. It is to support a mobile voting option for elections of the city of the community education councils and citywide education councils.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P776,"This is at the public schools. So. If you are a parent with a kid in public school These councils are the way that, You know, parents get elected onto the council, and it is the way that they have a say in what goes on in the schools that their kids go.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P777,"To. So. The problem has been that turnout has been really low, like at 2% and more than one election cycle. So. It's not just a fluke. there's a lot of reasons for it.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P778,it's outlined in the resolution.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P779,Some of it is just lack of education. There's also a New York City schools account which one-third of parents aren't even signed into.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P780,"Also, increasingly more households are mobile. Only households. That means the only computing device that they have in their home is a smartphone. There is no laptop, There is no computer and maybe not even a tablet. So, This proposal is to have a is to pilot a mobile voting option for these elections. It would be what they call a mobile first design. So, when they design it, it's you know, they make sure it's accessible by mobile phone, it would be multilingual.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P781,"It would be compatible with assistive technologies. It would and they would have you know, education or contact with parents before and during the voting process.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P782,"Also, you know now there are parents who don't use phones at all or families who don't.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P783,"So. It would not exclude those families who have technology problems at home, they're, not comfortable with technology, or they just feel like doing it in person.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P784,"So. This would the whole voting system would not be like an exclusively mo mobile voting. System. They would include that too. so where. This is to urge the New York City public schools, and they have another department, called the office of family and community empowerment.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P785,"I think it's called a face. Is that what they engage? I thought it was empowerment. I saw it on their website. I checked. It used to be engagement, and now it's empowerment. Right.","T15 - Claude Sonnet 5.5,T22 - Claude Opus 5.5",,2,2,,G16
+P786,So. They actually changed it. Okay.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P787,"So, to encourage them to pilot something to look into it and also do a lot more outreach about the voting.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P788,"Also to let you know this, so we did not make this resolution up by ourselves.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P789,"We got a lot of guidance from CEC1, which is covers school district 1, which is in the Lower East Side, and they also passed a resolution which is similar to this, and there are the parent leaders down here.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P790,"Are there, any questions?",,,0,0,,
+P791,okay.,,,0,0,,
+P792,"Yeah, a former CC member, Arnette, Laya, um, Alejandro, a bunch of us in the room.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P793,I would say for all the things you listed.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P794,"This is an important motion, but the thing that I think you didn't name is that the equity to access to voting is a big issue, but then that leads to, if there's a school that has more affluent parents who have more means to do outreach who can mobilize their parent groups?","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P795,"Usually white and affluent schools dominate the CEC's, so there's a big racial and class disparity. So, It's not only the access for being able to vote easily.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P796,"It's also this question of who makes up our CEC's, what parent leaders are represented on that body.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P797,"So, I just wanted to add that. Oh, one more, Sorry, I'm full of questions.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P798,Today.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P799,"I want to know. Is there a way to convey to parents that, like no immigration, information will be either taken or, if so distributed whatsoever?","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P800,"Because, again, I think I can see a lot of immigrant families not signing up for this for fear of being persecuted.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P801,there's something in the resolution about security and privacy and data.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P802,"So. That would it would be. Is that what you're talking about? And, then you know I mean you, don't really know I mean we don't really you don't really know a family's immigration status right because they don't ask they never ask I mean you can guess you know or from what they need, but it is never.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P803,"No kid is asked their immigration status when they enroll in public school, Yeah.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P804,"So, It should be like linguistically and culturally, You know, right, for lack of a better word, make sure like I had a situation with one of my residents that thought that it meant the election like.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P805,"Oh I'm, not a resident, yet I can't vote.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P806,I didn't register to vote so maybe to make that clear.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P807,"Also somehow someway you know, I know it sounds silly, but it may not be. You know what I mean for some people.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna",,3,3,,G16
+P808,"You have to be clear. This is, has nothing to do with your situation. I don't know right.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna",,3,3,,G16
+P809,"Is there any restriction for someone who Exactly. So, then that should be like highlighted. This way, more participation happens, too.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P810,Yeah.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P811,"So, you have to be an eligible family and you have to have a kid in public, school, But, yeah, so I think that that's part of the education and outreach that this is for it's not the regular voting where you have to be the right.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P812,"So yeah, So I would imagine that is true, and you know you don't have to be an American citizen or over 18, right?","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P813,"So, that's something they would need to include. So. This is so there's something about more better outreach and education to parents. In addition to the mobile voting. So, that's there's three whereases that we are asking for, and one of them is about. You know: education, outreach to parents. It's, the third, whereas Troy and we're gonna close it out with Troy. just wheation. so for folk online, We were promised in committee by one of the advocacy groups advocating for this, that resources were going to be made available explicitly to address multilingual and multi-ehood outreach to talk about those issues.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P814,"We were promised that those resources were already there that they would be deployed. Whether. They do or not, I can't speak, but we were told that, prior to our own deliberations, Okay.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P815,"And, just to add on to that, it's a voting mechanism, that's already existing with the CEC. The DOE can do a better job in outlining what that looks like for our immigrant parents, but this particular resolution is about having equity, to allow more people to vote.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,3,3,,G16
+P816,We already have they already. There are rules already in place about immigration status for children and things of that nature.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P817,"That's. Not that's! Not on the actual vote, if you have vote for a CEC member before it is basically the eligibility is based on your child being in school.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P818,"There's, no other identifying markers on that actual vote.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P819,"Now. What happens behind the scenes would probably is another conversation, but this particular application is a set aside to ensure that there's equity and more outreach and have people able to vote.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P820,"But. All these things are really fluent and complicated measures because of the world we live in now, So, I guess we can take that back to the provider just to ensure that our concerns are being addressed, Okay, Zoom, And, then so I just So, I just wanted to make sure that people understood that receive this, right?","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P821,"Like. This voting thing that we're going to get, what we're going to vote.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P822,"On. I just want to say that my recommendation would be that they explicitly say this is for school, you're voting for participation and this specific thing.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P823,"So, We don't assume people when you just say voting that people are just scared and they don't come.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P824,That's. My thing.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P825,"It don't matter because they could be Americans and still don't have common sense or they don't Yes, You can. Okay, Now we, after this we're really going to close it.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P826,Out. I just want to give a little context of do with a show of hands.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P827,Do. You guys know what a CEC is?,T15 - Claude Sonnet 5.5,,1,1,,G16
+P828,"Okay, just I had to ask relax.",T15 - Claude Sonnet 5.5,,1,1,,G16
+P829,"I the context is I'm. The former CC born president and so I just want to add, because this is an open zone, school district.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P830,That means that the majority of kids who go to school in this neighborhood are not from here.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P831,"We have schools like NES and Shang Wen, where the majority of these parents and students don't live.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna",,3,3,,G16
+P832,Here.,T15 - Claude Sonnet 5.5,,1,1,,G16
+P833,"However, they have a deciding factor on what happens in our neighborhood. For example, in our neighborhood right now, our children are not reading up to level.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P834,Their math levels are not on point.,"T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna",,2,2,,G16
+P835,"However, the other schools of parents who children not from here like NES and 184, Their concern is the gifted and talented program, which is not a concern in our neighborhood.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna",,3,3,,G16
+P836,"So, We need programs like this, because not everyone logs into the Amaya accounts and not everyone, votes. So, just to get some context of statistics in the neighborhood. Thank you.","T15 - Claude Sonnet 5.5,T21 - GPT-5.6 Luna,T22 - GPT-5.6 Luna,T22 - Claude Opus 5.5",,4,4,,G16
+P837,That was short. Thank you.,,,0,0,,
+P838,I appreciate that. Okay.,,,0,0,,
+P839,"thank you, May.",,,0,0,,
+P840,"Okay.[snorts] Next, we're going into bylaws. Come on down, Diane. And, then after that, um, Eric, if you want to Okay, got you.",T16 - Claude Sonnet 5.5,,1,1,,
+P841,"No, worries. I just want to say thank you to Alejandro for letting me out of the my seat so many times this evening.",T16 - Claude Sonnet 5.5,,1,1,,
+P842,"If you didn't get one of these handouts, there are copies up here at the front.",T16 - Claude Sonnet 5.5,,1,1,,
+P843,Table. There are proposed changes to the bylaws.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P844,"We're, not going to vote on them.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P845,Tonight.,"T16 - Claude Sonnet 5.5,T23 - Claude Opus 5.5",,2,2,,
+P846,"We'll vote on them at October's, full board, But this is your notice of the proposed changes.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P847,and I'll. Just tell you a little bit about what they are.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P848,"We have wanted to clarify and tighten up our attendance procedures, not in taking attendance but in dealing with attendance issues, and so the current bylaws state that you are.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P849,"If you miss too many meetings within a six-month period, you get a warning.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P850,"If. You then continue to miss too many meetings for the next three months, You may be subject to removal.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P851,And. Then there is a removal process specified in the bylaws.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P852,"It's, not just about attendance. It's, about all kinds of things that might cause you to be removed from the board.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P853,So. What we have are proposing in this change is that we come up with a we that we have a different process for attendance.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P854,"and so that, if you have too many absences during a six-month period, you will get a letter and you will be asked to come in and speak to the executive committee.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P855,"We want to deal with attendance issues, upfront.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P856,"We, don't want people to be removed from the board for attendance, reasons.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P857,"we. You were chosen for a reason, We want you here.",T16 - Claude Sonnet 5.5,,1,1,,
+P858,"So, If there is something that can be fixed, or if there's something that you can work with your committee chair or that thing, we'll have that meeting after the first time a problem happens, and hopefully that will be the end of it, because we are moving up that part of the process.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P859,"Then. The rest of the proposal is that if there is a second issue with your attendance, then it is then the job of the executive committee and ultimately the full board to decide whether to recommend your removal.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P860,So that's the first change. The second change is just removing attendance from the main process of removing a member from the board.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P861,"And. Then. Finally, the third change is: we just want to call out and specify that public members need to abide by all of the conflict of interest and other policies that apply to regular board members.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P862,Do you have any questions?,,,0,0,,
+P863,"Now? yeah, a question back here.",T16 - Claude Sonnet 5.5,,1,1,,
+P864,"Just, a quick note that the first edit says to recommend the board members removal to the executive.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P865,Committee.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P866,The executive committee should then determine whether to recommend removal.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P867,"If you recommend, and then they determine whether to recommend. It's like a double recommendation.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P868,"Yeah, what that's getting at is that the board chair makes the determination that this person needs to be recommended for removal, But then the executive committee also looks at that and votes on it.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P869,Yeah.,,,0,0,,
+P870,"It's, it's Yeah.",,,0,0,,
+P871,I just want to add our bylaws require 28 day notice.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P872,So. This will also be emailed out to everybody so that you have at least 28 days before the next board.,"T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P873,Meeting.,T20 - GPT-5.6 Luna,,1,1,,G17
+P874,"Okay, thank you.",,,0,0,,
+P875,Okay.,,,0,0,,
+P876,"If there Well, I want Oh, Okay. also want to add to that to the bylaws.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P877,"The by the attendance. Bylaws is not meant to be any a punitive measure for anyone. We just want to have accurate attendance accountability as well as if there is any issues that need to be addressed instead of waiting to the 9-month period, we're trying to move it up so that we can also support people as well as have attendance.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P878,"So, This is not a punitive measure, but we need to tighten it. Up. As. Well, as the Mattenboroough President's Office has this as one of their goals and priorities.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna,T23 - Claude Opus 5.5",,3,3,,G17
+P879,"So, we're trying to make sure we are ahead of the game and in step and everyone is on the same page.","T16 - Claude Sonnet 5.5,T20 - GPT-5.6 Luna",,2,2,,G17
+P880,"There is no report from Baroo Bath Houses, so I would like to move for the final roll call.",T22 - Claude Opus 5.5,,1,1,,
+P881,"Oh, You have something else to vote.",,,0,0,,
+P882,Okay.,,,0,0,,
+P883,Hello.,,,0,0,,
+P884,"Yes, Okay, Adam, Ala, yes, Okay, Steven, Ballinger, absent, Tanya, Bates, Is, that, yes for final vote?",T22 - Claude Opus 5.5,,1,1,,
+P885,"Yes. Okay, great, Lee, Berman, absent, Carlin, Chan, Ariadnachua, Vincent, Cerrito, Claudia, De, La, Cruz, Eric, Diaz, Alistar's, absent Tahisha, Fields, Naima, Fana I think she left so absent.",,,0,0,,
+P886,Okay.,,,0,0,,
+P887,"John, Fout. Can. You say that again? Okay.",,,0,0,,
+P888,"Sean Garcia, Brian, Gillum, accent, Charlie, Golden, Herman, Hewitt, Yes, Trevor, Holland, absent, Mary, Jen, Nancy, Kong, yes, Michelle, Cooper, Smith, Diane, Lake, I think we already voted deny on that, right?",,,0,0,,
+P889,"Wait, We already counted that vote.",,,0,0,,
+P890,"Oh, okay.",,,0,0,,
+P891,"Okay, I'm done.",,,0,0,,
+P892,That was number three.,,,0,0,,
+P893,"Francisco LeBron. Yes. Me. Laya Mayhei. Mahia. Michael Lavario. Molly Lou, Troy Mack, Campbell Mun, John Naid, is absent. Grain Olivarez. Yes. Daisy PZ. Okay.",,,0,0,,
+P894,"Elena Perez, Rod Romanian, yes. Rama absent. Demaris absent. Tal, Rooded, Jayen, absent, Arnette, Clint, Smeltzer, Sandra, Strer, Daniel, Tano, Zachary Thomas, saying get to. No, no. Alejandro Torres. Zulive, Velasquez, Josephine, BZ and Kathleen Webster. Thank, you everyone.",,,0,0,,
