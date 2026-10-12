@@ -17,7 +17,6 @@ export type TicketType = (typeof ticketTypes)[number];
 
 export const statuses = ["Open", "In Progress", "Closed"] as const;
 export type Status = (typeof statuses)[number];
-export type Source = "SMS" | "Transcript" | "Email";
 
 /** A geocoded point a ticket refers to. */
 export type Place = {
@@ -37,15 +36,9 @@ export type Ticket = {
   title: string;
   type: TicketType;
   status: Status;
-  source: Source;
-  document: string;
-  owner: string;
-  role: string;
-  nextSteps: string[];
   location: TicketLocation;
   requester: string;
   summary: string;
-  created: string;
   /** Highlighted character ranges in the transcript; the source of truth for evidence. */
   spans: Span[];
   /** Paragraph ids the spans touch (derived; kept for display and search). */
@@ -76,18 +69,6 @@ export const statusClass: Record<Status, string> = {
   Open: "to-do",
   "In Progress": "in-progress",
   Closed: "complete",
-};
-
-// Placeholder owners until tickets carry real assignments.
-const ownerByType: Record<TicketType, string> = {
-  "Quality of Life Complaint": "District Office",
-  "Public Safety Issue": "Public Safety Committee",
-  "Liquor License": "SLA Licensing Committee",
-  "Land Use Request": "Land Use Committee",
-  "Transportation Request": "Transportation Committee",
-  Other: "District Office",
-  "Budget Priority": "Executive Committee",
-  "Board Administration": "Executive Committee",
 };
 
 // Mapped places for the gold tickets. GeoSearch matches are its coordinates; it can't
@@ -156,15 +137,9 @@ export const initialTickets: Ticket[] = goldRows.map((r) => {
     title: r.title,
     type,
     status: r.status as Status,
-    source: "Transcript",
-    document: meetingTitle,
-    owner: ownerByType[type] ?? "District Office",
-    role: type,
-    nextSteps: [],
     location: { text: r.location_raw, places: seedPlaces[r.gold_id] ?? [] },
     requester: source?.requester ?? "",
     summary: source?.summary ?? "",
-    created: "Sep 29",
     ...(() => {
       const spans = spansFromParagraphIds(r.evidence.split(",").map((id) => id.trim()).filter(Boolean));
       return { spans, evidence: paragraphIdsFromSpans(spans) };
