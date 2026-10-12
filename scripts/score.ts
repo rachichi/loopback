@@ -5,7 +5,7 @@
  *   tsx scripts/score.ts --annotator "Claude Opus 5.5"
  *   tsx scripts/score.ts --all-annotators
  *
- * Flags: --gold <csv> --annotators-csv <csv> --threshold 0.3 --over-split 0.5 --json
+ * Flags: --gold <csv> --annotators-csv <csv> --threshold 0.3 --over-split 0.5
  */
 import { parseArgs } from "node:util";
 import { DATA_FILES, loadAnnotatorTickets, loadGold, loadRejected, loadRunTickets, type GoldTicket, type Ticket } from "../lib/data.ts";
@@ -20,7 +20,6 @@ const { values: args } = parseArgs({
     "annotators-csv": { type: "string", default: DATA_FILES.annotators },
     threshold: { type: "string", default: "0.3" },
     "over-split": { type: "string", default: "0.5" },
-    json: { type: "boolean", default: false },
   },
 });
 
@@ -90,8 +89,7 @@ function scoreAnnotator(name: string, all: ReturnType<typeof loadAnnotatorTicket
 if (args.run) {
   const { run, tickets } = loadRunTickets(args.run);
   const r = score(tickets, gold, opts);
-  if (args.json) console.log(JSON.stringify(summaryRow(run.prompt, run.model, run.run, r, run.costUsd)));
-  else printReport(`${run.prompt} · ${run.model} · run ${run.run}`, tickets, r);
+  printReport(`${run.prompt} · ${run.model} · run ${run.run}`, tickets, r);
 } else if (args.annotator) {
   scoreAnnotator(args.annotator, loadAnnotatorTickets(args["annotators-csv"]), true);
 } else if (args["all-annotators"]) {
@@ -128,17 +126,3 @@ if (args.run) {
   process.exit(1);
 }
 
-export function summaryRow(prompt: string, model: string, run: number, r: ScoreResult, cost: number) {
-  return {
-    prompt,
-    model,
-    run,
-    precision: r.precision,
-    recall: r.recall,
-    f1: r.f1,
-    typeAcc: r.typeAcc,
-    statusAcc: r.statusAcc,
-    evidenceF1: r.evidence.f1,
-    cost,
-  };
-}

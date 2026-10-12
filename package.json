@@ -1,5 +1,5 @@
 {
-  "name": "figma-make-app",
+  "name": "loopback",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -14,10 +14,13 @@
     "format": "oxfmt"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.78",
+    "ai": "^7.0.137",
     "lucide-react": "^1.52.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "simple-icons": "^16.34.0"
+    "simple-icons": "^16.34.0",
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",
