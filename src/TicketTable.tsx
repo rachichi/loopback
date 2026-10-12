@@ -1,8 +1,32 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { formatEvidence, statusClass, statuses, ticketTypes, typeClass, type Status, type Ticket, type TicketType } from "./goldTickets";
 
 // Evidence is edited by dragging highlights in the transcript; the ticket number is fixed.
 type EditableField = "title" | "type" | "location" | "requester" | "summary" | "status";
+
+// Resizable columns (after the fixed checkbox column), in pixels.
+const columns = [
+  { key: "title", label: "Title", width: 220 },
+  { key: "evidence", label: "Evidence", width: 120 },
+  { key: "type", label: "Type", width: 140 },
+  { key: "location", label: "Location", width: 160 },
+  { key: "requester", label: "Requester", width: 160 },
+  { key: "summary", label: "Summary", width: 320 },
+  { key: "status", label: "Status", width: 100 },
+] as const;
+type ColumnKey = (typeof columns)[number]["key"];
+const MIN_WIDTH = 60;
+const STORAGE_KEY = "loopback.ticketColumnWidths";
+const defaultWidths = Object.fromEntries(columns.map((c) => [c.key, c.width])) as Record<ColumnKey, number>;
+
+// Widths are a per-viewer convenience, so browser storage is enough; it may be unavailable.
+function loadWidths(): Record<ColumnKey, number> {
+  try {
+    return { ...defaultWidths, ...JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") };
+  } catch {
+    return defaultWidths;
+  }
+}
 
 export default function TicketTable({
   rows,
@@ -28,6 +52,31 @@ export default function TicketTable({
     scrollRef.current?.querySelector(`[data-ticket-id="${hoveredId}"]`)?.scrollIntoView({ block: "nearest" });
   }, [hoveredId, followHover]);
 
+  const [widths, setWidths] = useState(loadWidths);
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(widths)); } catch { /* storage unavailable */ }
+  }, [widths]);
+
+  // Drag a header's right edge to resize that column; double-click the edge to reset it.
+  const startResize = (event: React.MouseEvent, key: ColumnKey) => {
+    event.preventDefault();
+    const startX = event.clientX;
+    const startWidth = widths[key];
+    document.body.classList.add("col-resizing");
+    const move = (e: MouseEvent) => setWidths((current) => ({ ...current, [key]: Math.max(MIN_WIDTH, startWidth + e.clientX - startX) }));
+    const up = () => {
+      document.body.classList.remove("col-resizing");
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseup", up);
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+  };
+  const gridStyle = {
+    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")}`,
+    "--ticket-width": `${34 + columns.reduce((sum, c) => sum + widths[c.key], 0)}px`,
+  } as CSSProperties;
+
   const text = (ticket: Ticket, field: "title" | "location" | "requester" | "summary", label: string, rows = 2) => (
     <textarea
       className="cell-input"
@@ -39,11 +88,23 @@ export default function TicketTable({
   );
 
   return (
-    <div className="table-scroll" ref={scrollRef} onMouseLeave={() => onHover(null)}>
+    <div className="table-scroll" ref={scrollRef} style={gridStyle} onMouseLeave={() => onHover(null)}>
       <div className="ticket-grid ticket-head" role="row">
         <div className="check-cell"><input type="checkbox" aria-label="Select all" /></div>
-        <div>Title</div><div>Evidence</div><div>Type</div>
-        <div>Location</div><div>Requester</div><div>Summary</div><div>Status</div>
+        {columns.map((column) => (
+          <div key={column.key} className="resizable-head">
+            {column.label}
+            <span
+              className="col-resizer"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label={`Resize ${column.label} column`}
+              title="Drag to resize · double-click to reset"
+              onMouseDown={(event) => startResize(event, column.key)}
+              onDoubleClick={() => setWidths((current) => ({ ...current, [column.key]: defaultWidths[column.key] }))}
+            />
+          </div>
+        ))}
       </div>
       {rows.length ? rows.map((ticket) => (
         <div
