@@ -1,155 +1,65 @@
-# Loopback Community Board Portal
+# Loopback — MVP
 
-Loopback is a React portal prototype for Manhattan Community Board 3 (CB3). It brings together meeting preparation, ticket tracking, a meeting calendar, document templates, outreach drafting, and a board-to-board forum in one responsive interface.
+Loopback turns a community board meeting into a reviewed list of follow-up tickets. This branch (`mvp-state`) is the smallest version of the product: one screen where district office staff review tickets from a meeting against the meeting's own transcript and a map of the district.
 
-## Contents
+The full vision (Block Party ingest, review actions, cross-meeting follow-up, routing, multi-board) is described on the `ideal-state` branch. The broader prototype with Calendar, Templates, Outreach, Forum, Kanban/Roadmap views, and the Dashboard lives on `staging`.
 
-- [Portal Guide](#portal-guide)
-- [Staging](#staging)
-- [Future State](#future-state)
-- [MIT License](#mit-license)
+## What's in the MVP
 
-## Portal Guide
+**One screen, three linked parts.** It shows the CB3 Full Board Meeting of 9/29/26.
 
-The top navigation contains seven sections:
-
-| Section | What it contains |
+| Part | What it does |
 | --- | --- |
-| **Home** | CB3 welcome, links to common workflows, and a search field that opens Tickets with matching records. |
-| **Meetings** | A video file picker and optional meeting-minutes field for preparing meeting assets. |
-| **Tickets** | Searchable and status-filtered sample tickets, with List, Kanban board, and Roadmap views. The List view also has Map and Summary panels. Selecting a ticket opens its full detail page. |
-| **Calendar** | A monthly calendar and upcoming committee and board events. |
-| **Templates** | A gallery of sample document templates and recent documents. |
-| **Outreach** | Sample resolutions and community wins, their attachments, per-record channel toggles, and editable post previews for Instagram, Facebook, X, Blog, and Newsletter. |
-| **Forum** | Sample board-to-board questions and replies, with community resource links in a side rail. |
+| **Tickets table** (left) | The meeting's tickets. Title, Type, Map, Requester, Summary, and Status are editable in place; Transcript (the evidence paragraphs) is edited in the transcript. Search and status filter on top. Columns resize by dragging the header edges. |
+| **Transcript** (right, default) | The full transcript, with each ticket's evidence highlighted in its type's color. Hover a highlight to light up its ticket and row; drag the bold end bars to change exactly which words count as evidence. Clicking a row scrolls to its first highlight. |
+| **Map** (right) | OpenStreetMap with the CB3 boundary and a pin for every place a ticket concerns, colored by type. Hovering a pin highlights its row; clicking a place in the table's Map column flies to it. Add places from the table with NYC GeoSearch. |
 
-Every section ends with a shared black footer containing the Loopback logo and a static Contact Us label.
+**How tickets are made.** The tickets shown are the adjudicated gold set in `data/`. The extraction and eval scripts that generate and score tickets with Claude are kept on this branch:
 
-### Common workflows
-
-**Upload meetings:** Upload meeting transcript and drafts for tickets, documents, and outreach posts are generated based on discussion topics.
-
-**Find tickets:** Open Tickets, search by ticket number, title, type, or location, and optionally filter by status. Use List, Kanban board, or Roadmap to change the view. Select a row, card, roadmap event, or map pin to open the ticket detail page. Use Back to tickets to return to the ticket workspace. The List view's Map and Summary tabs switch the right-hand panel.
-
-**Search from Home:** Enter a phrase in the Home search field and submit.
-
-**Prepare outreach:** Select an outreach record. Toggle the icons in its Channels column to choose where that record should be prepared. Enabled channels appear available in the composer tabs. Edit the copy directly inside the post preview and use Post to mark the local draft as posted.
-
-**Join the forum:** Add a question with a title and details, or reply to an existing discussion. Use the left-side resource links to open public references.
-
-## Architecture
-
-The app is a client-side single-page application. Tab navigation and shared ticket state live in `App`; the current tab selects a view component. The interface does not currently use a router, database, or application API.
-
-```mermaid
-flowchart TD
-	Browser[Browser] --> Shell[index.html]
-	Shell --> Entry[src/main.tsx]
-	Entry --> Styles[src/index.css<br/>Tailwind v4 + portal styles]
-	Entry --> App[src/App.tsx<br/>App state and view selection]
-	App --> Header[PortalHeader<br/>navigation and page banners]
-	App --> Home[HomeView]
-	App --> Meetings[MeetingsView]
-	App --> Tickets[Ticket workspace]
-	App --> Calendar[CalendarView]
-	App --> Templates[TemplatesView]
-	App --> Outreach[OutreachView]
-	App --> Forum[ForumView]
-	Tickets --> Views[List / Kanban / Roadmap]
-	Tickets --> Detail[TicketDetailView]
-	Tickets --> Map[MapView / SummaryView]
-	Outreach --> Preview[Editable channel previews]
-	App -. sample records and local UI state .-> Data[In-memory data]
-	Map -. embedded external map .-> Boundaries[NYC Boundaries]
-	Forum -. external links .-> Resources[Public resources]
+```bash
+npx tsx scripts/run.ts --model claude-haiku-5-5 --n 3      # draft tickets with prompts/v1.md
+npx tsx scripts/score.ts --run runs/v1-claude-haiku-5-5-1.json
+npx tsx scripts/score.ts --all-annotators                  # annotators vs gold
+npx tsx scripts/log.ts runs/*.json                         # append scores + cost to results.csv
 ```
 
-### Project structure
+`run.ts` reads `ANTHROPIC_API_KEY` from `.env.local` (git-ignored).
 
-```text
-.
-├── index.html                 # Vite HTML shell
-├── package.json               # Scripts and dependencies
-├── pnpm-lock.yaml             # Locked dependency graph
-├── vite.config.ts             # Vite, React, Tailwind, and Figma Make setup
-├── public/
-│   ├── cb3_hero.jpg            # Home and sample outreach preview image
-│   └── mancb3_logo.png         # Community board brand asset
-└── src/
-	├── App.tsx                 # Portal views, sample data, and UI state
-	├── index.css               # Tailwind import and global/component styles
-	├── main.tsx                # React entry point
-	├── assets/logo.png         # Loopback logo
-	└── vite-env.d.ts           # Vite TypeScript declarations
-```
+## What the MVP leaves out
 
-Most page components currently live in `src/App.tsx`; shared design and responsive rules live in `src/index.css`. `lucide-react` supplies interface icons, and `simple-icons` supplies platform brand marks.
+- No persistence: edits last for the session only.
+- No accounts, roles, or access control. Don't enter confidential information.
+- One bundled meeting; no Block Party ingest yet.
+- No approve/reject/merge/split, no creating or deleting highlights.
+- Map tiles use OpenStreetMap's public servers (demo traffic only); GeoSearch can't find intersections.
 
 ## Development
 
-Requirements: Node.js 22.12 or later and pnpm 10. Install dependencies and start Vite:
+Requirements: Node.js 22.12 or later and pnpm 10.
 
 ```bash
 pnpm install --frozen-lockfile
-pnpm dev
+pnpm dev        # Vite dev server on $PORT (default 8443)
+pnpm build
 ```
 
-The Vite configuration binds to `0.0.0.0` and uses `PORT` when set; the default port is `8443`. Open the URL printed by Vite. If the port is already taken, choose another one:
-
-```bash
-PORT=8444 pnpm dev
+```text
+.
+├── data/                    # transcripts, gold/annotator/rejected tickets, ticket types
+├── lib/  prompts/  scripts/ # extraction (AI SDK + Claude), scoring, run/log scripts
+├── runs/  results.csv       # saved extraction runs and scores
+└── src/
+	├── App.tsx              # header, toolbar, workspace state
+	├── TicketTable.tsx      # editable, resizable tickets table
+	├── LocationCell.tsx     # Map column: places + GeoSearch picker
+	├── TranscriptView.tsx   # transcript with draggable evidence highlights
+	├── MapView.tsx          # Leaflet map, CB3 boundary, pins
+	├── goldTickets.ts       # ticket types and demo tickets from data/
+	├── transcript.ts        # paragraphs, offsets, span helpers
+	├── geosearch.ts         # NYC GeoSearch client
+	└── data/cb3-boundary.geojson
 ```
-
-Available scripts:
-
-```bash
-pnpm build    # Production build
-pnpm preview  # Serve the production build locally
-pnpm format   # Format files with oxfmt
-```
-
-## Staging
-
-The `staging` branch is intended for Netlify branch deploys; `main` remains the production branch. In Netlify, enable a branch deploy for `staging` under **Project configuration → Developer settings → Continuous deployment → Branches and deploy contexts**. Once enabled, pushes to `staging` deploy to a branch-specific URL, typically `staging--<site-name>.netlify.app`.
-
-## Current Prototype Boundaries
-
-- Ticket, calendar, template, outreach, and forum content is sample data in the frontend. Changes are not persisted to a server or database.
-- Outreach channel toggles, edited copy, and the Posted state are local UI state. The Post action does not publish to Instagram, Facebook, X, a blog, or an email service; no social accounts or publishing integrations are configured.
-- Outreach attachment thumbnails use the existing CB3 hero image as sample media. The filenames and media records are illustrative, not uploaded files.
-- Meetings currently provides file and minutes controls, but does not upload, store, transcribe, or generate documents yet.
-- Forum questions and replies are held in component state and are lost when the page is reloaded or the view is remounted.
-- Calendar entries are curated sample events. They are not synchronized with the live CB3 calendar.
-- The ticket map embeds NYC Boundaries, an external service. Its availability and map data are outside this app's control.
-- There is no authentication or authorization layer. Do not enter confidential or personally identifying information into this prototype.
-
-## Future State
-
-The long-term vision is to connect the portal's workflows to real, board-managed data and make the platform straightforward to replicate across all 59 New York City community boards. A shared foundation could support consistent workflows citywide while allowing each board to configure its own committees, services, events, and outreach.
-
-Potential capabilities include:
-
-- **Ticket intake and tracking:** Accept requests from residents, route them to the right board or committee, and track status and follow-up through resolution.
-- **Meeting and event calendar:** Publish and manage current meetings and events, with updates available to residents and board members.
-- **Personalized login experience:** Give residents, board members, and staff appropriate views, saved items, and permissions based on their roles.
-- **Outreach channels:** Prepare and manage communications across web, email, social, and other board-approved channels.
-- **Onboarding process:** Help residents and new board members find relevant services, understand the process, and get started with the portal.
-- **Metrics:** Provide useful, privacy-conscious reporting on requests, response times, participation, and outreach.
-
-These workflows would rely on secure APIs and durable storage rather than frontend sample data. Shared platform capabilities and board-specific configuration would make each deployment adaptable without duplicating the product.
 
 ## MIT License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
-
-## Engineering Practices
-
-- Keep shared records and cross-view state in the owning app/data layer. Keep view-only state local to a view unless it must survive navigation.
-- Model domain values with explicit TypeScript types and reuse the same records across List, Kanban, Roadmap, and detail views.
-- Keep examples clearly identifiable as sample data. Before production use, connect forms and actions to validated backend APIs and durable storage.
-- Treat uploaded files and user-generated forum content as untrusted input. Validate file type/size, sanitize rendered content, and enforce authorization on the server.
-- Never put API secrets, social publishing tokens, or credentials in frontend source or `VITE_*` variables. Use a server-side integration with scoped OAuth permissions.
-- Preserve accessible names and keyboard operation for icon-only controls, tabs, table selection, and form actions. Check focus indicators and color contrast when changing styles.
-- Keep layouts usable at mobile widths. Verify horizontal scrolling is limited to intentionally wide tables or calendars, not the full page.
-- After UI or TypeScript changes, run `npm run build` and check the affected workflow in the browser at desktop and mobile widths. Check the browser console and network when relying on external embeds.
-- Add or update automated tests when introducing nontrivial state transitions, persistence, authentication, file uploads, or third-party integrations.
