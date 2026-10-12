@@ -1,5 +1,9 @@
-import { useMemo, useState, type CSSProperties, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type CSSProperties, type ReactNode } from "react";
 import loopbackLogo from "./assets/logo.png";
+import { initialTickets, statusClass, statuses, ticketTypes, typeClass, withSpans, type Source, type Status, type Ticket } from "./goldTickets";
+import type { Span } from "./transcript";
+import TicketTable from "./TicketTable";
+import TranscriptView from "./TranscriptView";
 import { siBlogger, siFacebook, siInstagram, siX } from "simple-icons";
 import {
   BarChart3,
@@ -27,45 +31,20 @@ import {
   Paperclip,
   Play,
   Plus,
+  ScrollText,
   Search,
   Send,
   Settings2,
   SlidersHorizontal,
-  Upload,
   Users,
   X,
 } from "lucide-react";
 
-type TicketType =
-  | "Liquor license"
-  | "Proposal"
-  | "Service request"
-  | "Complaint"
-  | "Land use"
-  | "Budget";
-type Status = "To do" | "In progress" | "Complete";
-type Source = "SMS" | "Transcript" | "Email";
-
-type Ticket = {
-  number: string;
-  title: string;
-  type: TicketType;
-  status: Status;
-  source: Source;
-  document: string;
-  owner: string;
-  role: string;
-  nextSteps: string[];
-  location: string;
-  coordinates: [number, number];
-  created: string;
-};
-
 const mapBounds = {
-  minLat: 40.719,
+  minLat: 40.707,
   maxLat: 40.737,
-  minLng: -73.997,
-  maxLng: -73.972,
+  minLng: -74.002,
+  maxLng: -73.971,
 };
 
 const projectMapCoordinates = (lat: number, lng: number) => ({
@@ -125,74 +104,6 @@ const calendarEvents = [
   },
 ];
 
-const tickets: Ticket[] = [
-  {
-    number: "001",
-    title: "Third Avenue L stop closure proposal",
-    type: "Service request",
-    status: "In progress",
-    source: "Transcript",
-    document: "CB3 meeting transcript",
-    owner: "Transportation Committee",
-    role: "Transit advocacy",
-    nextSteps: ["Request MTA review", "Add to transportation agenda", "Measure rider impact"],
-    location: "Third Ave & 14th St",
-    coordinates: [40.7341, -73.9873],
-    created: "Sep 30",
-  },
-  {
-    number: "002",
-    title: "Delivery worker bike congestion on 11th Street",
-    type: "Complaint",
-    status: "In progress",
-    source: "Transcript",
-    document: "Public speaking comment",
-    owner: "9th Precinct",
-    role: "Enforcement coordination",
-    nextSteps: ["Renew enforcement on 11th St", "Coordinate sanitation cleanup", "Monitor corridor conditions"],
-    location: "11th St & Avenue A",
-    coordinates: [40.7288, -73.9805],
-    created: "Sep 30",
-  },
-  {
-    number: "003",
-    title: "Illegal bike storage in the East Village corridor",
-    type: "Complaint",
-    status: "To do",
-    source: "Transcript",
-    document: "Public speaking comment",
-    owner: "Community board liaison",
-    role: "Neighborhood operations",
-    nextSteps: ["Distribute flyers", "Coordinate with DOT and NYPD", "Track repeat violations"],
-    location: "East Village / 11th Street corridor",
-    coordinates: [40.7275, -73.9848],
-    created: "Sep 30",
-  },
-  {
-    number: "004",
-    title: "Beer and wine license stipulation review",
-    type: "Liquor license",
-    status: "In progress",
-    source: "Transcript",
-    document: "Licensing motion",
-    owner: "Licensing Committee",
-    role: "Licensing review",
-    nextSteps: ["Confirm stipulation details", "Follow up with applicant", "Record board recommendation"],
-    location: "E 11th St & 2nd Ave",
-    coordinates: [40.7299, -73.9861],
-    created: "Sep 30",
-  },
-];
-
-const typeClass: Record<TicketType, string> = {
-  "Liquor license": "purple",
-  Proposal: "green",
-  "Service request": "blue",
-  Complaint: "orange",
-  "Land use": "teal",
-  Budget: "yellow",
-};
-
 function Logo() {
   return (
     <div className="brand-lockup" aria-label="Loopback and Manhattan Community Board 3 branding">
@@ -225,7 +136,7 @@ function Tag({ children, className = "" }: { children: ReactNode; className?: st
   return <span className={`tag ${className}`}>{children}</span>;
 }
 
-type TabName = "home" | "meetings" | "tickets" | "calendar" | "templates" | "outreach" | "forum";
+type TabName = "home" | "tickets" | "calendar" | "templates" | "outreach" | "forum";
 type TicketView = "list" | "kanban" | "roadmap";
 type OutreachChannel = "Instagram" | "Facebook" | "X" | "Blog" | "Newsletter";
 
@@ -269,7 +180,6 @@ function OutreachChannelIcon({ channel }: { channel: OutreachChannel }) {
 }
 
 const tabDetails: Partial<Record<TabName, { title: string; subtitle: string }>> = {
-  meetings: { title: "Meetings", subtitle: "Upload meeting assets to generate drafts for tickets, documents, and outreach posts." },
   tickets: { title: "Tickets", subtitle: "Check, edit, and update status of existing tickets" },
   calendar: { title: "Calendar", subtitle: "Keep track of upcoming proposed and confirmed events" },
   templates: { title: "Templates", subtitle: "View document templates created by fellow community board members." },
@@ -298,7 +208,6 @@ function PortalHeader({ activeTab, setActiveTab }: { activeTab: TabName; setActi
       </header>
       <nav className="portal-nav">
         <button className={activeTab === "home" ? "nav-home active" : "nav-home"} onClick={() => setActiveTab("home")} aria-label="Home"><House size={16} /></button>
-        <button className={activeTab === "meetings" ? "active" : ""} onClick={() => setActiveTab("meetings")}><Upload size={15} /> Meetings</button>
         <button className={activeTab === "tickets" ? "active" : ""} onClick={() => setActiveTab("tickets")}><ClipboardList size={15} /> Tickets</button>
         <button className={activeTab === "calendar" ? "active" : ""} onClick={() => setActiveTab("calendar")}><CalendarDays size={15} /> Calendar</button>
         <button className={activeTab === "templates" ? "active" : ""} onClick={() => setActiveTab("templates")}><FileText size={15} /> Templates</button>
@@ -337,7 +246,7 @@ function Toolbar({
         <div className="filter-wrap">
           <Filter size={14} />
           <select value={status} onChange={(event) => setStatus(event.target.value as "All" | Status)}>
-            <option>All</option><option>To do</option><option>In progress</option><option>Complete</option>
+            <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
           </select>
         </div>
         <button title="Sort"><SlidersHorizontal size={15} /></button>
@@ -347,51 +256,14 @@ function Toolbar({
   );
 }
 
-function TicketTable({
-  rows,
-  selected,
-  onSelect,
-}: {
-  rows: Ticket[];
-  selected: Ticket;
-  onSelect: (ticket: Ticket) => void;
-}) {
-  return (
-    <div className="table-scroll">
-      <div className="ticket-grid ticket-head">
-        <div className="check-cell"><input type="checkbox" aria-label="Select all" /></div>
-        <div>Service Number</div><div>Title</div><div>Type</div><div>Status</div>
-        <div>Source</div><div>Supporting Documentation</div>
-      </div>
-      {rows.length ? rows.map((ticket) => (
-        <button
-          className={`ticket-grid ticket-row ${selected.number === ticket.number ? "selected" : ""}`}
-          key={ticket.number}
-          onClick={() => onSelect(ticket)}
-        >
-          <div className="check-cell"><input type="checkbox" aria-label={`Select ${ticket.number}`} onClick={(event) => event.stopPropagation()} /></div>
-          <div className="service-number"><span>{ticket.number}</span><small>{ticket.created}</small></div>
-          <div className="ticket-title">{ticket.title}<small><MapPin size={10} /> {ticket.location}</small></div>
-          <div><Tag className={`type ${typeClass[ticket.type]}`}>{ticket.type}</Tag></div>
-          <div><Tag className={`status ${ticket.status.toLowerCase().replace(" ", "-")}`}><i />{ticket.status}</Tag></div>
-          <div><Tag className="source">{ticket.source}</Tag></div>
-          <div className="document-link"><Paperclip size={13} />{ticket.document}</div>
-        </button>
-      )) : <div className="empty-results">No tickets match this view.</div>}
-    </div>
-  );
-}
-
 function TicketBoard({ rows, selected, onSelect }: { rows: Ticket[]; selected: Ticket; onSelect: (ticket: Ticket) => void }) {
-  const statuses: Status[] = ["To do", "In progress", "Complete"];
-
   return (
     <div className="kanban-board">
       {statuses.map((ticketStatus) => {
         const statusRows = rows.filter((ticket) => ticket.status === ticketStatus);
         return (
           <section className="kanban-lane" key={ticketStatus}>
-            <header><span><i className={ticketStatus.toLowerCase().replace(" ", "-")} />{ticketStatus}</span><strong>{statusRows.length}</strong></header>
+            <header><span><i className={statusClass[ticketStatus]} />{ticketStatus}</span><strong>{statusRows.length}</strong></header>
             <div className="kanban-cards">
               {statusRows.map((ticket) => (
                 <button key={ticket.number} className={`kanban-ticket ${selected.number === ticket.number ? "selected" : ""}`} onClick={() => onSelect(ticket)}>
@@ -462,13 +334,13 @@ function TicketRoadmap({ rows, selected, onSelect, onOpenCalendar }: { rows: Tic
                 {days.map((date, index) => <div className={`roadmap-day-cell ${index % 2 ? "alternate" : ""}`} key={`${ticket.number}-${date.toISOString()}`} />)}
                 {dateIndex >= 0 && (
                   <button
-                    className={`roadmap-event ${ticket.status.toLowerCase().replace(" ", "-")} ${selected.number === ticket.number ? "selected" : ""}`}
+                    className={`roadmap-event ${statusClass[ticket.status]} ${selected.number === ticket.number ? "selected" : ""}`}
                     style={{ "--event-day": dateIndex } as CSSProperties}
                     onClick={() => onSelect(ticket)}
                     title={`${ticket.title} · Created ${ticket.created}`}
                   >
                     <span>{ticket.title}</span>
-                    <Tag className={`status ${ticket.status.toLowerCase().replace(" ", "-")}`}>{ticket.status}</Tag>
+                    <Tag className={`status ${statusClass[ticket.status]}`}>{ticket.status}</Tag>
                   </button>
                 )}
               </div>
@@ -481,11 +353,13 @@ function TicketRoadmap({ rows, selected, onSelect, onOpenCalendar }: { rows: Tic
   );
 }
 
-function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: Ticket) => void }) {
-  const pinPositions = tickets.map((ticket) => {
-    const { x, y } = projectMapCoordinates(ticket.coordinates[0], ticket.coordinates[1]);
-    return { ...ticket, x, y };
+function MapView({ tickets, selected, onSelect }: { tickets: Ticket[]; selected: Ticket; onSelect: (ticket: Ticket) => void }) {
+  const mapped = tickets.filter((ticket) => ticket.coordinates);
+  const pinPositions = mapped.map((ticket) => {
+    const [lat, lng] = ticket.coordinates!;
+    return { ...ticket, ...projectMapCoordinates(lat, lng) };
   });
+  const markerIndex = mapped.findIndex((item) => item.id === selected.id);
 
   return (
     <div className="map-view">
@@ -502,8 +376,8 @@ function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: 
         <div className="map-pin-layer">
           {pinPositions.map((ticket, index) => (
             <button
-              key={ticket.number}
-              className={`map-pin ${selected.number === ticket.number ? "active" : ""}`}
+              key={ticket.id}
+              className={`map-pin ${selected.id === ticket.id ? "active" : ""}`}
               style={{ left: `${ticket.x}%`, top: `${ticket.y}%` }}
               onClick={() => onSelect(ticket)}
               aria-label={`Show ${ticket.title}`}
@@ -514,87 +388,20 @@ function MapView({ selected, onSelect }: { selected: Ticket; onSelect: (ticket: 
         </div>
       </div>
       <div className="map-record">
-        <span className="marker-number">{tickets.findIndex((item) => item.number === selected.number) + 1}</span>
+        <span className="marker-number">{markerIndex >= 0 ? markerIndex + 1 : "–"}</span>
         <div><strong>{selected.title}</strong><p><MapPin size={11} /> {selected.location}</p></div>
-        <Tag className={`status ${selected.status.toLowerCase().replace(" ", "-")}`}>{selected.status}</Tag>
+        <Tag className={`status ${statusClass[selected.status]}`}>{selected.status}</Tag>
       </div>
     </div>
   );
 }
 
-function TicketDetailView({ ticket, onBack, onOpenTicket }: { ticket: Ticket; onBack: () => void; onOpenTicket: (ticket: Ticket) => void }) {
-  const milestones = [
-    { title: "Ticket received", date: ticket.created, state: "complete" },
-    { title: "Current status", date: ticket.status, state: ticket.status === "Complete" ? "complete" : "current" },
-  ];
-
-  return (
-    <main className="ticket-detail-page">
-      <button className="ticket-back-button" onClick={onBack}><ChevronLeft size={16} /> Back to tickets</button>
-      <div className="ticket-detail-layout">
-        <div className="ticket-detail-main">
-          <header className="ticket-detail-heading">
-            <div className="ticket-detail-heading-meta"><span>Ticket {ticket.number}</span><Tag className={`status ${ticket.status.toLowerCase().replace(" ", "-")}`}><i />{ticket.status}</Tag></div>
-            <h1>{ticket.title}</h1>
-          </header>
-
-          <section className="ticket-detail-owner">
-            <span className="ticket-detail-avatar">{ticket.owner.split(" ").map((part) => part[0]).join("").toUpperCase()}</span>
-            <div><strong>Assigned team</strong><span>{ticket.owner}</span><small>{ticket.role}</small></div>
-            <Tag className={`type ${typeClass[ticket.type]}`}>{ticket.type}</Tag>
-          </section>
-
-          <section className="ticket-detail-brief">
-            <h2>Ticket brief</h2>
-            <p>Recorded from {ticket.source.toLowerCase()} as {ticket.type.toLowerCase()}. The reported location is <strong>{ticket.location}</strong>. Supporting documentation: {ticket.document}.</p>
-          </section>
-
-          <section className="ticket-detail-document">
-            <h2>Supporting documentation</h2>
-            <div><Paperclip size={16} /><span><strong>{ticket.document}</strong><small>Source: {ticket.source}</small></span></div>
-          </section>
-
-          <div className="ticket-detail-columns">
-            <section className="ticket-detail-actions">
-              <h2>Recommended actions</h2>
-              <ul>{ticket.nextSteps.map((step) => <li key={step}><span><Check size={12} /></span>{step}</li>)}</ul>
-            </section>
-            <section className="ticket-detail-milestones">
-              <h2>Milestones</h2>
-              <ol>{milestones.map((milestone) => (
-                <li className={milestone.state} key={milestone.title}>
-                  <span className="milestone-icon">{milestone.state === "complete" ? <Check size={12} /> : <span />}</span>
-                  <div><strong>{milestone.title}</strong><small>{milestone.date}</small></div>
-                </li>
-              ))}</ol>
-            </section>
-          </div>
-        </div>
-
-        <aside className="ticket-detail-aside">
-          <div className="ticket-detail-map"><MapView selected={ticket} onSelect={onOpenTicket} /></div>
-          <section className="ticket-detail-facts">
-            <h2>Location & record</h2>
-            <dl>
-              <div><dt>Borough</dt><dd>Manhattan</dd></div>
-              <div><dt>Community district</dt><dd>3</dd></div>
-              <div><dt>Address</dt><dd>{ticket.location}</dd></div>
-              <div><dt>Created</dt><dd>{ticket.created}, 2026</dd></div>
-              <div><dt>Source</dt><dd>{ticket.source}</dd></div>
-            </dl>
-          </section>
-        </aside>
-      </div>
-    </main>
-  );
-}
-
 function SummaryView({ rows }: { rows: Ticket[] }) {
-  const statuses = (["To do", "In progress", "Complete"] as Status[]).map((status) => ({
+  const statusCounts = statuses.map((status) => ({
     status,
     count: rows.filter((ticket) => ticket.status === status).length,
   }));
-  const types = (Object.keys(typeClass) as TicketType[]).map((type) => ({
+  const types = ticketTypes.map((type) => ({
     type,
     count: rows.filter((ticket) => ticket.type === type).length,
   })).filter((item) => item.count);
@@ -604,16 +411,16 @@ function SummaryView({ rows }: { rows: Ticket[] }) {
       <div className="summary-heading"><div><h2>Ticket overview</h2><p>Dashboard for the current left-hand view</p></div></div>
       <div className="metric-row">
         <article><span>VISIBLE TICKETS</span><strong>{rows.length}</strong><small>Current filtered view</small></article>
-        <article><span>IN PROGRESS</span><strong>{statuses.find((item) => item.status === "In progress")?.count || 0}</strong><small>Need staff follow-up</small></article>
-        <article><span>COMPLETE</span><strong>{statuses.find((item) => item.status === "Complete")?.count || 0}</strong><small>This reporting period</small></article>
+        <article><span>IN PROGRESS</span><strong>{statusCounts.find((item) => item.status === "In Progress")?.count || 0}</strong><small>Need staff follow-up</small></article>
+        <article><span>CLOSED</span><strong>{statusCounts.find((item) => item.status === "Closed")?.count || 0}</strong><small>This reporting period</small></article>
       </div>
       <section className="summary-card">
         <div className="card-heading"><h3>Status</h3><span>{rows.length} total</span></div>
         <div className="donut-layout">
           <div className="donut" style={{
-            background: `conic-gradient(#e5a419 0 ${(statuses[0].count / Math.max(rows.length, 1)) * 100}%, #2a93c9 0 ${((statuses[0].count + statuses[1].count) / Math.max(rows.length, 1)) * 100}%, #2d9b65 0)`,
+            background: `conic-gradient(#e5a419 0 ${(statusCounts[0].count / Math.max(rows.length, 1)) * 100}%, #2a93c9 0 ${((statusCounts[0].count + statusCounts[1].count) / Math.max(rows.length, 1)) * 100}%, #2d9b65 0)`,
           }}><span><strong>{rows.length}</strong>tickets</span></div>
-          <div className="status-legend">{statuses.map((item) => <div key={item.status}><i className={item.status.toLowerCase().replace(" ", "-")} /><span>{item.status}</span><strong>{item.count}</strong></div>)}</div>
+          <div className="status-legend">{statusCounts.map((item) => <div key={item.status}><i className={statusClass[item.status]} /><span>{item.status}</span><strong>{item.count}</strong></div>)}</div>
         </div>
       </section>
       <section className="summary-card">
@@ -630,8 +437,8 @@ function SummaryView({ rows }: { rows: Ticket[] }) {
 
 function HomeView({ setActiveTab, onSearch }: { setActiveTab: (tab: TabName) => void; onSearch: (query: string) => void }) {
   const [searchTerm, setSearchTerm] = useState("");
-  const actions: Array<{ label: string; icon: typeof Upload; tab: TabName }> = [
-    { label: "Upload Meeting Assets", icon: Upload, tab: "meetings" },
+  const actions: Array<{ label: string; icon: typeof Search; tab: TabName }> = [
+    { label: "Review Meeting Transcript", icon: ScrollText, tab: "tickets" },
     { label: "Look Up Tickets", icon: Search, tab: "tickets" },
     { label: "Find Document Templates", icon: FileText, tab: "templates" },
   ];
@@ -660,42 +467,6 @@ function HomeView({ setActiveTab, onSearch }: { setActiveTab: (tab: TabName) => 
         </div>
       </div>
     </main>
-  );
-}
-
-function MeetingsView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
-  return (
-    <div className="portal">
-      <PortalHeader activeTab="meetings" setActiveTab={setActiveTab} />
-      <main className="upload-view">
-        <section className="upload-panel">
-          <div className="upload-header">
-            <h1>Upload meeting assets</h1>
-            <p>Share meeting recordings and optional minutes for the board record.</p>
-          </div>
-
-          <label className="upload-dropzone" aria-label="Upload meeting video">
-            <input type="file" accept="video/*" />
-            <Upload size={28} />
-            <div>
-              <strong>Upload video</strong>
-              <span>Drag and drop or browse</span>
-            </div>
-          </label>
-
-          <label className="upload-field">
-            <span>Meeting minutes (optional)</span>
-            <textarea placeholder="Paste meeting notes or upload a transcription document..." />
-          </label>
-
-          <div className="upload-actions">
-            <button className="primary-action">Upload files</button>
-            <button className="secondary-action">Save draft</button>
-          </div>
-        </section>
-      </main>
-      <PortalFooter />
-    </div>
   );
 }
 
@@ -1100,30 +871,41 @@ function ForumView({ setActiveTab }: { setActiveTab: (tab: TabName) => void }) {
 }
 
 export default function App() {
-  const [selected, setSelected] = useState(tickets[0]);
-  const [detailTicket, setDetailTicket] = useState<Ticket | null>(null);
+  const [tickets, setTickets] = useState(initialTickets);
+  const [selectedId, setSelectedId] = useState(initialTickets[0].id);
+  const selected = tickets.find((ticket) => ticket.id === selectedId) ?? tickets[0];
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | Status>("All");
-  const [sideTab, setSideTab] = useState<"map" | "summary">("map");
+  const [sideTab, setSideTab] = useState<"transcript" | "map" | "summary">("transcript");
+  const [hover, setHover] = useState<{ id: string | null; from: "table" | "transcript" }>({ id: null, from: "table" });
+  const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
   const [ticketView, setTicketView] = useState<TicketView>("list");
   const [activeTab, setActiveTab] = useState<TabName>("home");
 
   const rows = useMemo(() => tickets.filter((ticket) => {
     const matchesStatus = status === "All" || ticket.status === status;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location} ${ticket.requester} ${ticket.summary}`.toLowerCase().includes(search);
     return matchesStatus && matchesQuery;
-  }), [query, status]);
+  }), [tickets, query, status]);
 
-  const openTicket = (ticket: Ticket) => {
-    setSelected(ticket);
-    setDetailTicket(ticket);
+  const updateTicket = useCallback((id: string, patch: Partial<Ticket>) => {
+    setTickets((current) => current.map((ticket) => ticket.id === id ? { ...ticket, ...patch } : ticket));
+  }, []);
+  const updateSpan = useCallback((id: string, index: number, span: Span) => {
+    setTickets((current) => current.map((ticket) => ticket.id === id
+      ? withSpans(ticket, ticket.spans.map((item, i) => i === index ? span : item))
+      : ticket));
+  }, []);
+
+
+  // Selecting a ticket also asks the transcript to jump to its first evidence paragraph.
+  const selectTicket = (ticket: Ticket) => {
+    setSelectedId(ticket.id);
+    setJump((current) => ({ id: ticket.id, n: current.n + 1 }));
   };
 
-  const navigateToTab = (tab: TabName) => {
-    setDetailTicket(null);
-    setActiveTab(tab);
-  };
+  const onTranscriptHover = useCallback((id: string | null) => setHover({ id, from: "transcript" }), []);
 
   const searchTicketsFromHome = (value: string) => {
     setQuery(value);
@@ -1139,10 +921,6 @@ export default function App() {
         <PortalFooter />
       </div>
     );
-  }
-
-  if (activeTab === "meetings") {
-    return <MeetingsView setActiveTab={setActiveTab} />;
   }
 
   if (activeTab === "templates") {
@@ -1161,16 +939,6 @@ export default function App() {
     return <OutreachView setActiveTab={setActiveTab} />;
   }
 
-  if (detailTicket) {
-    return (
-      <div className="portal">
-        <PortalHeader activeTab="tickets" setActiveTab={navigateToTab} />
-        <TicketDetailView ticket={detailTicket} onBack={() => setDetailTicket(null)} onOpenTicket={openTicket} />
-        <PortalFooter />
-      </div>
-    );
-  }
-
   return (
     <div className="portal">
       <PortalHeader activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -1186,16 +954,19 @@ export default function App() {
             <strong>{rows.length} tickets</strong>
             <button className="ticket-add"><Plus size={14} /> Add ticket</button>
           </div>
-          {ticketView === "list" && <TicketTable rows={rows} selected={selected} onSelect={openTicket} />}
-          {ticketView === "kanban" && <TicketBoard rows={rows} selected={selected} onSelect={openTicket} />}
-          {ticketView === "roadmap" && <TicketRoadmap rows={rows} selected={selected} onSelect={openTicket} onOpenCalendar={() => setActiveTab("calendar")} />}
+          {ticketView === "list" && <TicketTable rows={rows} selectedId={selected.id} hoveredId={hover.id} followHover={hover.from === "transcript"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} />}
+          {ticketView === "kanban" && <TicketBoard rows={rows} selected={selected} onSelect={selectTicket} />}
+          {ticketView === "roadmap" && <TicketRoadmap rows={rows} selected={selected} onSelect={selectTicket} onOpenCalendar={() => setActiveTab("calendar")} />}
         </section>
         {ticketView === "list" && <aside className="insights-pane">
           <div className="insights-tabs">
+            <button className={sideTab === "transcript" ? "active" : ""} onClick={() => setSideTab("transcript")}><ScrollText size={15} /> Transcript</button>
             <button className={sideTab === "map" ? "active" : ""} onClick={() => setSideTab("map")}><Map size={15} /> Map</button>
             <button className={sideTab === "summary" ? "active" : ""} onClick={() => setSideTab("summary")}><BarChart3 size={15} /> Summary</button>
           </div>
-          {sideTab === "map" ? <MapView selected={selected} onSelect={openTicket} /> : <SummaryView rows={rows} />}
+          {sideTab === "transcript" && <TranscriptView tickets={tickets} hoveredId={hover.id} onHover={onTranscriptHover} onSpanChange={updateSpan} jump={jump} />}
+          {sideTab === "map" && <MapView tickets={tickets} selected={selected} onSelect={selectTicket} />}
+          {sideTab === "summary" && <SummaryView rows={rows} />}
         </aside>}
       </main>
       <PortalFooter />
