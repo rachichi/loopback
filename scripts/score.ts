@@ -88,6 +88,10 @@ function scoreAnnotator(name: string, all: ReturnType<typeof loadAnnotatorTicket
 
 if (args.run) {
   const { run, tickets } = loadRunTickets(args.run);
+  if (run.transcript !== DATA_FILES.transcript) {
+    console.error(`${args.run}: run is on ${run.transcript}, but gold tickets only exist for ${DATA_FILES.transcript}`);
+    process.exit(1);
+  }
   const r = score(tickets, gold, opts);
   printReport(`${run.prompt} · ${run.model} · run ${run.run}`, tickets, r);
 } else if (args.annotator) {

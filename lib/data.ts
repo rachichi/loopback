@@ -34,7 +34,9 @@ export type RunFile = {
   run: number;
   transcript: string;
   createdAt: string;
-  usage: { inputTokens: number; outputTokens: number };
+  usage: { inputTokens: number; outputTokens: number; reasoningTokens?: number };
+  finishReason?: string;
+  attempts?: number;
   costUsd: number;
   tickets: Omit<Ticket, "id">[];
   dropped?: string[];

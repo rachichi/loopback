@@ -23,6 +23,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .portal-footer {
   min-height: 116px;
   flex: 0 0 auto;
+  border-top: 1px solid #818995; /* same line as the top of the workspace */
   display: flex;
   align-items: center;
   background: #fff;

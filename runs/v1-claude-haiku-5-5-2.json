@@ -1,0 +1,33 @@
+{
+  "prompt": "v1",
+  "model": "claude-haiku-5-5",
+  "run": 2,
+  "transcript": "data/psplit_train.txt",
+  "createdAt": "2026-10-12T04:40:35.354Z",
+  "usage": {
+    "inputTokens": 37702,
+    "outputTokens": 3557
+  },
+  "costUsd": 0.005548700000000001,
+  "tickets": [
+    {
+      "title": "Third Avenue L stop closure pilot proposal",
+      "evidence": [
+        "P19",
+        "P21",
+        "P22",
+        "P23",
+        "P25",
+        "P26",
+        "P27",
+        "P28",
+        "P29"
+      ],
+      "type": "Transportation Request",
+      "location_raw": "Third Avenue",
+      "summary": "A public speaker and software engineer simulated closing every NYC subway stop using MTA trip data and found that closing the Third Avenue L stop would save riders significant time because only about 5% of riders board or leave there. He noted the stop is not a transfer station or wheelchair accessible. Action: Refer the Third Avenue stop closure idea to the transportation committee and ask the MTA about piloting a closure.",
+      "status": "Open"
+    }
+  ],
+  "dropped": []
+}

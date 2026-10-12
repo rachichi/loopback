@@ -1,0 +1,256 @@
+{
+  "prompt": "v2",
+  "model": "claude-haiku-5-5",
+  "run": 1,
+  "transcript": "data/psplit_test2.txt",
+  "createdAt": "2026-10-12T04:47:56.715Z",
+  "usage": {
+    "inputTokens": 20775,
+    "outputTokens": 6011,
+    "reasoningTokens": 3281
+  },
+  "finishReason": "stop",
+  "attempts": 1,
+  "costUsd": 0.005083,
+  "tickets": [
+    {
+      "title": "Climate preparedness organizing for vulnerable communities",
+      "evidence": [
+        "P10",
+        "P13",
+        "P15",
+        "P16"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "A resident and climate scientist said extreme heat, wildfire smoke, and a forming super El Nino put vulnerable Lower East Side residents at risk, and that federal cuts to scientific agencies weaken preparedness. She said she hopes to find board members or residents to organize around the issue. Action: Board to identify interested members and connect them with the speaker to organize on climate preparedness.",
+      "status": "Open"
+    },
+    {
+      "title": "Alum building public restroom and cultural center proposal",
+      "evidence": [
+        "P21",
+        "P22",
+        "P24",
+        "P25",
+        "P26",
+        "P32"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "Alum",
+      "summary": "A speaker submitted a proposal in response to the May parks RFP to restore public restrooms in a closed building and operate a cafe with affordable space for artists, education, and workforce training. The speaker said the building has been closed for 70 years and that several local organizations support the plan. Action: Board to review the RFP proposal and consider a position of support for the project.",
+      "status": "Open"
+    },
+    {
+      "title": "Cherry Street and Avenue A substation mural selection",
+      "evidence": [
+        "P74",
+        "P75",
+        "P76",
+        "P97",
+        "P100",
+        "P101",
+        "P102",
+        "P103",
+        "P104",
+        "P105"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "Cherry Street substation",
+      "summary": "Con Edison reported that the mural project at the Avenue A and Cherry Street substations has been delayed, with the first Cherry Street muralist falling through due to capacity and availability issues. A resident said the project has been active for years without a clear status. Action: Board to get a firm schedule from Con Edison for convening stakeholders and finalizing the Cherry Street mural artist.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Con Edison load transfer between substations",
+      "evidence": [
+        "P78",
+        "P79",
+        "P83",
+        "P84",
+        "P85",
+        "P87",
+        "P88",
+        "P89",
+        "P90",
+        "P95",
+        "P96"
+      ],
+      "type": "Other",
+      "location_raw": "Terry Street station to the Avenue station",
+      "summary": "Con Edison described a three-year project to move electrical capacity from one substation to another to improve reliability in the Lower East Side. A resident said he had not heard about the project before and asked which stations were involved. Action: Board to ensure Con Edison sends the promised FAQ and community notices about the work before construction starts.",
+      "status": "Open"
+    },
+    {
+      "title": "NYCHA resident outreach and support from Mayor's office",
+      "evidence": [
+        "P153",
+        "P154",
+        "P155",
+        "P157",
+        "P160",
+        "P161",
+        "P162",
+        "P163"
+      ],
+      "type": "Other",
+      "location_raw": "NICHA",
+      "summary": "A board member asked what specific tenant outreach the Mayor's Office of Mass Engagement will provide to NYCHA residents and families in the coming months and who its counterparts are. The speaker said the board has high-need households and wants more specifics. Action: Mayor's Office of Mass Engagement to provide specific NYCHA outreach plans and named counterparts to the board.",
+      "status": "Open"
+    },
+    {
+      "title": "Third Street intake center street activity concerns",
+      "evidence": [
+        "P175",
+        "P176",
+        "P316",
+        "P317",
+        "P318"
+      ],
+      "type": "Public Safety Issue",
+      "location_raw": "Forest Street",
+      "summary": "A district manager said the Third Street intake center was set to open August 1 and that people not accepting services were gathering on Forest Street under scaffolding, with DHS police present. The president's office met with DSS about the intake center. Action: District manager to keep monitoring the block and report back, and the board to follow up with DSS on street conditions at the intake center.",
+      "status": "Open"
+    },
+    {
+      "title": "Opioid treatment center closure and service relocation",
+      "evidence": [
+        "P318",
+        "P319"
+      ],
+      "type": "Other",
+      "location_raw": "Gvenir Opioid Treatment Center",
+      "summary": "A district manager reported that the opioid treatment center run by Mount Sinai is closing because its building was sold, and that the location of relocated services is not yet known. A community meeting on the closure is set for August 11. Action: Board to request from Mount Sinai and the relevant agencies a clear plan for where opioid treatment services will move.",
+      "status": "Open"
+    },
+    {
+      "title": "Restrictive outdoor dining portal and pending legislation",
+      "evidence": [
+        "P320",
+        "P321",
+        "P322"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "The district office held a training on the new city outdoor dining portal and said it appears very restrictive, with little flexibility compared to other city portals. Legislation to amend the program is pending and the final form is unknown. Action: District office to track the outdoor dining legislation and report back to the board on how the portal will work.",
+      "status": "Open"
+    },
+    {
+      "title": "Beer and wine restaurant liquor application denial",
+      "evidence": [
+        "P361",
+        "P363",
+        "P364",
+        "P365",
+        "P366",
+        "P367",
+        "P368",
+        "P369",
+        "P370",
+        "P371",
+        "P372",
+        "P373",
+        "P374",
+        "P375",
+        "P377"
+      ],
+      "type": "Liquor License",
+      "location_raw": "strict between",
+      "summary": "The SLA committee recommended denial of a full liquor license application for a former beer and wine location, citing existing problems in the area and the applicant's lack of local experience. After the meeting the applicant threatened to sue the board over its lease requirement, and the board added an amended whereas clause documenting this. Action: Board to forward the denial resolution with the amended whereas clause to the SLA.",
+      "status": "Open"
+    },
+    {
+      "title": "Clinton Street safety and bike connection concerns",
+      "evidence": [
+        "P343",
+        "P345",
+        "P346",
+        "P347",
+        "P349"
+      ],
+      "type": "Transportation Request",
+      "location_raw": "Clint Street",
+      "summary": "Clint Street neighbors presented safety concerns, and the transportation committee walked the street with DOT about a street construction project that will begin next spring. Concerns about the bike connection to the bridge at Clint Street have been ongoing for a while. Action: Board to press DOT for a clear plan on Clint Street safety and the bike connection before next spring's construction.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Board chair vacancy and special election",
+      "evidence": [
+        "P290",
+        "P291",
+        "P292",
+        "P293",
+        "P294",
+        "P443",
+        "P444",
+        "P445",
+        "P446",
+        "P447"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "summary": "The board chair announced she is stepping down, so the first vice chair will become chair and the second vice chair will become first vice chair. A special election will fill the vacant second vice chair seat, with nominations by email and a vote at the September 29 full board meeting. Action: District office to send the nomination notice to all members and hold the special election vote at the September full board meeting.",
+      "status": "Open"
+    },
+    {
+      "title": "Remote participation rules and attendance standards",
+      "evidence": [
+        "P277",
+        "P278",
+        "P281",
+        "P282",
+        "P283",
+        "P284",
+        "P285",
+        "P296",
+        "P297",
+        "P298",
+        "P300",
+        "P301",
+        "P303",
+        "P306",
+        "P307",
+        "P308",
+        "P393",
+        "P394",
+        "P395",
+        "P396",
+        "P397"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "summary": "Members asked how board members can request remote participation, since the 2022 resolution does not clearly describe the process, and whether remote attendance counts. The bylaws committee is also working on standardized attendance language requested by the borough president's office. Action: Board to bring clearer remote participation and attendance rules to the September meeting for a vote.",
+      "status": "Open"
+    },
+    {
+      "title": "Community board budget priorities public hearing",
+      "evidence": [
+        "P323",
+        "P324",
+        "P325",
+        "P328",
+        "P329"
+      ],
+      "type": "Budget Priority",
+      "location_raw": "community board office",
+      "summary": "The district manager announced a charter-mandated public hearing on district budget priorities for city agency spending, which is usually dominated by parks groups. The hearing is set for September 21 at 6 p.m. at the community board office, with virtual access. Action: Board to hold the September 21 hearing, advertise it on the website, and invite nonprofits and residents to present priorities.",
+      "status": "Open"
+    },
+    {
+      "title": "Racial equity report community engagement request",
+      "evidence": [
+        "P124",
+        "P126",
+        "P129",
+        "P130",
+        "P131",
+        "P132",
+        "P133"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "A Commission on Racial Equity representative introduced the commission and offered to be a contact. A community member asked whether the commission would meet with the community about its racial equity report once it is complete. Action: Commission to send the community board updates on the racial equity report and arrange a community meeting when possible.",
+      "status": "Open"
+    }
+  ],
+  "dropped": []
+}

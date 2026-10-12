@@ -1,0 +1,267 @@
+{
+  "prompt": "v1",
+  "model": "claude-haiku-5-5",
+  "run": 1,
+  "transcript": "data/psplit_test2.txt",
+  "createdAt": "2026-10-12T04:40:50.423Z",
+  "usage": {
+    "inputTokens": 20695,
+    "outputTokens": 7216
+  },
+  "costUsd": 0.0056775,
+  "tickets": [
+    {
+      "title": "Climate risk preparedness organizing for vulnerable residents",
+      "evidence": [
+        "P10",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "A resident and climate scientist warned that a developing super El Nino, extreme heat, and wildfire smoke threaten vulnerable communities, and that federal cuts to scientific agencies reduce public preparedness. She said the city is not prepared and asked for board members and residents interested in organizing around the issue to come forward. Action: Follow up with the speaker and interested members on whether the board can help organize a climate preparedness effort.",
+      "status": "Open"
+    },
+    {
+      "title": "Public restroom and cultural center RFP proposal",
+      "evidence": [
+        "P21",
+        "P22",
+        "P24",
+        "P25",
+        "P26",
+        "P29",
+        "P32"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "Alum. Nancy",
+      "summary": "A speaker submitted a proposal to the parks RFP to restore a long-closed building with public restrooms, a cafe, and affordable space for artists, education, and workforce training. Supporters including several neighborhood institutions back the project. Action: Review the proposal and state the board's position on the parks RFP for this building.",
+      "status": "Open"
+    },
+    {
+      "title": "Avenue A substation mural project status",
+      "evidence": [
+        "P37",
+        "P42",
+        "P43",
+        "P44",
+        "P74",
+        "P75",
+        "P76",
+        "P97",
+        "P100",
+        "P101",
+        "P102",
+        "P103",
+        "P104"
+      ],
+      "type": "Quality of Life Complaint",
+      "location_raw": "Avenue A substation",
+      "summary": "Graffiti and an unkempt environment around the Avenue A substation have been a long-standing eyesore, and a local arts group is recruiting about 10 artists to paint murals there and on a nearby building. A board member asked about the status of the substation mural project, which has been active for years, and the utility said the Cherry Street mural list must be re-vetted after a muralist fell through. Action: Request a written status update from the utility and the arts group on both substation murals and the timeline for the Cherry Street selection.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Con Edison load transfer between substations",
+      "evidence": [
+        "P78",
+        "P79",
+        "P83",
+        "P84",
+        "P85",
+        "P87",
+        "P88",
+        "P89",
+        "P90",
+        "P91",
+        "P95",
+        "P96"
+      ],
+      "type": "Other",
+      "location_raw": "Avenue A to Cherry Street",
+      "summary": "The utility described a three-year project from 2027 to 2028 to move electric capacity between two Lower East Side substations and strengthen feeders and cables underground. A board member said the board had not heard about the plan before the meeting and asked which substations were involved. Action: Ask the utility to provide the promised one-page FAQ and contact information to the board and to brief the board on construction timing and community impacts.",
+      "status": "Open"
+    },
+    {
+      "title": "Racial equity commission engagement and report follow-up",
+      "evidence": [
+        "P109",
+        "P111",
+        "P113",
+        "P114",
+        "P115",
+        "P117",
+        "P118",
+        "P119",
+        "P120",
+        "P123",
+        "P124",
+        "P126",
+        "P129",
+        "P130",
+        "P131",
+        "P132",
+        "P133"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "A representative of the NYC Commission on Racial Equity introduced the voter-created commission, which sets community equity priorities used in the city's racial equity plan. A board member asked whether the commission would meet with the community about its commissioned equity report. Action: Send the commission's information session invite to board members and arrange a follow-up on the equity report when an update is available.",
+      "status": "Open"
+    },
+    {
+      "title": "NYCHA resident tenant support campaign specifics",
+      "evidence": [
+        "P152",
+        "P153",
+        "P154",
+        "P155",
+        "P156",
+        "P157",
+        "P158",
+        "P159",
+        "P160",
+        "P161",
+        "P162",
+        "P163"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "summary": "A board member asked how the Mayor's Office of Engagement's tenant door-knocking campaign will address NYCHA residents and families, and which counterparts will coordinate on it. The office described general tenant town halls and a partnership with the tenant protection office, but offered few specifics for NYCHA. Action: Request a written description of planned NYCHA-specific outreach, the coordinating NYCHA contacts, and a timeline for the board.",
+      "status": "Open"
+    },
+    {
+      "title": "Third Street intake center street activity concerns",
+      "evidence": [
+        "P175",
+        "P176",
+        "P316",
+        "P317"
+      ],
+      "type": "Public Safety Issue",
+      "location_raw": "Forest Street",
+      "summary": "The intake center on Third Street was set to open August 1, and residents have reported people gathering under scaffolding on Forest Street who are not connected to the shelter or outreach services. The district manager is monitoring the block and noted DHS police presence. Action: Continue monitoring the block and report conditions and any changes at the August 17 virtual intake center meeting.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Hybrid remote attendance rules and bylaws",
+      "evidence": [
+        "P277",
+        "P278",
+        "P279",
+        "P281",
+        "P282",
+        "P283",
+        "P284",
+        "P285",
+        "P286",
+        "P296",
+        "P297",
+        "P298",
+        "P299",
+        "P300",
+        "P301",
+        "P303",
+        "P306",
+        "P307",
+        "P308",
+        "P393",
+        "P394",
+        "P395",
+        "P396",
+        "P397"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "summary": "Confusion arose over when board members may attend remotely, and the chair pointed to a 2022 resolution that lists extraordinary circumstances, noting remote members do not count toward quorum. The district manager said that under ordinary circumstances members must attend in person, and the bylaws committee is considering standardized attendance language requested by the borough president's office. Action: Bring clarified hybrid attendance rules and proposed bylaws attendance language to the September full board meeting for a vote.",
+      "status": "In Progress"
+    },
+    {
+      "title": "Board chair vacancy and special election",
+      "evidence": [
+        "P290",
+        "P291",
+        "P292",
+        "P293",
+        "P294",
+        "P295"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "summary": "The board chair is stepping down, so the first vice chair will become chair and the second vice chair will move to first vice chair, leaving a second vice chair seat vacant. The board will hold a special election to fill it after a nomination process. Action: Send nomination instructions to all board members and hold the special election vote at the September 29 full board meeting.",
+      "status": "Open"
+    },
+    {
+      "title": "Budget priorities public hearing on September 21",
+      "evidence": [
+        "P323",
+        "P324",
+        "P325",
+        "P326",
+        "P327",
+        "P328",
+        "P329",
+        "P330"
+      ],
+      "type": "Budget Priority",
+      "location_raw": "",
+      "summary": "The board will hold its charter-mandated public hearing on district budget priorities for city agency spending, with an emphasis on hearing from nonprofits as well as parks groups. The meeting will be held at 6 p.m. on September 21 at the community board office, both virtually and in person. Action: Post the hearing notice on the board website and advertise it so residents and nonprofits can attend and comment.",
+      "status": "Open"
+    },
+    {
+      "title": "Liquor license application denial and SLA documentation",
+      "evidence": [
+        "P361",
+        "P362",
+        "P364",
+        "P365",
+        "P366",
+        "P367",
+        "P368",
+        "P369",
+        "P370",
+        "P371",
+        "P372",
+        "P373",
+        "P374",
+        "P375",
+        "P377",
+        "P383"
+      ],
+      "type": "Liquor License",
+      "location_raw": "",
+      "summary": "The committee recommended denial of a full liquor license application for a restaurant with DJs, live music, and unlimited drink specials, citing problems already present in the area. After the meeting, the applicant's attorney threatened litigation over the lease requirement, and the board added a whereas clause documenting this for the State Liquor Authority. Action: Vote on the committee's denial resolution and send the amended resolution with the threat documentation to the SLA.",
+      "status": "Open"
+    },
+    {
+      "title": "Middle Church site temporary cast iron fence",
+      "evidence": [
+        "P388",
+        "P389",
+        "P390",
+        "P391",
+        "P392"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "behind 112nd Avenue",
+      "summary": "The Middle Church, destroyed in 2020, plans to rebuild and is using a vacant lot behind 112th Avenue in the interim. The site will have cast iron fencing resembling the original and will store salvaged church stones, with community use allowed. Action: Vote on the landmarks resolution approving this temporary use of the site.",
+      "status": "Open"
+    },
+    {
+      "title": "Clinton Street safety and bike connection concerns",
+      "evidence": [
+        "P343",
+        "P345",
+        "P346",
+        "P347",
+        "P349"
+      ],
+      "type": "Transportation Request",
+      "location_raw": "Clint Street",
+      "summary": "The transportation committee heard from Clinton Street neighbors about safety concerns, and the board has long raised the Clinton Street bike connection to the bridge. DOT is planning a street construction project there starting next spring, and a two-way bike lane is proposed along Grand Street. Action: Follow up with DOT on how it will address the Clinton Street safety concerns and the bike connection in the upcoming construction project.",
+      "status": "In Progress"
+    }
+  ],
+  "dropped": []
+}

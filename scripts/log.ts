@@ -4,7 +4,7 @@
  *   tsx scripts/log.ts runs/*.json
  */
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
-import { loadGold, loadRunTickets } from "../lib/data.ts";
+import { DATA_FILES, loadGold, loadRunTickets } from "../lib/data.ts";
 import { score } from "../lib/score.ts";
 
 const RESULTS = "results.csv";
@@ -30,6 +30,10 @@ const fmt = (x: number) => x.toFixed(3);
 
 for (const file of files) {
   const { run, tickets } = loadRunTickets(file);
+  if (run.transcript !== DATA_FILES.transcript) {
+    console.log(`skip ${file} (run is on ${run.transcript}; gold tickets only exist for ${DATA_FILES.transcript})`);
+    continue;
+  }
   const key = [run.prompt, run.model, run.run].join(",");
   if (logged.has(key)) {
     console.log(`skip ${file} (already in ${RESULTS})`);

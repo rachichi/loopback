@@ -39,33 +39,75 @@ export function buildSystemPrompt(promptPath: string, types: TicketType[]): stri
 export type ExtractResult = {
   tickets: Omit<Ticket, "id">[];
   dropped: string[];
-  usage: { inputTokens: number; outputTokens: number };
+  usage: { inputTokens: number; outputTokens: number; reasoningTokens?: number };
+  finishReason: string;
   costUsd: number;
+  /** Calls made, including retries of answers that stopped after a ticket or two. */
+  attempts?: number;
 };
 
-export async function extract(opts: {
+type ExtractOptions = {
   paragraphs: Paragraph[];
   types: TicketType[];
   model: ModelId;
   promptPath: string;
-}): Promise<ExtractResult> {
-  const { paragraphs, types, model, promptPath } = opts;
+  /** "off" disables extended thinking; "adaptive" lets the model decide (the API default). */
+  thinking?: "adaptive" | "off";
+  /** Thinking depth / token spend. Haiku 5.5 defaults to "medium". */
+  effort?: "low" | "medium" | "high";
+};
+
+// Haiku 5.5 with adaptive thinking sometimes spends its output on reasoning and then writes
+// only the first ticket or two before stopping normally (about 1 run in 3-6 on the 9/29 meeting).
+// A full board meeting always has more action items than that, so a short answer is retried.
+const MIN_TICKETS = 3;
+const MAX_ATTEMPTS = 3;
+
+export async function extract(opts: ExtractOptions): Promise<ExtractResult> {
+  let total: ExtractResult | undefined;
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    const result = await extractOnce(opts);
+    // Every attempt is billed, so usage and cost accumulate across retries.
+    total = {
+      ...result,
+      attempts: attempt,
+      usage: {
+        inputTokens: (total?.usage.inputTokens ?? 0) + result.usage.inputTokens,
+        outputTokens: (total?.usage.outputTokens ?? 0) + result.usage.outputTokens,
+        reasoningTokens: (total?.usage.reasoningTokens ?? 0) + (result.usage.reasoningTokens ?? 0),
+      },
+      costUsd: (total?.costUsd ?? 0) + result.costUsd,
+    };
+    if (result.tickets.length >= MIN_TICKETS) break;
+  }
+  return total!;
+}
+
+async function extractOnce(opts: ExtractOptions): Promise<ExtractResult> {
+  const { paragraphs, types, model, promptPath, thinking = "adaptive", effort } = opts;
   const transcript = paragraphs.map((p) => `${p.id}\t${p.text}`).join("\n");
 
-  const { object, usage } = await generateObject({
+  const { object, usage, finishReason } = await generateObject({
     model: anthropic(model),
     schema: ticketSchema(types),
     system: buildSystemPrompt(promptPath, types),
     prompt: `<transcript>\n${transcript}\n</transcript>\n\nExtract the tickets from this transcript.`,
     maxOutputTokens: 16000,
     // Native structured outputs; Sonnet 5.5 rejects the forced tool call the jsonTool mode relies on.
-    providerOptions: { anthropic: { structuredOutputMode: "outputFormat" } satisfies AnthropicLanguageModelOptions },
+    providerOptions: {
+      anthropic: {
+        structuredOutputMode: "outputFormat",
+        ...(thinking === "off" ? { thinking: { type: "disabled" as const } } : {}),
+        ...(effort ? { effort } : {}),
+      } satisfies AnthropicLanguageModelOptions,
+    },
   });
 
   const inputTokens = usage.inputTokens ?? 0;
   const outputTokens = usage.outputTokens ?? 0;
   const { tickets, dropped } = validate(object.tickets, paragraphs, types);
-  return { tickets, dropped, usage: { inputTokens, outputTokens }, costUsd: costUsd(model, inputTokens, outputTokens) };
+  const reasoningTokens = usage.outputTokenDetails?.reasoningTokens;
+  return { tickets, dropped, usage: { inputTokens, outputTokens, reasoningTokens }, finishReason, costUsd: costUsd(model, inputTokens, outputTokens) };
 }
 
 /** Drop unknown para_ids, then drop tickets with empty evidence or an unknown type. */
