@@ -4,6 +4,7 @@ import { initialTickets, statusClass, statuses, ticketTypes, typeClass, withSpan
 import type { Span } from "./transcript";
 import TicketTable from "./TicketTable";
 import TranscriptView from "./TranscriptView";
+import MapView, { type MapFocus } from "./MapView";
 import { siBlogger, siFacebook, siInstagram, siX } from "simple-icons";
 import {
   BarChart3,
@@ -23,7 +24,6 @@ import {
   LayoutDashboard,
   Link2,
   Mail,
-  Map,
   MapPin,
   MessageCircle,
   Menu,
@@ -39,18 +39,6 @@ import {
   Users,
   X,
 } from "lucide-react";
-
-const mapBounds = {
-  minLat: 40.707,
-  maxLat: 40.737,
-  minLng: -74.002,
-  maxLng: -73.971,
-};
-
-const projectMapCoordinates = (lat: number, lng: number) => ({
-  x: ((lng - mapBounds.minLng) / (mapBounds.maxLng - mapBounds.minLng)) * 100,
-  y: ((mapBounds.maxLat - lat) / (mapBounds.maxLat - mapBounds.minLat)) * 100,
-});
 
 const calendarEvents = [
   {
@@ -269,7 +257,7 @@ function TicketBoard({ rows, selected, onSelect }: { rows: Ticket[]; selected: T
                 <button key={ticket.number} className={`kanban-ticket ${selected.number === ticket.number ? "selected" : ""}`} onClick={() => onSelect(ticket)}>
                   <span className="kanban-ticket-meta">#{ticket.number} <Tag className={`type ${typeClass[ticket.type]}`}>{ticket.type}</Tag></span>
                   <strong>{ticket.title}</strong>
-                  <span className="kanban-location"><MapPin size={12} />{ticket.location}</span>
+                  <span className="kanban-location"><MapPin size={12} />{ticket.location.text || "No location given"}</span>
                   <span className="kanban-owner">{ticket.owner}</span>
                 </button>
               ))}
@@ -350,49 +338,6 @@ function TicketRoadmap({ rows, selected, onSelect, onOpenCalendar }: { rows: Tic
         </div>
       </div>
     </section>
-  );
-}
-
-function MapView({ tickets, selected, onSelect }: { tickets: Ticket[]; selected: Ticket; onSelect: (ticket: Ticket) => void }) {
-  const mapped = tickets.filter((ticket) => ticket.coordinates);
-  const pinPositions = mapped.map((ticket) => {
-    const [lat, lng] = ticket.coordinates!;
-    return { ...ticket, ...projectMapCoordinates(lat, lng) };
-  });
-  const markerIndex = mapped.findIndex((item) => item.id === selected.id);
-
-  return (
-    <div className="map-view">
-      <div className="map-canvas">
-        <div className="map-embed-shell">
-          <iframe
-            title="NYC Boundaries map"
-            src="https://boundaries.beta.nyc/?map=cd&dist=103"
-            className="map-embed"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-        </div>
-        <div className="map-pin-layer">
-          {pinPositions.map((ticket, index) => (
-            <button
-              key={ticket.id}
-              className={`map-pin ${selected.id === ticket.id ? "active" : ""}`}
-              style={{ left: `${ticket.x}%`, top: `${ticket.y}%` }}
-              onClick={() => onSelect(ticket)}
-              aria-label={`Show ${ticket.title}`}
-            >
-              <span>{index + 1}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="map-record">
-        <span className="marker-number">{markerIndex >= 0 ? markerIndex + 1 : "–"}</span>
-        <div><strong>{selected.title}</strong><p><MapPin size={11} /> {selected.location}</p></div>
-        <Tag className={`status ${statusClass[selected.status]}`}>{selected.status}</Tag>
-      </div>
-    </div>
   );
 }
 
@@ -877,7 +822,8 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | Status>("All");
   const [sideTab, setSideTab] = useState<"transcript" | "map" | "summary">("transcript");
-  const [hover, setHover] = useState<{ id: string | null; from: "table" | "transcript" }>({ id: null, from: "table" });
+  const [hover, setHover] = useState<{ id: string | null; from: "table" | "transcript" | "map" }>({ id: null, from: "table" });
+  const [mapFocus, setMapFocus] = useState<MapFocus | null>(null);
   const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
   const [ticketView, setTicketView] = useState<TicketView>("list");
   const [activeTab, setActiveTab] = useState<TabName>("home");
@@ -885,7 +831,7 @@ export default function App() {
   const rows = useMemo(() => tickets.filter((ticket) => {
     const matchesStatus = status === "All" || ticket.status === status;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location} ${ticket.requester} ${ticket.summary}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.requester} ${ticket.summary}`.toLowerCase().includes(search);
     return matchesStatus && matchesQuery;
   }), [tickets, query, status]);
 
@@ -906,6 +852,13 @@ export default function App() {
   };
 
   const onTranscriptHover = useCallback((id: string | null) => setHover({ id, from: "transcript" }), []);
+  const onMapHover = useCallback((id: string | null) => setHover({ id, from: "map" }), []);
+  // A place chip in the table opens the map on that place.
+  const showOnMap = (id: string, place: number) => {
+    setSelectedId(id);
+    setSideTab("map");
+    setMapFocus((current) => ({ ticketId: id, place, n: (current?.n ?? 0) + 1 }));
+  };
 
   const searchTicketsFromHome = (value: string) => {
     setQuery(value);
@@ -954,18 +907,18 @@ export default function App() {
             <strong>{rows.length} tickets</strong>
             <button className="ticket-add"><Plus size={14} /> Add ticket</button>
           </div>
-          {ticketView === "list" && <TicketTable rows={rows} selectedId={selected.id} hoveredId={hover.id} followHover={hover.from === "transcript"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} />}
+          {ticketView === "list" && <TicketTable rows={rows} selectedId={selected.id} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} />}
           {ticketView === "kanban" && <TicketBoard rows={rows} selected={selected} onSelect={selectTicket} />}
           {ticketView === "roadmap" && <TicketRoadmap rows={rows} selected={selected} onSelect={selectTicket} onOpenCalendar={() => setActiveTab("calendar")} />}
         </section>
         {ticketView === "list" && <aside className="insights-pane">
           <div className="insights-tabs">
             <button className={sideTab === "transcript" ? "active" : ""} onClick={() => setSideTab("transcript")}><ScrollText size={15} /> Transcript</button>
-            <button className={sideTab === "map" ? "active" : ""} onClick={() => setSideTab("map")}><Map size={15} /> Map</button>
-            <button className={sideTab === "summary" ? "active" : ""} onClick={() => setSideTab("summary")}><BarChart3 size={15} /> Summary</button>
+            <button className={sideTab === "map" ? "active" : ""} onClick={() => setSideTab("map")}><MapPin size={15} /> Map</button>
+            <button className={sideTab === "summary" ? "active" : ""} onClick={() => setSideTab("summary")}><BarChart3 size={15} /> Dashboard</button>
           </div>
           {sideTab === "transcript" && <TranscriptView tickets={tickets} hoveredId={hover.id} onHover={onTranscriptHover} onSpanChange={updateSpan} jump={jump} />}
-          {sideTab === "map" && <MapView tickets={tickets} selected={selected} onSelect={selectTicket} />}
+          {sideTab === "map" && <MapView tickets={tickets} selected={selected} hoveredId={hover.id} focus={mapFocus} onHover={onMapHover} onSelect={selectTicket} />}
           {sideTab === "summary" && <SummaryView rows={rows} />}
         </aside>}
       </main>

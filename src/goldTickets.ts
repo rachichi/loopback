@@ -19,6 +19,18 @@ export const statuses = ["Open", "In Progress", "Closed"] as const;
 export type Status = (typeof statuses)[number];
 export type Source = "SMS" | "Transcript" | "Email";
 
+/** A geocoded point a ticket refers to. */
+export type Place = {
+  name: string;
+  lat: number;
+  lng: number;
+  /** "geosearch" = matched by NYC GeoSearch; "manual" = placed by hand (search pick-up, pin drag, or seed data). */
+  source: "geosearch" | "manual";
+};
+
+/** The location as said in the meeting, plus the mapped places it refers to (zero or more). */
+export type TicketLocation = { text: string; places: Place[] };
+
 export type Ticket = {
   id: string;
   number: string;
@@ -30,10 +42,9 @@ export type Ticket = {
   owner: string;
   role: string;
   nextSteps: string[];
-  location: string;
+  location: TicketLocation;
   requester: string;
   summary: string;
-  coordinates?: [number, number];
   created: string;
   /** Highlighted character ranges in the transcript; the source of truth for evidence. */
   spans: Span[];
@@ -79,16 +90,24 @@ const ownerByType: Record<TicketType, string> = {
   "Board Administration": "Executive Committee",
 };
 
-// Approximate map points for tickets with a mappable place (demo only).
-const coordinatesById: Record<string, [number, number]> = {
-  G1: [40.7325, -73.9861], // Third Avenue L station
-  G2: [40.7292, -73.9845], // 11th Street & First Avenue
-  G3: [40.7265, -73.9817], // Tompkins Square Park
-  G4: [40.715, -73.9919], // 11 Allen Street
-  G5: [40.7186, -73.9881], // Essex Market
-  G6: [40.7105, -73.9905], // Pier across from Catherine Slip
-  G7: [40.7283, -73.9905], // Cooper Square
-  G14: [40.7155, -73.9935], // Canal Street at the Manhattan Bridge
+// Mapped places for the gold tickets. GeoSearch matches are its coordinates; it can't
+// resolve intersections or garbled names, so those are approximate manual points.
+// Tickets about the whole district, or places we can't identify, have none.
+const seedPlaces: Record<string, Place[]> = {
+  G1: [{ name: "3 Av (L) station, E 14 St & 3 Av", lat: 40.73281, lng: -73.98606, source: "manual" }],
+  G2: [{ name: "E 11 St & 1 Av", lat: 40.72915, lng: -73.98425, source: "manual" }],
+  G3: [
+    { name: "Seward Park", lat: 40.71481, lng: -73.98928, source: "geosearch" },
+    { name: "Tompkins Square Park", lat: 40.72645, lng: -73.98171, source: "geosearch" },
+  ],
+  G4: [{ name: "11 Allen Street", lat: 40.71493, lng: -73.99295, source: "geosearch" }],
+  G5: [{ name: "Essex Market, 88 Essex Street", lat: 40.71793, lng: -73.98804, source: "geosearch" }],
+  G6: [{ name: "East River pier at Catherine Slip", lat: 40.70885, lng: -73.99435, source: "manual" }],
+  G7: [
+    { name: "Delancey St & Suffolk St", lat: 40.71836, lng: -73.98583, source: "manual" },
+    { name: "Cooper Square at E 6 St & 3 Av", lat: 40.72735, lng: -73.99063, source: "manual" },
+  ],
+  G14: [{ name: "Canal St at the Manhattan Bridge", lat: 40.71678, lng: -73.99545, source: "manual" }],
 };
 
 /** Minimal RFC 4180 parser: quoted fields may contain commas, quotes ("") and newlines. */
@@ -142,10 +161,9 @@ export const initialTickets: Ticket[] = goldRows.map((r) => {
     owner: ownerByType[type] ?? "District Office",
     role: type,
     nextSteps: [],
-    location: r.location_raw || "No location given",
+    location: { text: r.location_raw, places: seedPlaces[r.gold_id] ?? [] },
     requester: source?.requester ?? "",
     summary: source?.summary ?? "",
-    coordinates: coordinatesById[r.gold_id],
     created: "Sep 29",
     ...(() => {
       const spans = spansFromParagraphIds(r.evidence.split(",").map((id) => id.trim()).filter(Boolean));

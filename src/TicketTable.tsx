@@ -1,18 +1,21 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { CircleChevronDown, MapPin, ScrollText, Type, type LucideIcon } from "lucide-react";
+import LocationCell from "./LocationCell";
 import { formatEvidence, statusClass, statuses, ticketTypes, typeClass, type Status, type Ticket, type TicketType } from "./goldTickets";
 
 // Evidence is edited by dragging highlights in the transcript; the ticket number is fixed.
 type EditableField = "title" | "type" | "location" | "requester" | "summary" | "status";
 
-// Resizable columns (after the fixed checkbox column), in pixels.
-const columns = [
-  { key: "title", label: "Title", width: 220 },
-  { key: "evidence", label: "Evidence", width: 120 },
-  { key: "type", label: "Type", width: 140 },
-  { key: "location", label: "Location", width: 160 },
-  { key: "requester", label: "Requester", width: 160 },
-  { key: "summary", label: "Summary", width: 320 },
-  { key: "status", label: "Status", width: 100 },
+// Resizable columns (after the fixed checkbox column), in pixels. The icon shows the field type, Airtable-style.
+const columns: readonly { key: string; label: string; width: number; icon: LucideIcon; fieldType: string }[] = [
+  // Icons match the right-panel tabs: Transcript (ScrollText) and Map (MapPin).
+  { key: "title", label: "Title", width: 220, icon: Type, fieldType: "Text" },
+  { key: "evidence", label: "Transcript", width: 120, icon: ScrollText, fieldType: "Transcript paragraphs (edit by dragging highlights)" },
+  { key: "type", label: "Type", width: 140, icon: CircleChevronDown, fieldType: "Single select" },
+  { key: "location", label: "Map", width: 160, icon: MapPin, fieldType: "Map locations" },
+  { key: "requester", label: "Requester", width: 160, icon: Type, fieldType: "Text" },
+  { key: "summary", label: "Summary", width: 320, icon: Type, fieldType: "Text" },
+  { key: "status", label: "Status", width: 100, icon: CircleChevronDown, fieldType: "Single select" },
 ] as const;
 type ColumnKey = (typeof columns)[number]["key"];
 const MIN_WIDTH = 60;
@@ -36,6 +39,7 @@ export default function TicketTable({
   onHover,
   onSelect,
   onChange,
+  onShowOnMap,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -44,6 +48,7 @@ export default function TicketTable({
   onHover: (id: string | null) => void;
   onSelect: (ticket: Ticket) => void;
   onChange: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
+  onShowOnMap: (id: string, placeIndex: number) => void;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -73,11 +78,11 @@ export default function TicketTable({
     window.addEventListener("mouseup", up);
   };
   const gridStyle = {
-    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")}`,
+    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")} minmax(0, 1fr)`,
     "--ticket-width": `${34 + columns.reduce((sum, c) => sum + widths[c.key], 0)}px`,
   } as CSSProperties;
 
-  const text = (ticket: Ticket, field: "title" | "location" | "requester" | "summary", label: string, rows = 2) => (
+  const text = (ticket: Ticket, field: "title" | "requester" | "summary", label: string, rows = 2) => (
     <textarea
       className="cell-input"
       rows={rows}
@@ -92,8 +97,9 @@ export default function TicketTable({
       <div className="ticket-grid ticket-head" role="row">
         <div className="check-cell"><input type="checkbox" aria-label="Select all" /></div>
         {columns.map((column) => (
-          <div key={column.key} className="resizable-head">
-            {column.label}
+          <div key={column.key} className="resizable-head" title={column.fieldType}>
+            <column.icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
+            <span className="field-label">{column.label}</span>
             <span
               className="col-resizer"
               role="separator"
@@ -106,7 +112,7 @@ export default function TicketTable({
           </div>
         ))}
       </div>
-      {rows.length ? rows.map((ticket) => (
+      {rows.length ? rows.map((ticket, rowIndex) => (
         <div
           role="row"
           className={`ticket-grid ticket-row ${selectedId === ticket.id ? "selected" : ""} ${hoveredId === ticket.id ? `hovered ${typeClass[ticket.type]}` : ""}`}
@@ -115,7 +121,11 @@ export default function TicketTable({
           onMouseEnter={() => onHover(ticket.id)}
           onClick={() => onSelect(ticket)}
         >
-          <div className="check-cell"><input type="checkbox" aria-label={`Select ${ticket.number}`} onClick={(event) => event.stopPropagation()} /></div>
+          {/* Row position in the current view (not a ticket id); the checkbox replaces it on hover. */}
+          <div className="check-cell">
+            <span className="row-number" aria-hidden="true">{rowIndex + 1}</span>
+            <input type="checkbox" aria-label={`Select row ${rowIndex + 1}`} onClick={(event) => event.stopPropagation()} />
+          </div>
           <div>{text(ticket, "title", "Title")}</div>
           <div className="ticket-evidence" title={ticket.evidence.join(", ")}>
             <span>{formatEvidence(ticket.evidence)}</span>
@@ -131,7 +141,7 @@ export default function TicketTable({
               {ticketTypes.map((type) => <option key={type}>{type}</option>)}
             </select>
           </div>
-          <div>{text(ticket, "location", "Location")}</div>
+          <div><LocationCell ticket={ticket} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
           <div>{text(ticket, "requester", "Requester")}</div>
           <div>{text(ticket, "summary", "Summary", 3)}</div>
           <div>
