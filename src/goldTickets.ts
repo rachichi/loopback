@@ -1,5 +1,5 @@
 // Demo tickets: the adjudicated gold set for the 9/29/26 full board meeting.
-import goldCsv from "../data/Gold Tickets-Grid view.csv?raw";
+import goldCsv from "../data/train1_goldtickets-Grid view.csv?raw";
 import annotatorCsv from "../data/Annotator Tickets-Grid view.csv?raw";
 import { paragraphIdsFromSpans, spansFromParagraphIds, type Span } from "./transcript";
 

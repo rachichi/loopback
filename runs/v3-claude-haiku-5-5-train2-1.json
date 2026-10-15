@@ -1,0 +1,359 @@
+{
+  "prompt": "v3",
+  "model": "claude-haiku-5-5",
+  "run": 1,
+  "transcript": "data/psplit_train2.txt",
+  "createdAt": "2026-10-12T14:33:45.942Z",
+  "usage": {
+    "inputTokens": 21236,
+    "outputTokens": 8655,
+    "reasoningTokens": 4975
+  },
+  "finishReason": "stop",
+  "attempts": 1,
+  "costUsd": 0.0064511,
+  "tickets": [
+    {
+      "title": "Climate preparedness and community organizing interest",
+      "evidence": [
+        "P10",
+        "P11",
+        "P12",
+        "P13",
+        "P14",
+        "P15",
+        "P16"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "requester": "Kylie (public speaker)",
+      "status": "Open",
+      "summary": "A Lower East Side resident and climate scientist said vulnerable communities are at risk from extreme weather linked to a developing super El Nino and cuts to federal scientific agencies. She said the city is not prepared and she wants to find people interested in organizing on the issue, including board members. Action: Board members or the district office should follow up with the speaker to connect interested people on climate preparedness organizing."
+    },
+    {
+      "title": "Alum building RFP for restrooms and cultural center",
+      "evidence": [
+        "P21",
+        "P22",
+        "P24",
+        "P25",
+        "P26",
+        "P27",
+        "P28",
+        "P29",
+        "P30",
+        "P31",
+        "P32",
+        "P33",
+        "P34",
+        "P35"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "Alum",
+      "requester": "Miles Wney (public speaker)",
+      "status": "In Progress",
+      "summary": "The speaker submitted a proposal in May to the parks RFP to restore a closed public building as a cafe, public restrooms, and affordable space for artists, education, and workforce training. He said the building has been closed for 70 years and that several local institutions support the project. Action: The board should follow up on the status of the parks RFP and the proposal for this site."
+    },
+    {
+      "title": "Stalled mural project at Avenue A substation",
+      "evidence": [
+        "P74",
+        "P75",
+        "P76",
+        "P97",
+        "P100",
+        "P101",
+        "P102",
+        "P103",
+        "P104",
+        "P105",
+        "P106"
+      ],
+      "type": "Quality of Life Complaint",
+      "location_raw": "Avenue A substation",
+      "requester": "Trevor (public speaker); Emilio (Con Edison representative)",
+      "status": "In Progress",
+      "summary": "Trevor asked about the status of a mural project at a substation that has been active for years without an update. Con Edison said the earlier muralist fell through at the Cherry Street substation and three vetted muralists are being considered with stakeholders. Action: Con Edison and stakeholders should finalize a new mural list for the Cherry Street substation and the board should track the outcome."
+    },
+    {
+      "title": "Con Edison load transfer between substations",
+      "evidence": [
+        "P78",
+        "P79",
+        "P83",
+        "P84",
+        "P85",
+        "P87",
+        "P88",
+        "P89",
+        "P91",
+        "P93",
+        "P94",
+        "P95",
+        "P96",
+        "P99",
+        "P107",
+        "P108"
+      ],
+      "type": "Other",
+      "location_raw": "Avenue A to Cherry Street",
+      "requester": "Trevor (public speaker); Emilio (Con Edison representative)",
+      "status": "In Progress",
+      "summary": "Con Edison described a three-year project to move electric capacity between the Cherry Street and Avenue A substations to improve reliability ahead of growing demand. Trevor said he had not heard about the project before and asked which stations were involved. Action: Con Edison should share the planned FAQ one-pager and contact information with the board and community members."
+    },
+    {
+      "title": "Commission on Racial Equity report and engagement",
+      "evidence": [
+        "P109",
+        "P110",
+        "P111",
+        "P112",
+        "P113",
+        "P114",
+        "P115",
+        "P116",
+        "P117",
+        "P118",
+        "P119",
+        "P120",
+        "P121",
+        "P122",
+        "P123",
+        "P124",
+        "P125",
+        "P126",
+        "P129",
+        "P130",
+        "P131",
+        "P132",
+        "P133",
+        "P134"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "requester": "Marian Aguas (public speaker); Board member (unnamed)",
+      "status": "Open",
+      "summary": "A representative of the Commission on Racial Equity introduced the commission and its community engagement cycles, and announced an information session and a third engagement cycle starting in October 2026. A board member asked to be kept informed about the commission's equity report and to meet with the community about it. Action: The commission should send the information session invite to the board and provide updates on the equity report to the board."
+    },
+    {
+      "title": "Specifics on NYCHA tenant outreach and support",
+      "evidence": [
+        "P145",
+        "P146",
+        "P147",
+        "P152",
+        "P153",
+        "P154",
+        "P155",
+        "P156",
+        "P157",
+        "P158",
+        "P159",
+        "P160",
+        "P161",
+        "P162",
+        "P163",
+        "P164"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "requester": "Unnamed resident (public speaker)",
+      "status": "Open",
+      "summary": "The Mayor's Office of Community Engagement described door-knocking and tenant organizing in buildings with violations. A speaker asked what specific support the office will provide for NYCHA residents and families in the coming months and who its NYCHA counterpart is. Action: The office should provide specific plans for NYCHA residents and families to the board."
+    },
+    {
+      "title": "Homeless intake center street conditions and monitoring",
+      "evidence": [
+        "P175",
+        "P176",
+        "P316",
+        "P317",
+        "P318"
+      ],
+      "type": "Quality of Life Complaint",
+      "location_raw": "Forest Street",
+      "requester": "District Manager (unnamed)",
+      "status": "In Progress",
+      "summary": "The district manager reported residents' concerns about people gathering on Forest Street under scaffolding near the new intake center, which opens August 1. The people are not associated with the intake center or shelters and are not accepting outreach services. Action: The district manager will continue checking the block and report at the August 17 virtual community advisory board meeting for the intake center."
+    },
+    {
+      "title": "Annual budget priorities public hearing",
+      "evidence": [
+        "P323",
+        "P324",
+        "P325",
+        "P329"
+      ],
+      "type": "Budget Priority",
+      "location_raw": "",
+      "requester": "District Manager (unnamed)",
+      "status": "In Progress",
+      "summary": "The district manager announced a charter-mandated public hearing on district budget priorities for city agency spending, which the board holds annually. The hearing is mostly attended by parks groups, and nonprofits are encouraged to speak. Action: The board should hold the public hearing on September 21 at 6 p.m. at the community board office, virtually and in person, and advertise it on the website."
+    },
+    {
+      "title": "Remote attendance and hybrid meeting rules",
+      "evidence": [
+        "P277",
+        "P278",
+        "P279",
+        "P280",
+        "P281",
+        "P282",
+        "P283",
+        "P284",
+        "P285",
+        "P296",
+        "P297",
+        "P298",
+        "P299",
+        "P300",
+        "P301",
+        "P302",
+        "P303",
+        "P306",
+        "P307",
+        "P308"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "requester": "Board chair (unnamed); Michelle (board member)",
+      "status": "In Progress",
+      "summary": "The board chair said confusion exists about when board members may attend remotely under the open meetings law and a 2022 resolution. Quorum requires members present in person, and the board will provide more clarity on remote attendance at the September meeting. Action: The board will clarify the remote attendance process and extraordinary circumstances at its September meeting."
+    },
+    {
+      "title": "Board chair transition and second vice chair special election",
+      "evidence": [
+        "P290",
+        "P291",
+        "P292",
+        "P293",
+        "P294"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "requester": "Board chair (unnamed)",
+      "status": "In Progress",
+      "summary": "The board chair announced that Andrea is stepping down, so the first vice chair will become chair and the second vice chair will become first vice chair. A special election will fill the vacant second vice chair seat. Action: The district office will send a nomination email to board members, and the vote will be held at the September 29 full board meeting."
+    },
+    {
+      "title": "September meeting schedule and PS20 location",
+      "evidence": [
+        "P309",
+        "P310",
+        "P311",
+        "P312",
+        "P313",
+        "P314",
+        "P315"
+      ],
+      "type": "Board Administration",
+      "location_raw": "PS20",
+      "requester": "District Manager (unnamed)",
+      "status": "Open",
+      "summary": "The district manager said the meeting is held at an air-conditioned location in July because PS20 lacks air conditioning. The September full board meeting moves to the last Tuesday due to Labor Day, which pushes committee meetings back a week. Action: The district office will send the September calendar before the end of the week and confirm the return to PS20."
+    },
+    {
+      "title": "Denial of liquor license application and related threat",
+      "evidence": [
+        "P361",
+        "P362",
+        "P363",
+        "P364",
+        "P365",
+        "P366",
+        "P367",
+        "P368",
+        "P369",
+        "P370",
+        "P371",
+        "P372",
+        "P373",
+        "P374",
+        "P375",
+        "P377",
+        "P378",
+        "P379",
+        "P380",
+        "P381",
+        "P382",
+        "P383"
+      ],
+      "type": "Liquor License",
+      "location_raw": "strict between",
+      "requester": "SLA committee chair (unnamed); Stephen (board member)",
+      "status": "Closed",
+      "summary": "The SLA committee recommended denial of a full liquor license application for a restaurant that the committee found would add to existing problems on the street. After the meeting, the applicant's email threatened to sue the board, which the committee added to the record for the SLA. A board member asked about past lawsuits, and the chair said the board is advisory and the city law department handles any suit. Action: None; the board voted on the denial resolution and the committee documented the applicant's email for the SLA."
+    },
+    {
+      "title": "Temporary use of church site with cast iron fence",
+      "evidence": [
+        "P387",
+        "P388",
+        "P389",
+        "P390",
+        "P391"
+      ],
+      "type": "Land Use Request",
+      "location_raw": "behind 112nd Avenue",
+      "requester": "Landmarks committee chair (unnamed)",
+      "status": "Open",
+      "summary": "The landmarks committee presented a resolution on a church destroyed in 2020, whose congregation plans to rebuild. In the meantime, the site would be used temporarily by parishioners and the community behind a cast iron fence, with salvaged stones stored there. Action: The board should vote on the landmarks resolution for temporary use of the site."
+    },
+    {
+      "title": "Standardized attendance language in bylaws",
+      "evidence": [
+        "P392",
+        "P393",
+        "P394",
+        "P395",
+        "P396",
+        "P397"
+      ],
+      "type": "Board Administration",
+      "location_raw": "",
+      "requester": "Bylaws committee chair (unnamed)",
+      "status": "In Progress",
+      "summary": "The bylaws committee is reviewing attendance rules at the request of the borough president's office, which wants standardized language across community boards. No changes have been made yet. Action: The bylaws committee will bring proposed attendance changes to the board for a vote."
+    },
+    {
+      "title": "Clinton Street safety concerns and bike connection",
+      "evidence": [
+        "P343",
+        "P344",
+        "P345",
+        "P346"
+      ],
+      "type": "Transportation Request",
+      "location_raw": "Clint Street",
+      "requester": "Clint Street neighbors (public speakers); Transportation committee chair (unnamed)",
+      "status": "In Progress",
+      "summary": "Clinton Street neighbors presented on safety concerns on the street, and the transportation committee has long been concerned about the bike connection to the bridge at Clinton Street. The committee walked the street with DOT before a street construction project set to begin next spring. Action: The board should follow up with DOT on how the Clinton Street safety and bike connection concerns will be addressed in the spring project."
+    },
+    {
+      "title": "Canal Street redesign phases and Grand Street bike lane",
+      "evidence": [
+        "P347",
+        "P348",
+        "P349"
+      ],
+      "type": "Transportation Request",
+      "location_raw": "Canal Street",
+      "requester": "Transportation committee chair (unnamed)",
+      "status": "In Progress",
+      "summary": "The Canal Street redesign project was split into two phases, with phase one outside the district and phase two in the district pending community input. Phase one includes a two-way bike lane from Grand Street. Action: The board should provide community input to DOT on phase two of the Canal Street redesign."
+    },
+    {
+      "title": "Bath house information request",
+      "evidence": [
+        "P436",
+        "P437"
+      ],
+      "type": "Other",
+      "location_raw": "",
+      "requester": "Group house task force (unnamed)",
+      "status": "Open",
+      "summary": "The group house task force report was absent, and the chair asked whether anyone had information about the bath house. No details were given in the meeting. Action: The task force should gather information about the bath house and report to the board."
+    }
+  ],
+  "dropped": []
+}

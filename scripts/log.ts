@@ -4,11 +4,11 @@
  *   tsx scripts/log.ts runs/*.json
  */
 import { appendFileSync, existsSync, readFileSync } from "node:fs";
-import { DATA_FILES, loadGold, loadRunTickets } from "../lib/data.ts";
+import { GOLD_BY_TRANSCRIPT, loadGold, loadRunTickets, meetingName, type GoldTicket } from "../lib/data.ts";
 import { score } from "../lib/score.ts";
 
 const RESULTS = "results.csv";
-const HEADER = "date,prompt,model,run,precision,recall,f1,type_acc,status_acc,evidence_f1,cost_usd";
+const HEADER = "date,meeting,prompt,model,run,precision,recall,f1,type_acc,status_acc,evidence_f1,cost_usd";
 
 const files = process.argv.slice(2);
 if (!files.length) {
@@ -22,19 +22,22 @@ const logged = new Set(
     .split("\n")
     .slice(1)
     .filter(Boolean)
-    .map((line) => line.split(",").slice(1, 4).join(",")),
+    .map((line) => line.split(",").slice(1, 5).join(",")),
 );
 
-const gold = loadGold();
+const golds = new Map<string, GoldTicket[]>();
 const fmt = (x: number) => x.toFixed(3);
 
 for (const file of files) {
   const { run, tickets } = loadRunTickets(file);
-  if (run.transcript !== DATA_FILES.transcript) {
-    console.log(`skip ${file} (run is on ${run.transcript}; gold tickets only exist for ${DATA_FILES.transcript})`);
+  const goldPath = GOLD_BY_TRANSCRIPT[run.transcript];
+  if (!goldPath) {
+    console.log(`skip ${file} (no gold tickets for ${run.transcript})`);
     continue;
   }
-  const key = [run.prompt, run.model, run.run].join(",");
+  if (!golds.has(goldPath)) golds.set(goldPath, loadGold(goldPath));
+  const gold = golds.get(goldPath)!;
+  const key = [meetingName(run.transcript), run.prompt, run.model, run.run].join(",");
   if (logged.has(key)) {
     console.log(`skip ${file} (already in ${RESULTS})`);
     continue;

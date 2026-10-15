@@ -2,10 +2,10 @@
 """Split a raw meeting transcript into numbered paragraphs.
 
 Each non-empty line of the raw transcript becomes one paragraph, written as
-"P<n>\t<text>" (the format of data/psplit_train.txt).
+"P<n>\t<text>" (the format of data/psplit_train1.txt).
 
 Usage:
-    python3 scripts/split_paragraphs.py data/raw_train.txt data/psplit_train.txt
+    python3 scripts/split_paragraphs.py data/raw_train1.txt data/psplit_train1.txt
     python3 scripts/split_paragraphs.py data/raw_test.txt            # -> data/psplit_test.txt
 """
 

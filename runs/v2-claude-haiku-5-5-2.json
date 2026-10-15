@@ -2,7 +2,7 @@
   "prompt": "v2",
   "model": "claude-haiku-5-5",
   "run": 2,
-  "transcript": "data/psplit_train.txt",
+  "transcript": "data/psplit_train1.txt",
   "createdAt": "2026-10-12T04:48:47.659Z",
   "usage": {
     "inputTokens": 37782,

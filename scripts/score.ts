@@ -5,15 +5,17 @@
  *   tsx scripts/score.ts --annotator "Claude Opus 5.5"
  *   tsx scripts/score.ts --all-annotators
  *
+ * A run is scored against the gold file for its transcript (GOLD_BY_TRANSCRIPT); --gold overrides.
+ *
  * Flags: --gold <csv> --annotators-csv <csv> --threshold 0.3 --over-split 0.5
  */
 import { parseArgs } from "node:util";
-import { DATA_FILES, loadAnnotatorTickets, loadGold, loadRejected, loadRunTickets, type GoldTicket, type Ticket } from "../lib/data.ts";
+import { DATA_FILES, GOLD_BY_TRANSCRIPT, loadAnnotatorTickets, loadGold, loadRejected, loadRunTickets, type GoldTicket, type Ticket } from "../lib/data.ts";
 import { score, type ScoreResult } from "../lib/score.ts";
 
 const { values: args } = parseArgs({
   options: {
-    gold: { type: "string", default: DATA_FILES.gold },
+    gold: { type: "string" },
     run: { type: "string" },
     annotator: { type: "string" },
     "all-annotators": { type: "boolean", default: false },
@@ -24,7 +26,8 @@ const { values: args } = parseArgs({
 });
 
 const opts = { threshold: Number(args.threshold), overSplitMin: Number(args["over-split"]) };
-const gold = loadGold(args.gold);
+// Annotator tickets only exist for the train1 meeting; runs pick their gold below.
+let gold = loadGold(args.gold ?? DATA_FILES.gold);
 
 const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 const titleOf = (t: Ticket) => `${t.id}  "${t.title}"`;
@@ -88,10 +91,12 @@ function scoreAnnotator(name: string, all: ReturnType<typeof loadAnnotatorTicket
 
 if (args.run) {
   const { run, tickets } = loadRunTickets(args.run);
-  if (run.transcript !== DATA_FILES.transcript) {
-    console.error(`${args.run}: run is on ${run.transcript}, but gold tickets only exist for ${DATA_FILES.transcript}`);
+  const goldPath = args.gold ?? GOLD_BY_TRANSCRIPT[run.transcript];
+  if (!goldPath) {
+    console.error(`${args.run}: no gold tickets for ${run.transcript}; known: ${Object.keys(GOLD_BY_TRANSCRIPT).join(", ")}`);
     process.exit(1);
   }
+  gold = loadGold(goldPath);
   const r = score(tickets, gold, opts);
   printReport(`${run.prompt} · ${run.model} · run ${run.run}`, tickets, r);
 } else if (args.annotator) {

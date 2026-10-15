@@ -3,12 +3,12 @@
  *
  *   tsx scripts/run.ts --model claude-haiku-5-5 --prompt prompts/v2.md --n 3
  *
- * Flags: --transcript data/psplit_train.txt --model <id> --prompt <md> --n 1
+ * Flags: --previous <gold csv> (previous meeting's tickets, as history) --transcript data/psplit_train1.txt --model <id> --prompt <md> --n 1
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 import { parseArgs } from "node:util";
-import { DATA_FILES, loadParagraphs, loadTicketTypes, type RunFile } from "../lib/data.ts";
+import { DATA_FILES, loadGold, loadParagraphs, meetingName, loadTicketTypes, type RunFile } from "../lib/data.ts";
 import { extract, MODELS, type ModelId } from "../lib/extract.ts";
 
 if (existsSync(".env.local")) process.loadEnvFile(".env.local");
@@ -19,6 +19,7 @@ const { values: args } = parseArgs({
     model: { type: "string", default: "claude-haiku-5-5" },
     prompt: { type: "string", default: "prompts/v2.md" },
     n: { type: "string", default: "1" },
+    previous: { type: "string" },
   },
 });
 
@@ -29,11 +30,12 @@ const n = Number(args.n);
 
 const paragraphs = loadParagraphs(args.transcript);
 const types = loadTicketTypes();
+const previous = args.previous ? loadGold(args.previous) : undefined;
 mkdirSync("runs", { recursive: true });
 
 // Runs on the gold (train) transcript keep the plain name; any other meeting is tagged
-// with its transcript name (psplit_test2.txt -> "test2") so it can't be mistaken for a scored run.
-const tag = args.transcript === DATA_FILES.transcript ? "" : `-${basename(args.transcript, ".txt").replace(/^psplit_/, "")}`;
+// with its transcript name (psplit_train2.txt -> "train2") so it can't be mistaken for a scored run.
+const tag = args.transcript === DATA_FILES.transcript ? "" : `-${meetingName(args.transcript)}`;
 // Continue numbering after existing runs so nothing is overwritten.
 let i = 1;
 const nextPath = () => {
@@ -44,7 +46,7 @@ const nextPath = () => {
 for (let k = 0; k < n; k++) {
   const path = nextPath();
   const started = Date.now();
-  const result = await extract({ paragraphs, types, model, promptPath: args.prompt });
+  const result = await extract({ paragraphs, types, model, promptPath: args.prompt, previous });
   const run: RunFile = {
     prompt: promptVersion,
     model,
@@ -57,6 +59,7 @@ for (let k = 0; k < n; k++) {
     costUsd: result.costUsd,
     tickets: result.tickets,
     dropped: result.dropped,
+    ...(args.previous ? { previous: args.previous } : {}),
   };
   writeFileSync(path, JSON.stringify(run, null, 2) + "\n");
   const secs = ((Date.now() - started) / 1000).toFixed(0);

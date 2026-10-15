@@ -2,7 +2,7 @@
   "prompt": "v1",
   "model": "claude-sonnet-5-5",
   "run": 1,
-  "transcript": "data/psplit_train.txt",
+  "transcript": "data/psplit_train1.txt",
   "createdAt": "2026-10-12T01:50:16.849Z",
   "usage": {
     "inputTokens": 37702,

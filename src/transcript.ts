@@ -1,5 +1,5 @@
 // Demo transcript; meetings will come from the Block Party API.
-import rawTranscript from "../data/raw_train.txt?raw";
+import rawTranscript from "../data/raw_train1.txt?raw";
 
 /** A character range in the transcript, [start, end) in global offsets. */
 export type Span = { start: number; end: number };

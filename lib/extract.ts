@@ -25,8 +25,10 @@ export function ticketSchema(types: TicketType[]) {
     evidence: z.array(z.string()).describe('Paragraph ids that discuss the issue, e.g. ["P15", "P17"]'),
     type: z.enum(typeNames),
     location_raw: z.string().describe("Location copied verbatim from the transcript, or empty string"),
-    summary: z.string().describe('2-4 sentences, ending with a sentence starting "Action: "'),
+    requester: z.string().describe('Who raised the issue, with role in parentheses, e.g. "Jane Doe (public speaker)"'),
+    // Status comes before summary so the "Action: " sentence doesn't anchor it toward Open.
     status: z.enum(STATUSES),
+    summary: z.string().describe('2-4 sentences, ending with a sentence starting "Action: "'),
   });
   return z.object({ tickets: z.array(ticket) });
 }
@@ -55,7 +57,14 @@ type ExtractOptions = {
   thinking?: "adaptive" | "off";
   /** Thinking depth / token spend. Haiku 5.5 defaults to "medium". */
   effort?: "low" | "medium" | "high";
+  /** Tickets from the board's previous meeting, given as history for status. */
+  previous?: Ticket[];
 };
+
+function previousBlock(previous: Ticket[]): string {
+  const lines = previous.map((t) => `- ${t.title.trim()} (${t.type}; status then: ${t.status})${t.summary ? `: ${t.summary.trim()}` : ""}`);
+  return `<previous_tickets>\n${lines.join("\n")}\n</previous_tickets>\n\n`;
+}
 
 // Haiku 5.5 with adaptive thinking sometimes spends its output on reasoning and then writes
 // only the first ticket or two before stopping normally (about 1 run in 3-6 on the 9/29 meeting).
@@ -84,14 +93,14 @@ export async function extract(opts: ExtractOptions): Promise<ExtractResult> {
 }
 
 async function extractOnce(opts: ExtractOptions): Promise<ExtractResult> {
-  const { paragraphs, types, model, promptPath, thinking = "adaptive", effort } = opts;
+  const { paragraphs, types, model, promptPath, thinking = "adaptive", effort, previous } = opts;
   const transcript = paragraphs.map((p) => `${p.id}\t${p.text}`).join("\n");
 
   const { object, usage, finishReason } = await generateObject({
     model: anthropic(model),
     schema: ticketSchema(types),
     system: buildSystemPrompt(promptPath, types),
-    prompt: `<transcript>\n${transcript}\n</transcript>\n\nExtract the tickets from this transcript.`,
+    prompt: `${previous?.length ? previousBlock(previous) : ""}<transcript>\n${transcript}\n</transcript>\n\nExtract the tickets from this transcript.`,
     maxOutputTokens: 16000,
     // Native structured outputs; Sonnet 5.5 rejects the forced tool call the jsonTool mode relies on.
     providerOptions: {

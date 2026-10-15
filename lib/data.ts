@@ -3,12 +3,25 @@ import { parse } from "csv-parse/sync";
 
 // Airtable exports keep their "-Grid view" names; override any of these with CLI flags.
 export const DATA_FILES = {
-  transcript: "data/psplit_train.txt",
-  gold: "data/Gold Tickets-Grid view.csv",
+  transcript: "data/psplit_train1.txt",
+  gold: "data/train1_goldtickets-Grid view.csv",
   rejected: "data/Gold Rejected-Grid view.csv",
   annotators: "data/Annotator Tickets-Grid view.csv",
   types: "data/Ticket Types-Grid view.csv",
 };
+
+// CB3 meetings with gold tickets, oldest first. Gold tickets sharing an `issue` across meetings are the same issue updated.
+export const MEETINGS = [
+  { name: "train2", date: "2026-07-28", transcript: "data/psplit_train2.txt", gold: "data/train2_goldtickets-Grid view.csv" },
+  { name: "train1", date: "2026-09-29", transcript: DATA_FILES.transcript, gold: DATA_FILES.gold },
+];
+
+export const GOLD_BY_TRANSCRIPT: Record<string, string> = Object.fromEntries(MEETINGS.map((m) => [m.transcript, m.gold]));
+
+/** "data/psplit_train2.txt" -> "train2" */
+export function meetingName(transcript: string): string {
+  return transcript.replace(/^.*\//, "").replace(/\.txt$/, "").replace(/^psplit_/, "");
+}
 
 export const STATUSES = ["Open", "In Progress", "Closed"] as const;
 export type Status = (typeof STATUSES)[number];
@@ -20,10 +33,11 @@ export type Ticket = {
   type: string;
   status: string;
   location_raw?: string;
+  requester?: string;
   summary?: string;
 };
 
-export type GoldTicket = Ticket & { sourceTickets: string[]; adjudicationNote: string };
+export type GoldTicket = Ticket & { sourceTickets: string[]; adjudicationNote: string; issue: string };
 
 export type TicketType = { name: string; definition: string };
 
@@ -40,6 +54,8 @@ export type RunFile = {
   costUsd: number;
   tickets: Omit<Ticket, "id">[];
   dropped?: string[];
+  /** Gold file of the previous meeting whose tickets were given to the model as history. */
+  previous?: string;
 };
 
 export type Paragraph = { id: string; text: string };
@@ -84,8 +100,11 @@ export function loadGold(path = DATA_FILES.gold): GoldTicket[] {
     type: r.type.trim(),
     status: r.status.trim(),
     location_raw: r.location_raw?.trim(),
+    summary: r.summary?.trim(),
     sourceTickets: splitList(r.source_tickets),
     adjudicationNote: r.adjudication_note?.trim() ?? "",
+    // Airtable exports name the column "Issue" or "Issues" depending on the table.
+    issue: (r.Issue ?? r.Issues ?? "").trim(),
   }));
 }
 
@@ -100,6 +119,7 @@ export function loadAnnotatorTickets(path = DATA_FILES.annotators): AnnotatorTic
     type: r.type.trim(),
     status: r.status.trim(),
     location_raw: r.location_raw?.trim(),
+    requester: r.requester?.trim(),
     summary: r.summary?.trim(),
     annotator: r.annotator.trim(),
   }));
