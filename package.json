@@ -11,10 +11,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "format": "oxfmt"
+    "format": "oxfmt",
+    "db:seed-sql": "node scripts/make_supabase_seed.mjs"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.78",
+    "@supabase/supabase-js": "^2.118.0",
     "ai": "^7.0.137",
     "leaflet": "1.9.4",
     "lucide-react": "^1.52.0",

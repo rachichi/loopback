@@ -2,21 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Plus, X } from "lucide-react";
 import { searchPlaces } from "./geosearch";
-import type { Place, Ticket, TicketLocation } from "./goldTickets";
+import type { Place, TicketLocation } from "./goldTickets";
 
 const titleCase = (text: string) => text.toLowerCase().replace(/\b([a-z])/g, (c) => c.toUpperCase());
 
 /** The ticket's mapped places, plus a GeoSearch box to add more. The meeting's wording stays in location.text. */
 export default function LocationCell({
-  ticket,
+  location,
+  label,
   onChange,
   onShowOnMap,
 }: {
-  ticket: Ticket;
+  location: TicketLocation;
+  /** Names what the places belong to, for the search box's accessible label. */
+  label: string;
   onChange: (location: TicketLocation) => void;
-  onShowOnMap: (placeIndex: number) => void;
+  /** Omitted where there's no map to show (the intake form); the chips are then plain labels. */
+  onShowOnMap?: (placeIndex: number) => void;
 }) {
-  const { location } = ticket;
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
@@ -57,9 +60,11 @@ export default function LocationCell({
       <div className="place-chips">
         {location.places.map((place, index) => (
           <span className="place-chip" key={`${place.name}-${index}`}>
-            <button type="button" title="Show on map" onClick={(event) => { event.stopPropagation(); onShowOnMap(index); }}>
-              <span>{place.name}</span>
-            </button>
+            {onShowOnMap ? (
+              <button type="button" title="Show on map" onClick={(event) => { event.stopPropagation(); onShowOnMap(index); }}>
+                <span>{place.name}</span>
+              </button>
+            ) : <span>{place.name}</span>}
             <button type="button" className="place-remove" aria-label={`Remove ${place.name}`} onClick={(event) => { event.stopPropagation(); remove(index); }}><X size={9} /></button>
           </span>
         ))}
@@ -69,13 +74,14 @@ export default function LocationCell({
             className="place-search"
             autoFocus
             placeholder="Search NYC places…"
-            aria-label={`Add a place to ${ticket.number}`}
+            aria-label={`Add a place to ${label}`}
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onBlur={close}
             onKeyDown={(event) => {
-              if (event.key === "Escape") close();
-              if (event.key === "Enter" && results[0]) { event.preventDefault(); add(results[0]); }
+              // Keep Escape and Enter from also closing or submitting a surrounding form.
+              if (event.key === "Escape") { event.stopPropagation(); close(); }
+              if (event.key === "Enter") { event.preventDefault(); if (results[0]) add(results[0]); }
             }}
           />
         ) : (

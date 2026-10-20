@@ -26,7 +26,7 @@ export default function MapView({
   onSelect,
 }: {
   tickets: Ticket[];
-  selected: Ticket;
+  selected: Ticket | undefined;
   hoveredId: string | null;
   focus: MapFocus | null;
   onHover: (id: string | null) => void;
@@ -80,7 +80,7 @@ export default function MapView({
       ticket.location.places.forEach((place, index) => {
         const key = `${ticket.id}:${index}`;
         live.add(key);
-        const state = ticket.id === hoveredId ? "hovered" : ticket.id === selected.id ? "selected" : "";
+        const state = ticket.id === hoveredId ? "hovered" : ticket.id === selected?.id ? "selected" : "";
         let entry = markers.get(key);
         if (!entry) {
           const marker = L.marker([place.lat, place.lng], { icon: pinIcon(ticket) });
@@ -112,7 +112,7 @@ export default function MapView({
     for (const [key, entry] of markers) {
       if (!live.has(key)) { entry.marker.remove(); markers.delete(key); }
     }
-  }, [tickets, selected.id, hoveredId]);
+  }, [tickets, selected?.id, hoveredId]);
 
   // Pan to a place requested from the table.
   useEffect(() => {
