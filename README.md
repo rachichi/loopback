@@ -4,9 +4,17 @@ Loopback is a React portal prototype for Manhattan Community Board 3 (CB3). It b
 
 ## Contents
 
+- [Skills Showcased](#skills-showcased)
 - [Portal Guide](#portal-guide)
 - [Future State](#future-state)
 - [MIT License](#mit-license)
+
+## Skills Showcased
+
+- **Civic tech product design:** shaping one portal around the real workflows of community board staff, from meeting prep and ticket tracking to outreach and a board-to-board forum.
+- **Front-end engineering:** a React 19 and TypeScript single-page app built with Vite and styled with Tailwind CSS v4.
+- **Interface patterns:** searchable, filterable tables; List, Kanban and Roadmap views of the same tickets; a map panel; a calendar; and editable social post previews.
+- **Applied AI (other branches):** pulling follow-up tickets out of meeting transcripts with Claude, scoring the results against a hand-labeled gold set, and showing ticket locations on a Leaflet map.
 
 ## Portal Guide
 
