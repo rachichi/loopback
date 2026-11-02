@@ -1,7 +1,7 @@
 // Demo tickets: the adjudicated gold sets for the bundled meetings (see meetings.ts).
-import train1Csv from "../data/train1_goldtickets-Grid view.csv?raw";
-import train2Csv from "../data/train2_goldtickets-Grid view.csv?raw";
-import annotatorCsv from "../data/Annotator Tickets-Grid view.csv?raw";
+import train1Csv from "../evals/data/train1_goldtickets-Grid view.csv?raw";
+import train2Csv from "../evals/data/train2_goldtickets-Grid view.csv?raw";
+import annotatorCsv from "../evals/data/Annotator Tickets-Grid view.csv?raw";
 import { meetingById } from "./meetings";
 import { paragraphIdsFromSpans, spansFromParagraphIds, type Span } from "./transcript";
 
