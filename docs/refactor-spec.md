@@ -175,12 +175,24 @@ $$;
 
 | Table | select | insert | update | delete |
 | --- | --- | --- | --- | --- |
-| `tickets` | `is_board_member(board)` | `is_board_member(board)` | `is_board_member(board)` using + with check | board admin only |
+| `tickets` | `is_board_member(board)` or platform admin | `can_edit_board(board)` | `can_edit_board(board)` using + with check | `can_edit_board(board)` |
 | `boards` | member of that board, or platform admin | platform admin | platform admin (this is how flags are set) | none |
 | `board_members` | own rows, or platform admin | platform admin | platform admin | platform admin |
 | `feature_flags` | any signed-in user | platform admin | platform admin | platform admin |
 
 All policies `to authenticated`. No `anon` access to any table in V1. Enable RLS on the three new tables.
+
+Roles (decided 2026-11-02, migrations `20261102140000_roles.sql` and `20261102160000_public_share_links.sql`):
+
+| Role | Stored in | Access |
+| --- | --- | --- |
+| Platform admin | `platform_admins` | Every board: read, create, edit and delete tickets; boards, flags and members |
+| Staff | `board_members.role = 'staff'` (legacy `'admin'` counts as staff) | Own board: read, create, edit and delete tickets |
+| Public | a board's share link, `/share/<token>` | Own board's tickets, read only, limited fields |
+
+`can_edit_board(b)` is true for platform admins and for staff of `b`. There is no volunteer role; read-only access is the share link.
+
+Public share links. Each board has a random `boards.share_token` (24 characters). `anon` still has no access to any table: the share page calls two `security definer` functions, `public_board(token)` and `public_board_tickets(token)`, which return only number, title, type, status, urgent, deadline, location text and places, and submitted date. Requester, summary, `submitted_by`, meeting ids, spans, `created_by` and `owner_id` are never returned. Staff and platform admins replace a board's link with `rotate_share_token(b)`, which stops every copy of the old link.
 
 Acceptance test (write it as a SQL script or a Vitest integration test against the staging project): a user in `b-cb-9` cannot select, insert, update or delete a ticket with `board = 'm-cb-3'`, including by changing `board` in an update.
 
