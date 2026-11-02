@@ -114,6 +114,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .loopback-logo-image { width: 100%; height: 100%; object-fit: contain; display: block; border-radius: 12px; filter: drop-shadow(0 4px 12px rgba(17, 24, 44, 0.12)); }
 .board-logo { width: 160px; height: 62px; display: grid; place-items: center; }
 .board-logo-image { width: 100%; height: 100%; object-fit: contain; display: block; }
+.board-logo-name { font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 15px; font-weight: 600; line-height: 1.15; text-align: left; }
 /* Home / Tickets navigation; the white background and bottom rule run full width. */
 .portal-nav { width: min(1120px, calc(100% - 40px)); height: 40px; margin: 0 auto; position: sticky; top: 0; z-index: 20; isolation: isolate; display: grid; grid-template-columns: 42px minmax(120px, 180px) 1fr; }
 .portal-nav::before { content: ""; position: absolute; z-index: -1; top: 0; left: 50%; width: 100vw; height: 100%; transform: translateX(-50%); background: #fff; pointer-events: none; }
@@ -137,13 +138,15 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .board-status { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; color: #4c5561; font-size: 14px; text-align: center; }
 .board-status-signout { padding: 6px 14px; border: 1px solid #aeb4bc; border-radius: 5px; background: #fff; cursor: pointer; }
 
-/* Home: the CB9 photo under a dark wash so the white headline stays readable over the bright sky. */
+/* Home: the board's photo (--hero-image, set from boards.background_url) under a dark wash so the white headline
+   stays readable. A board without a photo gets a neutral gradient. */
 .home-view { width: 100%; flex: 1; min-height: 0; display: flex; background: #2a3242; }
 .hero-banner { position: relative; width: 100%; flex: 1; min-height: calc(100vh - 20px); display: flex; align-items: center; justify-content: center; overflow: hidden; isolation: isolate; }
-.hero-banner::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(90deg, rgba(17, 24, 44, .68) 0%, rgba(17, 24, 44, .42) 50%, rgba(17, 24, 44, .5) 100%), url('/bklyncb9_background.jpg'); background-size: cover; background-position: center; }
+.hero-banner::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(90deg, rgba(17, 24, 44, .68) 0%, rgba(17, 24, 44, .42) 50%, rgba(17, 24, 44, .5) 100%), var(--hero-image, linear-gradient(135deg, #1f5f91 0%, #176d69 100%)); background-size: cover; background-position: center; }
 .hero-content { width: min(1200px, calc(100% - 64px)); min-height: calc(100vh - 236px); margin: 0 auto; padding: 32px 0 42px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); align-content: center; align-items: stretch; gap: 32px 36px; }
 .hero-primary { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
 .hero-copy h1 { max-width: 760px; margin: 0; color: rgba(255, 255, 255, .97); font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 60px; font-weight: 800; line-height: 1.02; text-transform: uppercase; text-shadow: 0 2px 12px rgba(17, 24, 44, .35); }
+.hero-board { margin: 0 0 10px; color: rgba(255, 255, 255, .85); font-size: 15px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .hero-search { width: 100%; height: 58px; display: flex; overflow: hidden; border: 3px solid #111; border-radius: 4px; background: #fff; box-shadow: 0 4px 14px rgba(17, 24, 44, .18); }
 .hero-search input { min-width: 0; flex: 1; padding: 0 26px; border: 0; outline: 0; background: #fff; color: #111; font-size: 18px; font-weight: 600; }
 .hero-search input::placeholder { color: #969696; opacity: 1; }
@@ -332,7 +335,7 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .intake-form footer .primary:hover { background: #1fa2c2; }
 .map-view { min-height: 0; flex: 1; display: flex; flex-direction: column; }
 .map-canvas { min-height: 0; flex: 1; position: relative; overflow: hidden; background: #edf1ed; z-index: 0; }
-/* Lightly soften OSM's colors; outside CB3 the map is grayed by a blend mask (see MapView). */
+/* Lightly soften OSM's colors so the type-colored pins stand out. */
 .map-tiles { filter: saturate(.8) brightness(1.03) contrast(.96); }
 /* Map pins: a dot in the ticket's type color; hovered and selected pins grow. */
 .map-place { background: none; border: 0; }

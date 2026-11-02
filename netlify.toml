@@ -1,5 +1,8 @@
 [build]
-command = "pnpm run build"
+# Netlify restores node_modules from its build cache, and a stale or partial copy makes pnpm skip the
+# install ("Lockfile is up to date") and the build fail on missing files. --force relinks every package
+# from the lockfile, so cached builds behave like "Clear cache and deploy".
+command = "pnpm install --frozen-lockfile --force && pnpm run build"
 publish = "dist"
 
 [build.environment]

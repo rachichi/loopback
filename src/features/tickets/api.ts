@@ -1,7 +1,7 @@
 // Ticket queries. Every call takes the board id from BoardProvider; RLS is what actually limits a user to
 // their own board, the filter here only keeps a platform admin's view to one board.
 import { db } from "../../db";
-import type { Ticket } from "../../goldTickets";
+import type { Ticket } from "./types";
 import { fromRow, toRow, type TicketRow } from "./rows";
 
 export async function loadTickets(board: string): Promise<Ticket[]> {

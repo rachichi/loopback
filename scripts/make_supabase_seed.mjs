@@ -19,7 +19,7 @@ const sql = (value, column) => {
   return `'${value.replace(/'/g, "''")}'`;
 };
 
-// The bundled sample tickets come from Manhattan CB3's meetings, whatever board the app is set to.
+// The bundled sample tickets come from Manhattan CB3's meetings, so they belong to m-cb-3.
 const rows = initialTickets.map((ticket) => toRow(ticket, "m-cb-3"));
 const columns = Object.keys(rows[0]);
 const values = rows.map((row) => `  (${columns.map((column) => sql(row[column], column)).join(", ")})`);

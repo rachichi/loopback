@@ -1,6 +1,6 @@
 // Mapping between a Ticket and a row of the tickets table. No database access here, so
 // scripts/make_supabase_seed.mjs can use it without Supabase credentials.
-import { withSpans, type Status, type Ticket, type TicketType } from "../../goldTickets";
+import type { Status, Ticket } from "./types";
 
 /** The columns of the tickets table that the client reads and writes. */
 export type TicketRow = {
@@ -48,7 +48,7 @@ export function fromRow(row: TicketRow): Ticket {
     id: row.id,
     number: String(row.number),
     title: row.title,
-    type: row.type as TicketType,
+    type: row.type,
     status: row.status as Status,
     urgent: row.urgent,
     deadline: row.deadline ?? "",
@@ -58,9 +58,9 @@ export function fromRow(row: TicketRow): Ticket {
     submittedBy: row.submitted_by,
     submittedAt: row.submitted_at,
     meetingIds: row.meeting_ids,
-    spans: [],
+    spans: row.spans,
+    // Paragraph ids are derived from the spans and the transcripts, which V1 doesn't ship, so they stay empty.
     evidence: {},
   };
-  // Paragraph ids are derived from the spans, so they aren't stored.
-  return withSpans(ticket, row.spans);
+  return ticket;
 }

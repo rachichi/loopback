@@ -1,18 +1,17 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Calendar, CircleChevronDown, MapPin, ScrollText, SquareCheck, Type, type LucideIcon } from "lucide-react";
+import { Calendar, CircleChevronDown, MapPin, SquareCheck, Type, type LucideIcon } from "lucide-react";
 import LocationCell from "./LocationCell";
-import { meetingById } from "./meetings";
-import { formatEvidence, statusClass, statuses, ticketTypes, typeClass, type Status, type Ticket, type TicketType } from "./goldTickets";
+import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
+import { useBoard, useTypeClass } from "./lib/board";
 
-// Evidence is edited by dragging highlights in the transcript; the ticket number is fixed.
+// The ticket number is assigned by the database and fixed.
 type EditableField = "title" | "urgent" | "type" | "location" | "requester" | "summary" | "deadline" | "status" | "submittedBy" | "submittedAt";
 
 // Resizable columns (after the fixed checkbox column), in pixels. The icon shows the field type, Airtable-style.
 const columns: readonly { key: string; label: string; width: number; icon: LucideIcon; fieldType: string }[] = [
-  // Icons match the right-panel tabs: Transcript (ScrollText) and Map (MapPin).
+  // The Map icon matches the right-panel tab. The Transcript column returns with transcript matching (V2).
   { key: "title", label: "Title", width: 220, icon: Type, fieldType: "Text" },
   { key: "urgent", label: "Urgent", width: 70, icon: SquareCheck, fieldType: "Checkbox" },
-  { key: "evidence", label: "Transcript", width: 150, icon: ScrollText, fieldType: "Meeting and transcript paragraphs (edit by dragging highlights)" },
   { key: "type", label: "Type", width: 140, icon: CircleChevronDown, fieldType: "Single select" },
   { key: "location", label: "Map", width: 160, icon: MapPin, fieldType: "Map locations" },
   { key: "requester", label: "Requester", width: 160, icon: Type, fieldType: "Text" },
@@ -46,7 +45,6 @@ export default function TicketTable({
   onSelect,
   onChange,
   onShowOnMap,
-  onShowTranscript,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -57,8 +55,9 @@ export default function TicketTable({
   onSelect: (ticket: Ticket) => void;
   onChange: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
   onShowOnMap: (id: string, placeIndex: number) => void;
-  onShowTranscript: (ticket: Ticket, meetingId?: string) => void;
 }) {
+  const { ticketTypes } = useBoard();
+  const typeClass = useTypeClass();
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Only follow hovers that start in the transcript; scrolling under the cursor would jitter.
@@ -138,7 +137,7 @@ export default function TicketTable({
       {rows.length ? rows.map((ticket, rowIndex) => (
         <div
           role="row"
-          className={`ticket-grid ticket-row ${selectedId === ticket.id ? "selected" : ""} ${hoveredId === ticket.id ? `hovered ${typeClass[ticket.type]}` : ""}`}
+          className={`ticket-grid ticket-row ${selectedId === ticket.id ? "selected" : ""} ${hoveredId === ticket.id ? `hovered ${typeClass(ticket.type)}` : ""}`}
           key={ticket.id}
           data-ticket-id={ticket.id}
           onMouseEnter={() => onHover(ticket.id)}
@@ -159,18 +158,17 @@ export default function TicketTable({
               onChange={(event) => onChange(ticket.id, { urgent: event.target.checked })}
             />
           </div>
-          {/* Clicking anywhere in the Transcript or Map cell opens that side panel. */}
-          <div className="ticket-evidence opens-panel" onClick={(event) => { event.stopPropagation(); onShowTranscript(ticket); }}>
-            <EvidenceCell ticket={ticket} onShowTranscript={(meetingId) => onShowTranscript(ticket, meetingId)} />
-          </div>
+          {/* Clicking anywhere in the Map cell opens the map panel. */}
           <div>
             <select
-              className={`cell-select tag type ${typeClass[ticket.type]}`}
+              className={`cell-select tag type ${typeClass(ticket.type)}`}
               aria-label={`Type for ${ticket.number}`}
               value={ticket.type}
-              onChange={(event) => onChange(ticket.id, { type: event.target.value as TicketType })}
+              onChange={(event) => onChange(ticket.id, { type: event.target.value })}
             >
-              {ticketTypes.map((type) => <option key={type}>{type}</option>)}
+              {ticketTypes.map((type) => <option key={type.label} title={type.definition}>{type.label}</option>)}
+              {/* Keep a type the board no longer defines selectable, so the select doesn't misreport it. */}
+              {!ticketTypes.some((type) => type.label === ticket.type) && <option>{ticket.type}</option>}
             </select>
           </div>
           <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
@@ -193,26 +191,4 @@ export default function TicketTable({
       )) : <div className="empty-results">{emptyMessage}</div>}
     </div>
   );
-}
-
-/** A tag per meeting where the ticket was discussed; each opens that transcript, and its tooltip lists the cited paragraphs. */
-function EvidenceCell({ ticket, onShowTranscript }: { ticket: Ticket; onShowTranscript: (meetingId: string) => void }) {
-  const meetings = ticket.meetingIds.flatMap((id) => meetingById(id) ?? []);
-  if (!meetings.length) return <small>Intake form</small>;
-  return <>
-    {meetings.map((meeting) => {
-      const paragraphs = ticket.evidence[meeting.id] ?? [];
-      return (
-        <button
-          key={meeting.id}
-          type="button"
-          className="meeting-tag"
-          title={`${meeting.title}\n${paragraphs.length ? formatEvidence(paragraphs) : "No highlights"}\nClick to open the transcript`}
-          onClick={(event) => { event.stopPropagation(); onShowTranscript(meeting.id); }}
-        >
-          {meeting.label}
-        </button>
-      );
-    })}
-  </>;
 }

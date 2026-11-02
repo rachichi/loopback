@@ -12,6 +12,8 @@ export type Board = {
   name: string;
   borough: string;
   logoUrl: string | null;
+  /** Home page photo, from the board-assets Storage bucket. */
+  backgroundUrl: string | null;
   boundary: GeoJSON.GeoJsonObject | null;
   ticketTypes: BoardTicketType[];
   /** Resolved flags from board_effective_features. Read them through useFeature. */
@@ -41,7 +43,7 @@ async function loadBoard(userId: string): Promise<Board | null> {
 
   const { data: row, error: boardError } = await db
     .from("boards")
-    .select("id, name, borough, logo_url, boundary_geojson, ticket_types")
+    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types")
     .eq("id", member.board_id)
     .single();
   if (boardError) throw boardError;
@@ -64,6 +66,7 @@ async function loadBoard(userId: string): Promise<Board | null> {
     name: row.name,
     borough: row.borough,
     logoUrl: row.logo_url,
+    backgroundUrl: row.background_url,
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
     features,
@@ -119,6 +122,13 @@ export function useBoard(): Board {
   const board = useContext(BoardContext);
   if (!board) throw new Error("useBoard() must be used inside <BoardProvider>.");
   return board;
+}
+
+/** Maps a ticket type label to its css_class from boards.ticket_types. The class sets the tag and
+ *  highlight colors in src/index.css. A label the board doesn't define gets the neutral "other" style. */
+export function useTypeClass(): (type: string) => string {
+  const { ticketTypes } = useBoard();
+  return (type) => ticketTypes.find((item) => item.label === type)?.css_class || "other";
 }
 
 /** Whether a feature is on for the current board. Unknown keys are off. */

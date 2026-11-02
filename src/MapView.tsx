@@ -1,17 +1,18 @@
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import boundary from "./data/cb3-boundary.geojson?raw";
-import { typeClass, type Ticket } from "./goldTickets";
+import type { Ticket } from "./features/tickets/types";
+import { useBoard, useTypeClass } from "./lib/board";
 
 /** Which place to bring into view; n changes on every request so repeat clicks still pan. */
 export type MapFocus = { ticketId: string; place: number; n: number };
 
-const cb3 = JSON.parse(boundary) as GeoJSON.FeatureCollection;
+/** The five boroughs, for a board whose boundary hasn't been loaded yet. */
+const NYC_BOUNDS = L.latLngBounds([40.4774, -74.2591], [40.9176, -73.7004]);
 
-const pinIcon = (ticket: Ticket) =>
+const pinIcon = (className: string) =>
   L.divIcon({
-    className: `map-place ${typeClass[ticket.type]}`,
+    className: `map-place ${className}`,
     html: "<span></span>",
     iconSize: [18, 18],
     iconAnchor: [9, 9],
@@ -32,6 +33,8 @@ export default function MapView({
   onHover: (id: string | null) => void;
   onSelect: (ticket: Ticket) => void;
 }) {
+  const { boundary } = useBoard();
+  const typeClass = useTypeClass();
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.LayerGroup | null>(null);
@@ -39,7 +42,7 @@ export default function MapView({
   const handlers = useRef({ onHover, onSelect });
   handlers.current = { onHover, onSelect };
 
-  // Create the map once, framed on the CB3 boundary.
+  // Create the map once, framed on the board's boundary, or on the whole city when the board has none.
   useEffect(() => {
     if (!containerRef.current) return;
     const map = L.map(containerRef.current, { zoomControl: true, scrollWheelZoom: true });
@@ -50,8 +53,11 @@ export default function MapView({
       maxZoom: 19,
       className: "map-tiles",
     }).addTo(map);
-    const district = L.geoJSON(cb3, { style: { color: "#1fa2c2", weight: 2.5, opacity: 0.9, fill: false }, interactive: false }).addTo(map);
-    map.fitBounds(district.getBounds(), { padding: [16, 16] });
+    const district = boundary
+      ? L.geoJSON(boundary, { style: { color: "#1fa2c2", weight: 2.5, opacity: 0.9, fill: false }, interactive: false }).addTo(map)
+      : null;
+    const bounds = district?.getBounds();
+    map.fitBounds(bounds?.isValid() ? bounds : NYC_BOUNDS, { padding: [16, 16] });
     layerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     // The pane can change size when tabs switch; keep tiles in sync.
@@ -63,7 +69,8 @@ export default function MapView({
       mapRef.current = null;
       markersRef.current.clear();
     };
-  }, []);
+    // The board is fixed for the life of the portal (BoardProvider is keyed by user), so this runs once.
+  }, [boundary]);
 
   // Keep one marker per place and update it in place when tickets, selection or hover change.
   // Rebinding a tooltip or swapping an icon would close an open tooltip under the cursor, so
@@ -83,7 +90,7 @@ export default function MapView({
         const state = ticket.id === hoveredId ? "hovered" : ticket.id === selected?.id ? "selected" : "";
         let entry = markers.get(key);
         if (!entry) {
-          const marker = L.marker([place.lat, place.lng], { icon: pinIcon(ticket) });
+          const marker = L.marker([place.lat, place.lng], { icon: pinIcon(typeClass(ticket.type)) });
           const current = () => ticketsRef.current.find((item) => item.id === ticket.id);
           entry = { marker, type: ticket.type, tooltip: "" };
           marker.bindTooltip("", { direction: "top", offset: [0, -10] });
@@ -95,7 +102,7 @@ export default function MapView({
         }
         entry.marker.setLatLng([place.lat, place.lng]);
         if (entry.type !== ticket.type) {
-          entry.marker.setIcon(pinIcon(ticket));
+          entry.marker.setIcon(pinIcon(typeClass(ticket.type)));
           entry.type = ticket.type;
         }
         const element = entry.marker.getElement();

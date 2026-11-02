@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { typeClass, type EvidenceSpan, type Ticket } from "./goldTickets";
+import type { EvidenceSpan, Ticket } from "./features/tickets/types";
 import type { Meeting } from "./meetings";
 import { normalizeSpan, paragraphIndexAt, type Span } from "./transcript";
 
@@ -35,8 +35,11 @@ export default function TranscriptView({
   onHover,
   onSpanChange,
   jump,
+  typeClass,
 }: {
   meetings: Meeting[];
+  /** Ticket type label to css_class, from useTypeClass(). */
+  typeClass: (type: string) => string;
   /** The meeting whose transcript is shown. */
   meeting: Meeting;
   onMeetingChange: (meetingId: string) => void;
@@ -117,7 +120,7 @@ export default function TranscriptView({
   const handle = (item: Placed, edge: "start" | "end") => (
     <span
       key={`${item.ticket.id}-${item.index}-${edge}`}
-      className={`hl-handle ${edge} ${typeClass[item.ticket.type]}`}
+      className={`hl-handle ${edge} ${typeClass(item.ticket.type)}`}
       title={`Drag to adjust where this highlight ${edge === "start" ? "starts" : "ends"}`}
       onMouseEnter={keep}
       onMouseDown={(event) => {
@@ -167,7 +170,7 @@ export default function TranscriptView({
                 <mark
                   key={a}
                   data-start={a}
-                  className={`hl ${typeClass[owner.ticket.type]} ${owner.ticket.id === activeId ? "active" : ""}`}
+                  className={`hl ${typeClass(owner.ticket.type)} ${owner.ticket.id === activeId ? "active" : ""}`}
                   title={covering.map(({ ticket }) => `${ticket.number} · ${ticket.title}`).join("\n")}
                   onMouseEnter={() => hover(owner.ticket.id)}
                 >
