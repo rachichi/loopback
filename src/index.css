@@ -127,11 +127,10 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .nav-account .board-switcher { min-width: 0; max-width: 240px; height: 28px; padding: 0 6px; border: 1px solid #aeb4bc; border-radius: 5px; background: #fff; font-size: 12px; }
 .role-badge { flex: none; padding: 2px 8px; border-radius: 999px; background: #e6e9ec; color: #4c5561; font-size: 11px; font-weight: 600; white-space: nowrap; }
 .role-badge.platform_admin { background: #dff3f8; color: #12667a; }
-.role-badge.volunteer { background: #fdf1d6; color: #7d6210; }
 .nav-signout { height: 100%; display: flex; align-items: center; gap: 7px; padding: 0 14px; border: 0; border-left: 1px solid #aeb4bc; background: #fff; color: #4c5561; font-size: 13px; font-weight: 600; cursor: pointer; }
 .nav-signout:hover { background: #f5fbfc; }
-/* Wraps the ticket table only to disable it for volunteers; it adds no box of its own. */
-.ticket-fieldset { display: contents; }
+.nav-share { height: 28px; display: flex; align-items: center; gap: 6px; padding: 0 10px; border: 1px solid #aeb4bc; border-radius: 5px; background: #fff; color: #33404c; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.nav-share:hover { background: #f5fbfc; }
 /* Delete sits in the table's trailing column and shows on row hover, selection or keyboard focus. */
 .row-actions { display: flex; align-items: flex-start; padding: 6px 4px; }
 .row-delete { width: 26px; height: 26px; display: grid; place-items: center; border: 0; border-radius: 4px; background: transparent; color: #a3263c; cursor: pointer; opacity: 0; }
@@ -429,4 +428,38 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
   .portal-footer img { width: 48px; height: 48px; }
   .portal-footer-contact { max-width: 260px; gap: 6px; }
   .portal-footer-contact p { font-size: 10px; }
+}
+
+/* Share dialog (staff) */
+.share-note { margin: 0; color: #4c5561; font-size: 13px; line-height: 1.45; }
+.share-row { display: flex; gap: 8px; }
+.share-row input { flex: 1; min-width: 0; height: 34px; padding: 0 9px; border: 1px solid #cfd5db; border-radius: 5px; color: #11182c; font-size: 12px; background: #f7f9fa; }
+.share-copy { flex: none; height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border: 0; border-radius: 5px; background: #11182c; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; }
+.share-error { margin: 0; color: #a3263c; font-size: 12px; font-weight: 600; }
+.intake-form footer .secondary:disabled { opacity: .6; cursor: progress; }
+
+/* Public read-only page (/share/<token>) */
+.public-header { width: min(1280px, calc(100% - 32px)); margin: 0 auto; padding: 18px 0 14px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; }
+.public-heading { display: flex; align-items: center; gap: 12px; }
+.public-heading h1 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 24px; }
+.public-main { width: min(1280px, calc(100% - 32px)); margin: 0 auto; flex: 1; display: flex; flex-direction: column; gap: 12px; padding-bottom: 24px; }
+.public-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 10px 0; border-top: 1px solid #818995; color: #4c5561; font-size: 13px; }
+.public-summary strong { color: #11182c; }
+.public-search { margin-left: auto; width: min(260px, 100%); height: 32px; padding: 0 10px; border: 1px solid #cfd5db; border-radius: 5px; font-size: 13px; }
+.public-layout { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 16px; align-items: start; }
+.public-table-wrap { min-width: 0; overflow-x: auto; border: 1px solid #d9dde2; border-radius: 6px; }
+.public-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.public-table th { position: sticky; top: 0; padding: 8px 10px; background: #fafbfc; border-bottom: 1px solid #d9dde2; color: #4c5561; font-size: 11px; font-weight: 600; text-align: left; white-space: nowrap; }
+.public-table td { padding: 8px 10px; border-bottom: 1px solid #eef1f3; vertical-align: top; }
+.public-table tbody tr { cursor: pointer; }
+.public-table tbody tr:hover, .public-table tbody tr.hovered { background: #f5fbfc; }
+.public-table tbody tr.selected { background: #e9f6fa; }
+.public-number { color: #8b929c; font-variant-numeric: tabular-nums; }
+.public-title { min-width: 180px; font-weight: 600; }
+.public-empty { padding: 28px 10px; color: #8b929c; text-align: center; }
+.public-map { position: sticky; top: 12px; height: min(640px, calc(100vh - 40px)); display: flex; border: 1px solid #d9dde2; border-radius: 6px; overflow: hidden; }
+.public-footer { padding: 18px 16px; border-top: 1px solid #d9dde2; color: #8b929c; font-size: 12px; text-align: center; }
+@media (max-width: 900px) {
+  .public-layout { grid-template-columns: minmax(0, 1fr); }
+  .public-map { position: static; order: -1; height: 360px; }
 }

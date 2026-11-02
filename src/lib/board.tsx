@@ -3,16 +3,15 @@
 // its flags from board_effective_features. Nothing below the provider renders until the board has
 // resolved, so no board-specific UI can show with missing or stale data.
 //
-// Roles (spec: supabase/migrations/20261102140000_roles.sql). The database enforces them; the UI only
-// mirrors them so volunteers aren't offered controls that would fail.
+// Roles. The database enforces them (can_edit_board and the ticket policies).
 //   platform_admin  every board, read and write
 //   staff           their board, read and write (the legacy board role "admin" counts as staff)
-//   volunteer       their board, read only
+// Read-only access for everyone else is the board's public share link (src/PublicBoard.tsx), not a role.
 import { createContext, Fragment, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { db } from "../db";
 
 export type BoardTicketType = { label: string; css_class: string; definition: string };
-export type Role = "platform_admin" | "staff" | "volunteer";
+export type Role = "platform_admin" | "staff";
 
 export type Board = {
   id: string;
@@ -25,9 +24,10 @@ export type Board = {
   ticketTypes: BoardTicketType[];
   /** Resolved flags from board_effective_features. Read them through useFeature. */
   features: Record<string, boolean>;
-  role: Role;
-  /** Whether the user can create, edit and delete this board's tickets. */
-  canEdit: boolean;
+  /** Null on the public share page, where nobody is signed in. */
+  role: Role | null;
+  /** Secret part of the board's public read-only link (/share/<token>); null when sharing is off. */
+  shareToken: string | null;
 };
 
 /** A board the user can switch to: every board for a platform admin, their own boards otherwise. */
@@ -69,7 +69,7 @@ async function loadAccess(userId: string): Promise<Access> {
 async function loadBoard(boardId: string, access: Access): Promise<Board> {
   const { data: row, error: boardError } = await db
     .from("boards")
-    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types")
+    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types, share_token")
     .eq("id", boardId)
     .single();
   if (boardError) throw boardError;
@@ -87,8 +87,7 @@ async function loadBoard(boardId: string, access: Access): Promise<Board> {
     features[key] = value === true;
   }
 
-  const membership = access.memberships.get(boardId);
-  const role: Role = access.platformAdmin ? "platform_admin" : membership === "volunteer" ? "volunteer" : "staff";
+  const role: Role = access.platformAdmin ? "platform_admin" : "staff";
 
   return {
     id: row.id,
@@ -100,7 +99,7 @@ async function loadBoard(boardId: string, access: Access): Promise<Board> {
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
     features,
     role,
-    canEdit: role !== "volunteer",
+    shareToken: row.share_token,
   };
 }
 
@@ -181,6 +180,16 @@ export function BoardProvider({ userId, children }: { userId: string; children: 
         {/* Keyed by board, so switching boards starts the portal fresh instead of carrying over tickets. */}
         <Fragment key={state.board.id}>{children}</Fragment>
       </BoardContext.Provider>
+    </SwitcherContext.Provider>
+  );
+}
+
+/** Provides an already-loaded board without sign-in, for the public share page. There is one board and
+ *  nothing to switch to. */
+export function StaticBoardProvider({ board, children }: { board: Board; children: ReactNode }) {
+  return (
+    <SwitcherContext.Provider value={{ boards: [{ id: board.id, name: board.name }], switchBoard: () => {} }}>
+      <BoardContext.Provider value={board}>{children}</BoardContext.Provider>
     </SwitcherContext.Provider>
   );
 }

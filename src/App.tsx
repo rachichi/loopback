@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ClipboardList, Filter, House, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
+import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable from "./TicketTable";
@@ -10,6 +10,8 @@ import { db } from "./db";
 import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
 import { BoardProvider, useBoard, useBoardSwitcher, type Role } from "./lib/board";
 import SignIn from "./SignIn";
+import ShareLink from "./ShareLink";
+import PublicBoard from "./PublicBoard";
 
 /** The state of the tickets in Supabase. */
 type Sync = "loading" | "saving" | "saved" | "error";
@@ -41,20 +43,24 @@ function Logo() {
 
 type View = "home" | "tickets";
 
-const roleLabel: Record<Role, string> = { platform_admin: "Platform admin", staff: "Staff", volunteer: "Volunteer (read only)" };
+const roleLabel: Record<Role, string> = { platform_admin: "Platform admin", staff: "Staff" };
 
-/** Right end of the nav: a board switcher when the user has more than one board, their role, and sign-out. */
+/** Right end of the nav: share link, a board switcher when the user has more than one board, their role, and sign-out. */
 function AccountControls() {
   const { id, role } = useBoard();
   const { boards, switchBoard } = useBoardSwitcher();
+  const [sharing, setSharing] = useState(false);
+  const closeShare = useCallback(() => setSharing(false), []);
   return (
     <div className="nav-account">
+      <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
+      {sharing && <ShareLink onClose={closeShare} />}
       {boards.length > 1 && (
         <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => switchBoard(event.target.value)}>
           {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
         </select>
       )}
-      <span className={`role-badge ${role}`}>{roleLabel[role]}</span>
+      {role && <span className={`role-badge ${role}`}>{roleLabel[role]}</span>}
       <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
     </div>
   );
@@ -96,12 +102,12 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   onLookUp: () => void;
   onNewTicket: () => void;
 }) {
-  const { name, backgroundUrl, canEdit } = useBoard();
+  const { name, backgroundUrl } = useBoard();
   const [searchTerm, setSearchTerm] = useState("");
   const actions = [
     { label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap },
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
-    ...(canEdit ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
+    { label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket },
   ];
   return (
     <main className="home-view">
@@ -189,7 +195,6 @@ function Toolbar({
   onNew: () => void;
   sync: Sync;
 }) {
-  const { canEdit } = useBoard();
   return (
     <div className="table-toolbar">
       <div className="table-meta">
@@ -204,13 +209,16 @@ function Toolbar({
             <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
           </select>
         </div>
-        {canEdit && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
+        <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>
       </div>
     </div>
   );
 }
 
 /** Signed out: the sign-in screen. Signed in: the portal for the user's board, once it has loaded. */
+/** The token from a public share link (/share/<token>), or null on any other page. */
+const shareToken = window.location.pathname.match(/^\/share\/([A-Za-z0-9_-]{20,})\/?$/)?.[1] ?? null;
+
 export default function App() {
   // undefined until the stored session has been read, so a signed-in user never sees the sign-in screen flash.
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -220,6 +228,8 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // A public share link needs no account. The token is checked by the database (public_board).
+  if (shareToken) return <PublicBoard token={shareToken} />;
   if (session === undefined) return null;
   if (!session) return <SignIn />;
   // Keyed by user so signing in as someone else starts from a clean portal, not the last user's state.
@@ -389,11 +399,7 @@ function Portal() {
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          {/* Volunteers are read only: a disabled fieldset disables every control in the table at once. The
-              database enforces this too (can_edit_board), so this only avoids offering edits that would fail. */}
-          <fieldset className="ticket-fieldset" disabled={!board.canEdit}>
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : board.canEdit ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} onDelete={board.canEdit ? removeTicket : undefined} />
-          </fieldset>
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : "No tickets yet. Add the first one with New ticket."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} onDelete={removeTicket} />
         </section>
         {sidebarOpen ? (
           <aside className="insights-pane">
@@ -411,7 +417,7 @@ function Portal() {
           </aside>
         )}
       </main>
-      {intakeOpen && board.canEdit && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
+      {intakeOpen && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
       <PortalFooter />
     </div>
   );
