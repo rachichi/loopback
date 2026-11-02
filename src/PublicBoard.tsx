@@ -135,7 +135,7 @@ function PublicView({ tickets }: { tickets: Ticket[] }) {
   // The token never reaches analytics: the page is reported as /share/:token.
   useEffect(() => {
     setAnalyticsUser({ board_id: boardId, role: "public" });
-    trackPage("/share/:token", "Public board");
+    trackPage("/share/:token", "Public board", boardId);
   }, [boardId]);
   const mapOn = useFeature("district_map");
   const [selectedId, setSelectedId] = useState("");

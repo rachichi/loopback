@@ -122,9 +122,11 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 
 `src/lib/analytics.ts` loads Google Analytics 4 only when `VITE_GA_MEASUREMENT_ID` is set (production only on Netlify). It sends:
 
-- Screen views: `/`, `/tickets`, `/sign-in`, `/share/:token`.
-- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`.
+- Screen views: `/`, `/tickets`, `/sign-in`, `/share/:token`. Each view of a board's screen carries `board_id` as an event parameter, so views are attributed to the board shown even after a platform admin switches boards.
+- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched` (all but `login` carry `board_id`).
 - User properties: `board_id`, `role`.
+
+In GA, `board_id` and `role` are registered as user-scoped custom dimensions; register `board_id` again as an event-scoped dimension to filter individual views and events by board.
 
 It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens. Every hit's page address is rewritten before it leaves the browser.
 
