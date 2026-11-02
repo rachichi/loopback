@@ -130,7 +130,7 @@ In the app, platform admins see a board switcher in the nav for moving between a
 - **Security lives in Postgres.** Every new table gets RLS and policies `to authenticated`. Never filter for security in the client, never give `anon` table access, and expose public data only through `security definer` functions that return chosen columns.
 - **No secrets in the browser.** `VITE_*` variables are public. Secret keys belong in Supabase Edge Function secrets, Netlify secrets or GitHub secrets, never in `.env.local` with a `VITE_` prefix.
 - **Tickets:** insert new ones with `number: 0` and update existing ones by id. Never mix them in one upsert.
-- **Analytics never carries personal data.** Event parameters are ids and counts only. Add new events to the `EventName` list in `src/lib/analytics.ts`.
+- **Analytics never carries personal data.** Event parameters are ids and counts only. Add new events to the `EventName` list in `src/lib/analytics.ts`. Keep session replays, console logs and click autocapture off in Better Stack.
 - **No em dashes** in code comments, docs or commit messages. Use double quotes for strings containing apostrophes. Export components as default exports.
 
 ## Deploys and configuration
@@ -138,7 +138,7 @@ In the app, platform admins see a board switcher in the nav for moving between a
 | Variable | Where | Notes |
 | --- | --- | --- |
 | `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | `.env.local`, Netlify (all contexts) | Public by design |
-| `VITE_GA_MEASUREMENT_ID` | Netlify **Production** only (optional in `.env.local`) | Leave unset elsewhere so previews don't send analytics |
+| `VITE_BETTERSTACK_TOKEN` | Netlify **Production** only (optional in `.env.local`) | Better Stack application token, public. Leave unset elsewhere so previews don't send analytics |
 
 Netlify builds every pull request as a deploy preview and `main` as production. If a deploy fails with missing modules, the build already relinks dependencies; report it rather than clearing the cache by hand.
 

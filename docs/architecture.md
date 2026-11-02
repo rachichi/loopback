@@ -17,7 +17,7 @@ flowchart LR
     PG[(Postgres<br/>RLS on every table)]
     Storage[Storage<br/>board-assets bucket]
   end
-  GA[Google Analytics 4]
+  BS[Better Stack]
   GeoSearch[NYC GeoSearch]
   OSM[OpenStreetMap tiles]
 
@@ -26,7 +26,7 @@ flowchart LR
   App -- queries as the signed-in user --> PG
   App -- share page: public functions only --> PG
   App -- logos, backgrounds --> Storage
-  App -- usage events, no personal data --> GA
+  App -- usage events and errors, no personal data --> BS
   App -- place search --> GeoSearch
   App -- map tiles --> OSM
 ```
@@ -106,7 +106,7 @@ src/
 ├── lib/
 │   ├── board.tsx            # BoardProvider, useBoard, useFeature, useBoardSwitcher, roles
 │   ├── features.ts          # FeatureKey: the single list of flag keys
-│   └── analytics.ts         # Google Analytics 4 (off unless VITE_GA_MEASUREMENT_ID is set)
+│   └── analytics.ts         # Better Stack analytics and errors (off unless VITE_BETTERSTACK_TOKEN is set)
 ├── features/tickets/
 │   ├── types.ts             # Ticket, Status, Source, Place
 │   ├── rows.ts              # Ticket <-> database row mapping (no database access)
@@ -120,23 +120,24 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 
 ## Usage analytics
 
-`src/lib/analytics.ts` loads Google Analytics 4 only when `VITE_GA_MEASUREMENT_ID` is set (production only on Netlify). It sends:
+`src/lib/analytics.ts` loads Better Stack's JS tag only when `VITE_BETTERSTACK_TOKEN` is set (production only on Netlify). It sends:
 
-- Screen views: `/`, `/tickets`, `/sign-in`, `/share/:token`. Each view of a board's screen carries `board_id` as an event parameter, so views are attributed to the board shown even after a platform admin switches boards.
-- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched` (all but `login` carry `board_id`).
-- User properties: `board_id`, `role`.
+- Screen views (`page-load`, then `page-change`): `/`, `/tickets`, `/sign-in`, `/share/:token`. Automatic page views are off; the app sends these itself with a cleaned address. Each view of a board's screen carries `board_id`, so views are attributed to the board shown even after a platform admin switches boards.
+- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`.
+- On every view and event, once known: `board_id` and `role` (set by `setAnalyticsUser`; Better Stack's own `user` call is not used, because it attaches ids and emails).
+- Web vitals and frontend errors. Errors go through the Sentry SDK inside the tag; `beforeSend` and `beforeBreadcrumb` clean URLs, drop cookies and headers, and drop click and console breadcrumbs.
 
-In GA, `board_id` and `role` are registered as user-scoped custom dimensions; register `board_id` again as an event-scoped dimension to filter individual views and events by board.
+It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens.
 
-It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens. Every hit's page address is rewritten before it leaves the browser.
+Most of the tag's features are on by default and can only be switched off in Better Stack (application, Frontend tab). Keep these off, since they would capture ticket content: session replays, console logs, auto-capture of anonymous and identified user events, browser fingerprint. Keep on: frontend errors, web vitals, website analytics.
 
 ## Environments and deploys
 
 | Where | What runs | Configuration |
 | --- | --- | --- |
-| Local | `pnpm dev` on http://localhost:5173 | `.env.local` (git-ignored): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, optional `VITE_GA_MEASUREMENT_ID` |
-| Deploy previews | Netlify builds every pull request | Netlify environment variables (no GA id) |
-| Production | Netlify builds `main` | Netlify environment variables, including `VITE_GA_MEASUREMENT_ID` |
+| Local | `pnpm dev` on http://localhost:5173 | `.env.local` (git-ignored): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, optional `VITE_BETTERSTACK_TOKEN` |
+| Deploy previews | Netlify builds every pull request | Netlify environment variables (no Better Stack token) |
+| Production | Netlify builds `main` | Netlify environment variables, including `VITE_BETTERSTACK_TOKEN` |
 | Database | Supabase project `enanmsnprjviztiiemtn` | Migrations in `supabase/migrations/`; see [`supabase/README.md`](../supabase/README.md) |
 
 All environments currently use the same Supabase project. A separate staging project is planned (spec section 9, step 9).
@@ -149,6 +150,6 @@ Netlify's build runs `pnpm install --frozen-lockfile --force` before building so
 | --- | --- | --- |
 | Supabase | Auth, Postgres, Storage | Free plan pauses after about a week of inactivity; the daily keep-alive workflow calls `ping()`. Upgrade before real staff depend on it. Built-in email only reaches the project's team; inviting by email needs custom SMTP. |
 | Netlify | Hosting and previews | |
-| Google Analytics 4 | Usage analytics | Sets cookies. Check whether the boards need a consent banner. |
+| Better Stack | Usage analytics, web vitals, frontend errors | Sets a first-party `_bs` session cookie. Check whether the boards need a consent banner. Replays and autocapture must stay off (see Usage analytics). |
 | NYC GeoSearch | Address and place search | Free, no key. Cannot resolve intersections; staff place those by hand. |
 | OpenStreetMap | Map tiles | Public tile servers are fine for light use; switch to a keyed provider for heavy traffic. |
