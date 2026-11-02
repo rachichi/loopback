@@ -6,7 +6,7 @@ import { statuses, today, type Status, type Ticket, type TicketLocation } from "
 import { useBoard } from "./lib/board";
 
 /** The fields a person fills in; the parent assigns the id and number. */
-export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans" | "evidence">;
+export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans" | "evidence" | "ownerId" | "source" | "closedAt" | "createdBy">;
 
 /** Dictated text is appended, so people can speak a field in several goes or fix a typed start. */
 const append = (current: string, text: string) => (current.trim() ? `${current.trimEnd()} ${text}` : text);

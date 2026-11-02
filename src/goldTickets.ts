@@ -105,6 +105,10 @@ const meetingTickets = goldSets.flatMap(({ meetingId, rows, places, annotators }
       meetingIds: [meetingId],
       spans,
       evidence: evidenceOf([meetingId], spans),
+      ownerId: null,
+      source: "transcript",
+      closedAt: null,
+      createdBy: null,
     };
     // The gold files name the issue a ticket belongs to when it comes up at more than one meeting.
     return { ticket, issue: r.Issues ?? r.Issue ?? "" };

@@ -48,10 +48,22 @@ export type Ticket = {
   meetingIds: string[];
   /** Highlighted character ranges in those meetings' transcripts; the source of truth for evidence. */
   spans: EvidenceSpan[];
+  /** Staff member responsible (auth user id), or null. */
+  ownerId: string | null;
+  source: Source;
+  /** Set by the database when the status becomes Closed; null while open. Read only. */
+  closedAt: string | null;
+  /** Auth user who created the ticket, set by the database. Read only. */
+  createdBy: string | null;
   /** Paragraph ids the spans touch, per meeting id. Derived from the transcripts, so empty while V1 ships
    *  without them (spec section 7, meetings.ts). */
   evidence: Record<string, string[]>;
 };
+
+/** Where a ticket came from. V1 creates manual tickets only; transcript (V2) and email (V3) come later. */
+export const sources = ["manual", "transcript", "email"] as const;
+export type Source = (typeof sources)[number];
+export const sourceLabel: Record<Source, string> = { manual: "Manual", transcript: "Transcript", email: "Email" };
 
 /** Today's local date as YYYY-MM-DD, the default for a new intake ticket. */
 export function today(): string {
