@@ -124,12 +124,12 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 
 - Screen views (`page-load`, then `page-change`): `/`, `/tickets`, `/sign-in`, `/share/:token`. Automatic page views are off; the app sends these itself with a cleaned address. Each view of a board's screen carries `board_id`, so views are attributed to the board shown even after a platform admin switches boards.
 - Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`.
-- On every view and event, once known: `board_id` and `role` (set by `setAnalyticsUser`; Better Stack's own `user` call is not used, because it attaches ids and emails).
+- On every view and event, once known: `board_id` and `role` (set by `setAnalyticsUser` and cleared on the sign-in screen; Better Stack's own `user` call is not used, because it attaches ids and emails).
 - Web vitals and frontend errors. Errors go through the Sentry SDK inside the tag; `beforeSend` and `beforeBreadcrumb` clean URLs, drop cookies and headers, and drop click and console breadcrumbs.
 
 It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens.
 
-Most of the tag's features are on by default and can only be switched off in Better Stack (application, Frontend tab). Keep these off, since they would capture ticket content: session replays, console logs, auto-capture of anonymous and identified user events, browser fingerprint. Keep on: frontend errors, web vitals, website analytics.
+Most of the tag's features are on by default and can only be switched off in Better Stack (application, Frontend tab). Keep these off, since they would capture ticket content: session replays, console logs, auto-capture of anonymous and identified user events, browser fingerprint. Keep on: frontend errors, web vitals, website analytics. As a backstop, the application's ingestion transformations (VRL) drop autocapture events, console logs and replays and strip the fingerprint, so these are not stored even if a switch is turned back on.
 
 ## Environments and deploys
 
