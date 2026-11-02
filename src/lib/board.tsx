@@ -9,6 +9,7 @@
 // Read-only access for everyone else is the board's public share link (src/PublicBoard.tsx), not a role.
 import { createContext, Fragment, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { db } from "../db";
+import type { FeatureKey } from "./features";
 
 export type BoardTicketType = { label: string; css_class: string; definition: string };
 export type Role = "platform_admin" | "staff";
@@ -215,7 +216,9 @@ export function useBoardSwitcher() {
   return switcher;
 }
 
-/** Whether a feature is on for the current board. Unknown keys are off. */
-export function useFeature(key: string): boolean {
+/** Whether a feature is on for the current board. Keys are typed by FeatureKey (./features); a key the
+ *  database doesn't return reads as off. This only hides UI: anything that costs money or touches
+ *  secrets must also be checked server-side. */
+export function useFeature(key: FeatureKey): boolean {
   return useBoard().features[key] === true;
 }

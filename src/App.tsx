@@ -8,7 +8,7 @@ import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
-import { BoardProvider, useBoard, useBoardSwitcher, type Role } from "./lib/board";
+import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
 import SignIn from "./SignIn";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
@@ -67,6 +67,7 @@ function AccountControls() {
 }
 
 function PortalHeader({ view, setView }: { view: View; setView: (view: View) => void }) {
+  const mapOn = useFeature("district_map");
   const [showNotice, setShowNotice] = useState(true);
   return (
     <>
@@ -88,7 +89,7 @@ function PortalHeader({ view, setView }: { view: View; setView: (view: View) => 
         <div className="title-band">
           <div>
             <h1>Tickets</h1>
-            <span>Review and update tickets, and see where they are on the map</span>
+            <span>{mapOn ? "Review and update tickets, and see where they are on the map" : "Review and update tickets"}</span>
           </div>
         </div>
       )}
@@ -103,11 +104,13 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   onNewTicket: () => void;
 }) {
   const { name, backgroundUrl } = useBoard();
+  const mapOn = useFeature("district_map");
+  const intakeOn = useFeature("manual_intake");
   const [searchTerm, setSearchTerm] = useState("");
   const actions = [
-    { label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap },
+    ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
-    { label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket },
+    ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
   ];
   return (
     <main className="home-view">
@@ -195,6 +198,7 @@ function Toolbar({
   onNew: () => void;
   sync: Sync;
 }) {
+  const intakeOn = useFeature("manual_intake");
   return (
     <div className="table-toolbar">
       <div className="table-meta">
@@ -209,7 +213,7 @@ function Toolbar({
             <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
           </select>
         </div>
-        <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>
+        {intakeOn && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
       </div>
     </div>
   );
@@ -295,6 +299,8 @@ function Portal() {
   const [mapFocus, setMapFocus] = useState<MapFocus | null>(null);
   const [urgency, setUrgency] = useState<UrgencyTab>("all");
   // The map panel starts collapsed so the tickets get the full width.
+  const mapOn = useFeature("district_map");
+  const intakeOn = useFeature("manual_intake");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [view, setView] = useState<View>("home");
@@ -395,13 +401,14 @@ function Portal() {
   return (
     <div className="portal">
       <PortalHeader view={view} setView={setView} />
-      <main className={`workspace ${sidebarOpen ? "" : "sidebar-collapsed"}`}>
+      <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : "No tickets yet. Add the first one with New ticket."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} onDelete={removeTicket} />
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} />
         </section>
-        {sidebarOpen ? (
+        {/* district_map off: no map panel, no rail, and the Map cells don't open one. */}
+        {!mapOn ? null : sidebarOpen ? (
           <aside className="insights-pane">
             <div className="insights-tabs">
               <button className="active"><MapPin size={15} /> Map</button>
@@ -417,7 +424,7 @@ function Portal() {
           </aside>
         )}
       </main>
-      {intakeOpen && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
+      {intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
       <PortalFooter />
     </div>
   );
