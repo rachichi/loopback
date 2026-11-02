@@ -228,7 +228,9 @@ Provide one view `board_ticket_metrics`, created `with (security_invoker = true)
 
 **Changed 2026-11-02:** the strip was built (PR #10) and removed. "Metrics" meant usage analytics, not ticket statistics. The `board_ticket_metrics` and `board_ticket_counts` views stay in the database, unused by the app, for a later report.
 
-Usage analytics: Google Analytics 4, loaded by `src/lib/analytics.ts` only when `VITE_GA_MEASUREMENT_ID` is set. It sends screen views (`/`, `/tickets`, `/sign-in`, `/share/:token`), the events `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced` and `board_switched`, and the user properties `board_id` and `role`. It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens.
+~~Usage analytics: Google Analytics 4, loaded by `src/lib/analytics.ts` only when `VITE_GA_MEASUREMENT_ID` is set.~~
+
+**Changed 2026-11-02:** Google Analytics was replaced by Better Stack. Usage analytics: Better Stack's JS tag, loaded by `src/lib/analytics.ts` only when `VITE_BETTERSTACK_TOKEN` is set. It sends screen views (`/`, `/tickets`, `/sign-in`, `/share/:token`), the events `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced` and `board_switched`, `board_id` and `role` on each, web vitals and frontend errors. It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens. Session replays, console logs and click autocapture stay off in Better Stack.
 
 ### 6.4 Explicitly out of V1
 
@@ -298,7 +300,7 @@ Still open:
 - Cross-board read and write attempts fail at the database.
 - Creating tickets concurrently never produces duplicate numbers within a board.
 - Turning `manual_intake` or `district_map` off in `boards.features` hides the feature with no code change.
-- Usage analytics report page views and events in Google Analytics, with no share tokens or personal data.
+- Usage analytics report page views and events in Better Stack, with no share tokens or personal data.
 - The keep-alive workflow has run green at least once from the Actions tab.
 
 ## 12. Supabase and GitHub setup runbook (user does these in the dashboards)
