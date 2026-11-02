@@ -138,10 +138,11 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .board-status { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; color: #4c5561; font-size: 14px; text-align: center; }
 .board-status-signout { padding: 6px 14px; border: 1px solid #aeb4bc; border-radius: 5px; background: #fff; cursor: pointer; }
 
-/* Home: a dark wash under the white headline. Per-board photos come back once they live in Supabase Storage. */
+/* Home: the board's photo (--hero-image, set from boards.background_url) under a dark wash so the white headline
+   stays readable. A board without a photo gets a neutral gradient. */
 .home-view { width: 100%; flex: 1; min-height: 0; display: flex; background: #2a3242; }
 .hero-banner { position: relative; width: 100%; flex: 1; min-height: calc(100vh - 20px); display: flex; align-items: center; justify-content: center; overflow: hidden; isolation: isolate; }
-.hero-banner::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(90deg, rgba(17, 24, 44, .68) 0%, rgba(17, 24, 44, .42) 50%, rgba(17, 24, 44, .5) 100%), linear-gradient(135deg, #1f5f91 0%, #176d69 100%); background-size: cover; background-position: center; } /* board-neutral until per-board images live in Storage */
+.hero-banner::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: linear-gradient(90deg, rgba(17, 24, 44, .68) 0%, rgba(17, 24, 44, .42) 50%, rgba(17, 24, 44, .5) 100%), var(--hero-image, linear-gradient(135deg, #1f5f91 0%, #176d69 100%)); background-size: cover; background-position: center; }
 .hero-content { width: min(1200px, calc(100% - 64px)); min-height: calc(100vh - 236px); margin: 0 auto; padding: 32px 0 42px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 420px); align-content: center; align-items: stretch; gap: 32px 36px; }
 .hero-primary { min-width: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 20px; }
 .hero-copy h1 { max-width: 760px; margin: 0; color: rgba(255, 255, 255, .97); font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 60px; font-weight: 800; line-height: 1.02; text-transform: uppercase; text-shadow: 0 2px 12px rgba(17, 24, 44, .35); }

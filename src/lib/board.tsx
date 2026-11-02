@@ -12,6 +12,8 @@ export type Board = {
   name: string;
   borough: string;
   logoUrl: string | null;
+  /** Home page photo, from the board-assets Storage bucket. */
+  backgroundUrl: string | null;
   boundary: GeoJSON.GeoJsonObject | null;
   ticketTypes: BoardTicketType[];
   /** Resolved flags from board_effective_features. Read them through useFeature. */
@@ -41,7 +43,7 @@ async function loadBoard(userId: string): Promise<Board | null> {
 
   const { data: row, error: boardError } = await db
     .from("boards")
-    .select("id, name, borough, logo_url, boundary_geojson, ticket_types")
+    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types")
     .eq("id", member.board_id)
     .single();
   if (boardError) throw boardError;
@@ -64,6 +66,7 @@ async function loadBoard(userId: string): Promise<Board | null> {
     name: row.name,
     borough: row.borough,
     logoUrl: row.logo_url,
+    backgroundUrl: row.background_url,
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
     features,

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ClipboardList, Filter, House, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
@@ -77,7 +77,7 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   onLookUp: () => void;
   onNewTicket: () => void;
 }) {
-  const { name } = useBoard();
+  const { name, backgroundUrl } = useBoard();
   const [searchTerm, setSearchTerm] = useState("");
   const actions = [
     { label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap },
@@ -86,7 +86,12 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   ];
   return (
     <main className="home-view">
-      <div className="hero-banner" aria-label="Home page banner">
+      <div
+        className="hero-banner"
+        aria-label="Home page banner"
+        // The board's photo, if it has one, sits under the dark wash in index.css (.hero-banner::before).
+        style={backgroundUrl ? ({ "--hero-image": `url(${JSON.stringify(backgroundUrl)})` } as CSSProperties) : undefined}
+      >
         <div className="hero-content">
           <div className="hero-primary">
             <div className="hero-copy">
