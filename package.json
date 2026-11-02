@@ -11,6 +11,7 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
+    "check:bundle": "node scripts/check_bundle.mjs",
     "preview": "vite preview",
     "format": "oxfmt",
     "db:seed-sql": "node scripts/make_supabase_seed.mjs",

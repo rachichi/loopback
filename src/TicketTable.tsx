@@ -55,7 +55,8 @@ export default function TicketTable({
   onHover: (id: string | null) => void;
   onSelect: (ticket: Ticket) => void;
   onChange: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
-  onShowOnMap: (id: string, placeIndex: number) => void;
+  /** Omitted when the board's district_map flag is off; the Map cell then only edits places. */
+  onShowOnMap?: (id: string, placeIndex: number) => void;
   /** Omitted for read-only users, which hides the delete buttons. */
   onDelete?: (ticket: Ticket) => void;
 }) {
@@ -125,7 +126,8 @@ export default function TicketTable({
         {columns.map((column) => (
           <div key={column.key} className="resizable-head" title={column.fieldType}>
             <column.icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
-            <span className="field-label">{column.label}</span>
+            {/* Without the map the column holds places only, so it's labelled Location. */}
+            <span className="field-label">{column.key === "location" && !onShowOnMap ? "Location" : column.label}</span>
             <span
               className="col-resizer"
               role="separator"
@@ -175,7 +177,9 @@ export default function TicketTable({
               {!ticketTypes.some((type) => type.label === ticket.type) && <option>{ticket.type}</option>}
             </select>
           </div>
-          <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
+          {onShowOnMap
+            ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
+            : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} /></div>}
           <div>{text(ticket, "requester", "Requester")}</div>
           <div>{text(ticket, "summary", "Summary", 3)}</div>
           <div>{date(ticket, "deadline", "Deadline")}</div>

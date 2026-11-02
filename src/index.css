@@ -463,3 +463,6 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
   .public-layout { grid-template-columns: minmax(0, 1fr); }
   .public-map { position: static; order: -1; height: 360px; }
 }
+
+/* district_map off: the tickets take the full width. */
+.workspace.no-map, .public-layout.no-map { grid-template-columns: minmax(0, 1fr); }

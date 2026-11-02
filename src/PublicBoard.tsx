@@ -4,8 +4,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import loopbackLogo from "./assets/logo.png";
 import { db } from "./db";
-import { StaticBoardProvider, useBoard, useTypeClass, type Board } from "./lib/board";
+import { StaticBoardProvider, useBoard, useFeature, useTypeClass, type Board } from "./lib/board";
 import { statusClass, type Status, type Ticket } from "./features/tickets/types";
+import { featureFlags } from "./lib/features";
 import MapView from "./MapView";
 
 type PublicBoardRow = {
@@ -16,6 +17,8 @@ type PublicBoardRow = {
   background_url: string | null;
   boundary_geojson: GeoJSON.GeoJsonObject | null;
   ticket_types: unknown;
+  /** Resolved flags; absent before migration 20261102170000, when the defaults in features.ts apply. */
+  features?: Record<string, unknown> | null;
 };
 
 type PublicTicketRow = {
@@ -73,7 +76,11 @@ async function load(token: string): Promise<State> {
     backgroundUrl: row.background_url,
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
-    features: {},
+    // Same rule as BoardProvider: only true counts as on. Without flags from the database (migration not
+    // applied yet), fall back to the documented defaults so the map and intake stay on.
+    features: row.features
+      ? Object.fromEntries(Object.entries(row.features).map(([key, value]) => [key, value === true]))
+      : Object.fromEntries(Object.entries(featureFlags).map(([key, flag]) => [key, flag.defaultEnabled])),
     role: null,
     shareToken: null,
   };
@@ -119,6 +126,7 @@ export default function PublicBoard({ token }: { token: string }) {
 
 function PublicView({ tickets }: { tickets: Ticket[] }) {
   const typeClass = useTypeClass();
+  const mapOn = useFeature("district_map");
   const [selectedId, setSelectedId] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
@@ -146,7 +154,7 @@ function PublicView({ tickets }: { tickets: Ticket[] }) {
           <span>{open} open</span>
           <input className="public-search" aria-label="Search tickets" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search tickets" />
         </section>
-        <div className="public-layout">
+        <div className={`public-layout ${mapOn ? "" : "no-map"}`}>
           <div className="public-table-wrap">
             <table className="public-table">
               <thead>
@@ -179,9 +187,11 @@ function PublicView({ tickets }: { tickets: Ticket[] }) {
               </tbody>
             </table>
           </div>
-          <aside className="public-map">
-            <MapView tickets={tickets} selected={selected} hoveredId={hoveredId} focus={null} onHover={onHover} onSelect={onSelect} />
-          </aside>
+          {mapOn && (
+            <aside className="public-map">
+              <MapView tickets={tickets} selected={selected} hoveredId={hoveredId} focus={null} onHover={onHover} onSelect={onSelect} />
+            </aside>
+          )}
         </div>
       </main>
       <footer className="public-footer">
