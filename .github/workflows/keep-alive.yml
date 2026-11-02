@@ -1,0 +1,34 @@
+name: Supabase keep-alive
+
+# Free-tier Supabase projects are paused after a week of low activity. This sends one harmless request a day.
+# It calls public.ping(), which returns true and exposes no data. A failed run emails the repo owner.
+on:
+  schedule:
+    - cron: "17 13 * * *"   # daily, off the top of the hour
+  workflow_dispatch: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping production
+        env:
+          URL: ${{ secrets.SUPABASE_URL }}
+          KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "production secrets not set, skipping"; exit 0; fi
+          code=$(curl -sS -o /tmp/out -w '%{http_code}' -X POST "$URL/rest/v1/rpc/ping" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}')
+          echo "status $code, body: $(cat /tmp/out)"
+          [ "$code" = "200" ] && grep -q true /tmp/out
+
+      - name: Ping staging
+        env:
+          URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$KEY" ]; then echo "staging secrets not set, skipping"; exit 0; fi
+          code=$(curl -sS -o /tmp/out -w '%{http_code}' -X POST "$URL/rest/v1/rpc/ping" \
+            -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}')
+          echo "status $code, body: $(cat /tmp/out)"
+          [ "$code" = "200" ] && grep -q true /tmp/out
