@@ -314,8 +314,8 @@ function Portal() {
   // Usage analytics: who by board and role only, and which screen. Fixed page names, never ticket content.
   useEffect(() => setAnalyticsUser({ board_id: board.id, role: board.role ?? "unknown" }), [board.id, board.role]);
   useEffect(() => {
-    if (view === "home") trackPage("/", "Home");
-    else trackPage("/tickets", "Tickets");
+    if (view === "home") trackPage("/", "Home", board.id);
+    else trackPage("/tickets", "Tickets", board.id);
   }, [view, board.id]);
 
   // Search and status filters apply first, so each urgency tab's count matches what it shows.

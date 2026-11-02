@@ -46,12 +46,18 @@ export function initAnalytics(): void {
   document.head.appendChild(script);
 }
 
-/** A screen view. `path` is a stable, content-free name such as "/tickets". */
-export function trackPage(path: string, title: string): void {
+/** A screen view. `path` is a stable, content-free name such as "/tickets". `boardId` is the board the
+ *  screen shows, so views can be filtered by board even after a platform admin switches boards; omit it
+ *  for screens with no board (sign in). */
+export function trackPage(path: string, title: string, boardId?: string): void {
   if (!started) return;
   // Also the default for later events on this screen.
   window.gtag?.("set", { page_location: safeLocation(path), page_title: title });
-  window.gtag?.("event", "page_view", { page_location: safeLocation(path), page_title: title });
+  window.gtag?.("event", "page_view", {
+    page_location: safeLocation(path),
+    page_title: title,
+    ...(boardId ? { board_id: boardId } : {}),
+  });
 }
 
 type EventName = "login" | "ticket_created" | "ticket_deleted" | "share_link_copied" | "share_link_replaced" | "board_switched";
