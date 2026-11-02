@@ -4,3 +4,7 @@ publish = "dist"
 
 [build.environment]
 NODE_VERSION = "22"
+
+# The Supabase URL and publishable key are built into the site on purpose (the browser needs them;
+# row-level security controls access), so the secrets scan shouldn't fail the build over them.
+SECRETS_SCAN_OMIT_KEYS = "VITE_SUPABASE_URL,VITE_SUPABASE_ANON_KEY"
