@@ -11,7 +11,7 @@ import { parseArgs } from "node:util";
 import { DATA_FILES, loadGold, loadParagraphs, meetingName, loadTicketTypes, type RunFile } from "../lib/data.ts";
 import { extract, MODELS, type ModelId } from "../lib/extract.ts";
 
-if (existsSync(".env.local")) process.loadEnvFile(".env.local");
+for (const envFile of [".env.local", "../.env.local"]) if (existsSync(envFile)) process.loadEnvFile(envFile);
 
 const { values: args } = parseArgs({
   options: {

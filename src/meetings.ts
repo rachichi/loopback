@@ -1,7 +1,7 @@
 // The meetings whose transcripts staff can flip through. These are bundled demo transcripts;
 // in production this list comes from the Block Party API, and this module is the place to swap it in.
-import rawTrain1 from "../data/raw_train1.txt?raw";
-import rawTrain2 from "../data/raw_train2.txt?raw";
+import rawTrain1 from "../evals/data/raw_train1.txt?raw";
+import rawTrain2 from "../evals/data/raw_train2.txt?raw";
 import { buildParagraphs, type Paragraph } from "./transcript";
 
 export type Meeting = {
