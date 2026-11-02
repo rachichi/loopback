@@ -7,7 +7,8 @@ import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
-import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
+import { deleteTicket, insertTicket, loadBoardStaff, loadTickets, updateTickets, type StaffMember } from "./features/tickets/api";
+import MetricsStrip from "./features/tickets/MetricsStrip";
 import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
 import SignIn from "./SignIn";
 import ShareLink from "./ShareLink";
@@ -256,6 +257,13 @@ function Portal() {
   const persisted = useRef(new Map<string, Ticket>());
   // New tickets whose insert is in flight. Edits made meanwhile are saved as an update once it returns.
   const inserting = useRef(new Set<string>());
+  // Bumped after every successful save or delete, so the metrics strip re-reads the views.
+  const [metricsVersion, setMetricsVersion] = useState(0);
+  // The board's staff, for the Owner column. Without it the column still shows Unassigned and current owners.
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  useEffect(() => {
+    loadBoardStaff(board.id).then(setStaff).catch((error) => console.error("Couldn't load staff for the Owner column", error));
+  }, [board.id]);
   useEffect(() => {
     loadTickets(board.id)
       .then((loaded) => {
@@ -288,6 +296,7 @@ function Portal() {
         .then(() => {
           for (const ticket of changed) persisted.current.set(ticket.id, ticket);
           setSync("saved");
+          setMetricsVersion((current) => current + 1);
         })
         .catch((error) => { console.error(error); setSync("error"); });
     }, 600);
@@ -322,7 +331,7 @@ function Portal() {
   const addTicket = (fields: IntakeFields) => {
     // The database assigns the number when the ticket is inserted; until then it shows blank.
     // Every board shares one table, so ids must be unique across boards, not just within this one.
-    const ticket: Ticket = { ...fields, id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {} };
+    const ticket: Ticket = { ...fields, id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {}, ownerId: null, source: "manual", closedAt: null, createdBy: null };
     setTickets((current) => [ticket, ...current]);
     setSelectedId(ticket.id);
     setQuery("");
@@ -352,6 +361,7 @@ function Portal() {
       await deleteTicket(ticket.id);
       remove();
       setSync("saved");
+      setMetricsVersion((current) => current + 1);
     } catch (error) {
       console.error(error);
       setSync("error");
@@ -403,9 +413,10 @@ function Portal() {
       <PortalHeader view={view} setView={setView} />
       <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
+          <MetricsStrip board={board.id} version={metricsVersion} />
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} />
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} staff={staff} />
         </section>
         {/* district_map off: no map panel, no rail, and the Map cells don't open one. */}
         {!mapOn ? null : sidebarOpen ? (

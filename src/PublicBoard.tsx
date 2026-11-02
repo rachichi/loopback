@@ -57,6 +57,10 @@ const toTicket = (row: PublicTicketRow): Ticket => ({
   meetingIds: [],
   spans: [],
   evidence: {},
+  ownerId: null,
+  source: "manual",
+  closedAt: null,
+  createdBy: null,
 });
 
 async function load(token: string): Promise<State> {

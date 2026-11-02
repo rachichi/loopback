@@ -466,3 +466,26 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 
 /* district_map off: the tickets take the full width. */
 .workspace.no-map, .public-layout.no-map { grid-template-columns: minmax(0, 1fr); }
+
+/* Ticket table: number, owner, source and submitted cells (spec section 6.2). */
+.number-cell { color: #4c5561; font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; padding-top: 10px; }
+.cell-owner { width: 100%; font-size: 10px; background: transparent; cursor: pointer; }
+.tag.source { padding: 3px 8px; font-size: 8px; font-weight: 600; background: #eef1f3; color: #4c5561; }
+.tag.source.transcript { background: #ece4f5; color: #5b3a7a; }
+.tag.source.email { background: #e1eef8; color: #1f5f91; }
+.submitted-cell { display: flex; flex-direction: column; gap: 2px; }
+
+/* Metrics strip above the ticket table (spec section 6.3). Numbers only, no charts. */
+.metrics-strip { display: flex; flex-wrap: wrap; align-items: stretch; gap: 6px 18px; padding: 8px 12px; border-bottom: 1px solid #d9dde2; background: #fff; }
+.metrics-strip.muted { color: #8b929c; font-size: 11px; }
+.metrics-group { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; }
+.metrics-group + .metrics-group { padding-left: 18px; border-left: 1px solid #e3e6ea; }
+.metric { display: flex; flex-direction: column; gap: 1px; }
+.metric dt { color: #6b7380; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.metric dd { margin: 0; color: #11182c; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric dd small { color: #6b7380; font-size: 10px; font-weight: 500; }
+.metric.alert dd { color: #a3263c; }
+.metric.small { flex-direction: row; align-items: center; gap: 5px; }
+.metric.small dt { text-transform: none; letter-spacing: 0; }
+.metric.small dd { font-size: 12px; }
+@media (max-width: 560px) { .metrics-group + .metrics-group { padding-left: 0; border-left: 0; } }

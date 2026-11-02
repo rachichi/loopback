@@ -1,6 +1,6 @@
 // Mapping between a Ticket and a row of the tickets table. No database access here, so
 // scripts/make_supabase_seed.mjs can use it without Supabase credentials.
-import type { Status, Ticket } from "./types";
+import type { Source, Status, Ticket } from "./types";
 
 /** The columns of the tickets table that the client reads and writes. */
 export type TicketRow = {
@@ -20,6 +20,14 @@ export type TicketRow = {
   submitted_at: string;
   meeting_ids: string[];
   spans: Ticket["spans"];
+};
+
+/** Columns the database sets or that only some writes send. Read with the rest; see api.ts for writes. */
+export type TicketRowExtra = {
+  owner_id: string | null;
+  source: string;
+  closed_at: string | null;
+  created_by: string | null;
 };
 
 export function toRow(ticket: Ticket, board: string): TicketRow {
@@ -43,7 +51,7 @@ export function toRow(ticket: Ticket, board: string): TicketRow {
   };
 }
 
-export function fromRow(row: TicketRow): Ticket {
+export function fromRow(row: TicketRow & Partial<TicketRowExtra>): Ticket {
   const ticket: Ticket = {
     id: row.id,
     number: String(row.number),
@@ -59,6 +67,10 @@ export function fromRow(row: TicketRow): Ticket {
     submittedAt: row.submitted_at,
     meetingIds: row.meeting_ids,
     spans: row.spans,
+    ownerId: row.owner_id ?? null,
+    source: (row.source ?? "manual") as Source,
+    closedAt: row.closed_at ?? null,
+    createdBy: row.created_by ?? null,
     // Paragraph ids are derived from the spans and the transcripts, which V1 doesn't ship, so they stay empty.
     evidence: {},
   };
