@@ -8,9 +8,9 @@ import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTicket, insertTicket, loadBoardStaff, loadTickets, updateTickets, type StaffMember } from "./features/tickets/api";
-import MetricsStrip from "./features/tickets/MetricsStrip";
 import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
 import SignIn from "./SignIn";
+import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
 
@@ -57,7 +57,7 @@ function AccountControls() {
       <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
       {sharing && <ShareLink onClose={closeShare} />}
       {boards.length > 1 && (
-        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => switchBoard(event.target.value)}>
+        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
           {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
         </select>
       )}
@@ -257,8 +257,6 @@ function Portal() {
   const persisted = useRef(new Map<string, Ticket>());
   // New tickets whose insert is in flight. Edits made meanwhile are saved as an update once it returns.
   const inserting = useRef(new Set<string>());
-  // Bumped after every successful save or delete, so the metrics strip re-reads the views.
-  const [metricsVersion, setMetricsVersion] = useState(0);
   // The board's staff, for the Owner column. Without it the column still shows Unassigned and current owners.
   const [staff, setStaff] = useState<StaffMember[]>([]);
   useEffect(() => {
@@ -287,6 +285,7 @@ function Portal() {
         insertTicket(sent, board.id)
           .then((saved) => {
             persisted.current.set(saved.id, saved);
+            trackEvent("ticket_created", { board_id: board.id, source: saved.source });
             // Keep any edits made while the insert was in flight; they differ from `saved`, so they get updated next.
             setTickets((current) => current.map((ticket) => ticket.id !== saved.id ? ticket : ticket === sent ? saved : { ...ticket, number: saved.number }));
           })
@@ -296,7 +295,6 @@ function Portal() {
         .then(() => {
           for (const ticket of changed) persisted.current.set(ticket.id, ticket);
           setSync("saved");
-          setMetricsVersion((current) => current + 1);
         })
         .catch((error) => { console.error(error); setSync("error"); });
     }, 600);
@@ -313,6 +311,12 @@ function Portal() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [view, setView] = useState<View>("home");
+  // Usage analytics: who by board and role only, and which screen. Fixed page names, never ticket content.
+  useEffect(() => setAnalyticsUser({ board_id: board.id, role: board.role ?? "unknown" }), [board.id, board.role]);
+  useEffect(() => {
+    if (view === "home") trackPage("/", "Home");
+    else trackPage("/tickets", "Tickets");
+  }, [view, board.id]);
 
   // Search and status filters apply first, so each urgency tab's count matches what it shows.
   const filtered = useMemo(() => tickets.filter((ticket) => {
@@ -359,9 +363,9 @@ function Portal() {
     setSync("saving");
     try {
       await deleteTicket(ticket.id);
+      trackEvent("ticket_deleted", { board_id: board.id });
       remove();
       setSync("saved");
-      setMetricsVersion((current) => current + 1);
     } catch (error) {
       console.error(error);
       setSync("error");
@@ -413,7 +417,6 @@ function Portal() {
       <PortalHeader view={view} setView={setView} />
       <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
-          <MetricsStrip board={board.id} version={metricsVersion} />
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
           <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} staff={staff} />

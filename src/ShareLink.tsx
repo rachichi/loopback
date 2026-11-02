@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import { Check, Copy, X } from "lucide-react";
 import { db } from "./db";
 import { useBoard } from "./lib/board";
+import { trackEvent } from "./lib/analytics";
 
 export const shareUrl = (token: string) => `${window.location.origin}/share/${token}`;
 
@@ -26,6 +27,7 @@ export default function ShareLink({ onClose }: { onClose: () => void }) {
     if (!token) return;
     try {
       await navigator.clipboard.writeText(shareUrl(token));
+      trackEvent("share_link_copied", { board_id: board.id });
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -44,6 +46,7 @@ export default function ShareLink({ onClose }: { onClose: () => void }) {
       return;
     }
     setToken(data);
+    trackEvent("share_link_replaced", { board_id: board.id });
     setCopied(false);
   };
 

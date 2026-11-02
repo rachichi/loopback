@@ -1,13 +1,15 @@
 // Email and password sign-in. Accounts are invite-only (spec section 5), so there is no sign-up here.
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import loopbackLogo from "./assets/logo.png";
 import { db } from "./db";
+import { trackEvent, trackPage } from "./lib/analytics";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  useEffect(() => trackPage("/sign-in", "Sign in"), []);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
@@ -18,7 +20,9 @@ export default function SignIn() {
     if (error) {
       setError(error.message);
       setBusy(false);
+      return;
     }
+    trackEvent("login", { method: "password" });
   };
 
   return (
