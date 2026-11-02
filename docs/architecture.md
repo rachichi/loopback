@@ -1,215 +1,152 @@
-> **Status: aspirational.** Written on 2026-10-12 for the single-board prototype (Manhattan CB3) on the old `ideal-state` branch. The multi-board design, auth, RLS and feature flags are in [`refactor-spec.md`](refactor-spec.md), which wins where the two disagree. References below to the `mvp-state` branch mean what is now `main`.
+# Architecture
 
-# Loopback Community Board Portal — Ideal State
+How Loopback works today (V1). Scope, decisions and the version plan are in [`refactor-spec.md`](refactor-spec.md). Where the product is headed (transcripts, AI-drafted tickets, routing) is in [`ideal-state.md`](ideal-state.md).
 
-Loopback turns community board meetings into tracked follow-up work. A meeting transcript goes in; a reviewed list of tickets comes out, each one tied to the exact words in the meeting that support it, to the places it concerns, and to its history across meetings.
-
-This branch (`ideal-state`) describes where the product is headed. The app on this branch is the current prototype for Manhattan Community Board 3 (CB3); the sections below say what it does today and what the full system adds. The `mvp-state` branch is the same prototype cut down to the essential review loop.
-
-## Contents
-
-- [The ideal workflow](#the-ideal-workflow)
-- [Architecture](#architecture)
-- [Data model](#data-model)
-- [Ticket extraction and evaluation](#ticket-extraction-and-evaluation)
-- [What exists today](#what-exists-today)
-- [Roadmap](#roadmap)
-- [Development](#development)
-- [Staging](#staging)
-- [Engineering practices](#engineering-practices)
-- [MIT License](#mit-license)
-
-## The ideal workflow
+## Overview
 
 ```mermaid
 flowchart LR
-	A[Meeting held] --> B[Transcript pulled<br/>from Block Party]
-	B --> C[Split into<br/>numbered paragraphs]
-	C --> D[Claude drafts tickets<br/>with evidence spans]
-	D --> E[Validator checks<br/>ids, types, spans]
-	E --> F[District office reviews<br/>in the transcript view]
-	F --> G[Tickets published,<br/>routed to committees]
-	G --> H[Follow-up across<br/>later meetings]
-	H --> B
-	F -. corrections .-> I[Eval set]
-	I -. scores prompts/models .-> D
+  subgraph Browser
+    App[React app<br/>Vite build]
+  end
+  subgraph Netlify
+    Static[Static site<br/>dist/]
+  end
+  subgraph Supabase
+    Auth[Auth<br/>email + password]
+    PG[(Postgres<br/>RLS on every table)]
+    Storage[Storage<br/>board-assets bucket]
+  end
+  GA[Google Analytics 4]
+  GeoSearch[NYC GeoSearch]
+  OSM[OpenStreetMap tiles]
+
+  Static --> App
+  App -- sign in --> Auth
+  App -- queries as the signed-in user --> PG
+  App -- share page: public functions only --> PG
+  App -- logos, backgrounds --> Storage
+  App -- usage events, no personal data --> GA
+  App -- place search --> GeoSearch
+  App -- map tiles --> OSM
 ```
 
-1. **Ingest.** After each full board or committee meeting, the transcript is pulled from Block Party, which hosts the board's transcriptions, through its API. No one uploads files by hand.
-2. **Split.** The transcript is split into numbered paragraphs (`P1`, `P2`, …). Paragraph ids are the stable reference everything else points at.
-3. **Draft.** Claude reads the whole meeting and drafts tickets: action items the district office or board must follow up on. Each draft has a title, type (one of the board's ticket types), status, requester, summary ending in an "Action:", the places it concerns, and **evidence**: the paragraphs that support it. Announcements, informational updates with no ask, and procedural filler are excluded; everything about one issue becomes one ticket, even across distant parts of the meeting.
-4. **Validate.** Code checks every draft before a person sees it: paragraph ids exist, types are known, every ticket has evidence. Invalid pieces are dropped and logged.
-5. **Review.** District office staff review drafts side by side with the transcript. Every ticket's evidence is highlighted in the transcript in its type's color; hovering a highlight lights up its ticket and vice versa. Staff fix fields inline, drag highlight ends to tighten or extend evidence, attach places on the map, merge or split tickets, and reject drafts that are not action items.
-6. **Publish and route.** Approved tickets are published and routed by type to the responsible committee or office, with an owner and due date.
-7. **Follow up.** When an issue comes up again at a later meeting, the new draft is linked to the existing ticket instead of creating a duplicate. Its status moves from Open to In Progress to Closed, and its history shows every meeting where it was discussed, with evidence from each.
-8. **Learn.** Every reviewer correction (an edited type, a moved highlight, a rejected draft) is recorded. Corrections become gold data for the eval harness, so prompt and model changes are measured against what reviewers actually accept.
+- **One deployment, many boards.** All 59 NYC community boards share one site, one database and one `tickets` table. Nothing board-specific is in the code: name, borough, logo, background, boundary, ticket types and feature flags come from the `boards` row.
+- **No server of our own.** The browser talks to Supabase directly with the public (publishable) key. Postgres row-level security (RLS) decides what each request may read or write. There is no API layer to bypass it.
+- **Secrets never reach the browser.** `VITE_*` variables are public by design. Anything needing a secret key would run in a Supabase Edge Function (none exist today).
 
-Around this loop, the same tickets feed the rest of the portal: a map of open issues by place, a dashboard of volume and response times, outreach drafts for resolved wins, and the meeting calendar.
+## Who can do what
 
-## Architecture
-
-```mermaid
-flowchart TD
-	subgraph Sources
-		BP[Block Party API<br/>meeting transcripts]
-		Other[Later: 311, SMS, email intake]
-	end
-
-	subgraph Backend
-		Ingest[Ingest job<br/>fetch + split paragraphs]
-		Extract[Extraction worker<br/>Claude via AI SDK + zod schema]
-		Validate[Validator]
-		API[Portal API<br/>auth, tickets, review actions]
-		DB[(Postgres + PostGIS<br/>meetings, paragraphs, tickets,<br/>evidence spans, places, history)]
-		Geo[Geocoding<br/>NYC GeoSearch]
-		Evals[Eval harness<br/>score.ts / run.ts / log.ts]
-	end
-
-	subgraph Web app
-		Table[Tickets table<br/>inline editing]
-		Transcript[Transcript view<br/>evidence highlights]
-		Map[Map view<br/>Leaflet + district boundary]
-		Dash[Dashboard / Outreach / Calendar]
-	end
-
-	BP --> Ingest --> DB
-	Other -.-> API
-	Ingest --> Extract --> Validate --> DB
-	DB <--> API
-	API <--> Table & Transcript & Map & Dash
-	Map --> Geo
-	API --> Geo
-	DB -- reviewer corrections --> Evals
-	Evals -- prompt/model choice --> Extract
-```
-
-| Piece | Responsibility | Notes |
+| Role | How it is granted | Can do |
 | --- | --- | --- |
-| **Ingest job** | Fetches new meetings from Block Party, splits paragraphs, stores them. | Runs on a schedule or on a Block Party webhook. Idempotent per meeting. |
-| **Extraction worker** | Calls Claude with the versioned prompt (`prompts/*.md`), the type definitions, and the numbered transcript; returns structured tickets. | Uses the Vercel AI SDK with a zod schema. Haiku 5.5 is the default model for cost; the eval harness decides when a different model is worth it. |
-| **Validator** | Drops unknown paragraph ids, empty evidence, and unknown types. | Same rules as `lib/extract.ts` today. |
-| **Portal API** | Auth, roles, ticket CRUD, review actions (approve, reject, merge, split), audit log. | The only place credentials live. The browser never holds API keys. |
-| **Database** | Postgres with PostGIS for places. | Evidence is stored as character spans so highlights survive edits. |
-| **Geocoding** | NYC GeoSearch for addresses and named places. | Free and keyless; intersections need a fallback geocoder or manual pins. |
-| **Web app** | React + Vite + Tailwind. Tickets table, transcript, map, dashboard. | Tables and panels share one ticket store; hover and selection are linked across them. |
-| **Eval harness** | Scores model output against gold tickets: matching, P/R/F1, type/status accuracy, evidence overlap, cost. | Gold grows from reviewer corrections. |
+| **Platform admin** | A row in `platform_admins` | Every board: read, create, edit and delete tickets, replace share links. Switch between all boards in the app. Manage boards, flags and members (SQL today). |
+| **Staff** | A row in `board_members` with `role = 'staff'` (legacy `'admin'` counts as staff) | Their own board: read, create, edit and delete tickets, assign owners, copy or replace the share link. |
+| **Public** | Holding a board's share link, `/share/<token>` | One board, read only: number, title, type, status, urgent, deadline, location, submitted date. Never requester, summary, submitted-by, owner, meetings or transcripts. |
 
-### Multi-board
+The database enforces all of this. The UI only hides what a role can't use.
 
-The same deployment serves all 59 NYC community boards. Each board configures its ticket types and definitions, committees and routing rules, district boundary, and Block Party source. Prompts read the board's types and definitions, so extraction adapts without code changes.
+| Rule | Where it lives |
+| --- | --- |
+| Read a board's tickets | `tickets` select policy: `is_board_member(board) or is_platform_admin()` |
+| Create, edit, delete tickets | `can_edit_board(board)`: platform admin, or staff of that board |
+| Read board settings | `boards` select policy: member of that board, or platform admin |
+| Change board settings and flags | `boards` update policy: platform admin only |
+| Public share page | `public_board(token)` and `public_board_tickets(token)`: `security definer` functions that return only the allowed columns. `anon` has no access to any table. |
+| Replace a share link | `rotate_share_token(b)`: checks `can_edit_board(b)` |
+| Owner dropdown | `board_staff(b)`: lists a board's staff and emails to that board's staff and platform admins |
 
 ## Data model
 
-```mermaid
-erDiagram
-	BOARD ||--o{ MEETING : holds
-	MEETING ||--o{ PARAGRAPH : "split into"
-	BOARD ||--o{ TICKET_TYPE : defines
-	TICKET }o--|| TICKET_TYPE : "classified as"
-	TICKET ||--o{ EVIDENCE_SPAN : "supported by"
-	EVIDENCE_SPAN }o--|| MEETING : "points into"
-	TICKET ||--o{ PLACE : concerns
-	TICKET ||--o{ TICKET_EVENT : history
-	TICKET }o--o| USER : "owned by"
-	TICKET_EVENT }o--o| USER : "made by"
-```
-
-- **Ticket:** title, type, status (Open / In Progress / Closed), requester, summary, owner, due date, and links to earlier tickets for the same issue.
-- **Evidence span:** meeting id + character start/end in that meeting's transcript. The paragraphs a ticket cites are computed from its spans, which is how the table's Transcript column works today.
-- **Place:** name, coordinates, and source (geocoder match or placed by hand). A ticket can have several.
-- **Ticket event:** every status change, field edit, highlight change, merge, and review decision, with who made it and when. This is the audit trail and the source of eval corrections.
-
-## Ticket extraction and evaluation
-
-The extraction and scoring pieces already exist as scripts and run against the CB3 9/29/26 meeting:
-
-```bash
-npx tsx scripts/score.ts --all-annotators          # score the three model annotators vs gold
-npx tsx scripts/run.ts --model claude-haiku-5-5 --n 3   # draft tickets with prompts/v1.md
-npx tsx scripts/score.ts --run runs/v1-claude-haiku-5-5-1.json
-npx tsx scripts/log.ts runs/*.json                 # append scores and cost to results.csv
-```
-
-- `lib/extract.ts`: AI SDK `generateObject` call, zod schema, validator, cost per run.
-- `lib/score.ts`: greedy one-to-one matching by Jaccard overlap of evidence paragraphs (threshold 0.3), over-split detection, precision/recall/F1, type and status accuracy, and paragraph-level evidence P/R/F1.
-- `prompts/v1.md`: the extraction prompt, versioned so prompt changes can be diffed and scored.
-- `data/`: transcripts, gold tickets, rejected tickets, annotator tickets, and ticket type definitions.
-
-`run.ts` reads `ANTHROPIC_API_KEY` from `.env.local`, which is git-ignored. On the 9/29 meeting, Haiku 5.5 reaches about 88% ticket F1 for about $0.01 per meeting; status is the weakest field. Status accuracy improves in the ideal state because the extractor sees each issue's history from earlier meetings instead of guessing whether it was "raised before".
-
-## What exists today
-
-| Area | Today (this branch) | Ideal |
+| Table | Purpose | Key columns |
 | --- | --- | --- |
-| Transcript source | `data/raw_train.txt`, bundled at build time | Pulled from the Block Party API per meeting |
-| Tickets | The 17 adjudicated gold tickets from `data/`, editable in the table for the session | Drafted by Claude, reviewed, persisted in the database |
-| Evidence | Character-span highlights in the transcript; drag the end bars to edit; Transcript column updates | Same, persisted with history, across multiple meetings |
-| Places | Seeded places for the gold tickets; add more through NYC GeoSearch; Leaflet map with the CB3 boundary | Same, persisted; fallback geocoding for intersections |
-| Review actions | Inline edits | Approve / reject / merge / split, with audit log |
-| Status | Set by hand or from gold | Inferred from ticket history across meetings, confirmed by reviewers |
-| Other sections | Home, Calendar, Templates, Outreach, Forum, Dashboard use sample data | Backed by the same API and data |
-| Auth | None | Roles for residents, board members, and district staff |
+| `boards` | One row per community board | `id` (slug such as `m-cb-3`), `name`, `borough`, `logo_url`, `background_url`, `boundary_geojson`, `ticket_types` (`[{label, css_class, definition}]`), `features` (per-board flag overrides), `next_ticket_no`, `share_token` |
+| `board_members` | Who is staff on which board | `user_id`, `board_id`, `role` (`staff`, or legacy `admin`) |
+| `platform_admins` | Who can manage everything | `user_id` |
+| `feature_flags` | Global flag defaults | `key`, `default_enabled`, `requires_board_setup` |
+| `tickets` | Every board's tickets | `id`, `board`, `number` (per board), `title`, `type`, `status`, `urgent`, `deadline`, `location_text`, `places`, `requester`, `owner_id`, `summary`, `source`, `submitted_by`, `submitted_at`, `closed_at`, `created_by`, `meeting_ids`, `spans` |
 
-Do not enter confidential or personally identifying information into the prototype: nothing is persisted and there is no access control.
+Triggers do the bookkeeping the client must not:
 
-## Roadmap
+- **Ticket numbers.** A new ticket is inserted with `number = 0`; the trigger assigns the board's next number under a row lock, so concurrent inserts never collide. The client inserts new tickets and updates existing ones separately; a mixed upsert would renumber.
+- **`closed_at`** is set when status becomes `Closed` and cleared when reopened.
+- **`created_by`** defaults to the signed-in user.
 
-1. **Persist** tickets, spans, and places behind a small API; replace bundled CSVs.
-2. **Block Party ingest** with paragraph splitting (`scripts/split_paragraphs.py` is the reference).
-3. **Draft review** in the existing table + transcript UI: approve, reject, merge, split; creating and deleting highlights.
-4. **Cross-meeting linking** so recurring issues update one ticket and its status.
-5. **Corrections to evals**: export reviewer changes as gold; score every prompt/model change before rollout.
-6. **Routing and notifications** to committees and owners.
-7. **Multi-board configuration** for types, committees, boundaries, and sources.
+Views: `board_effective_features` (each board's resolved flags, read by the app) and `board_ticket_metrics` / `board_ticket_counts` (ticket statistics, not used by the app today). All are `security_invoker`, so RLS applies.
 
-## Development
+## Feature flags
 
-Requirements: Node.js 22.12 or later and pnpm 10.
+A flag's value for a board is the board's override in `boards.features` if present, otherwise the global `feature_flags.default_enabled`. The app reads resolved values from `board_effective_features` and nowhere else.
 
-```bash
-pnpm install --frozen-lockfile
-pnpm dev        # Vite dev server on $PORT (default 8443)
-pnpm build      # production build
-pnpm preview    # serve the production build
-```
+| Key | Default | What it controls |
+| --- | --- | --- |
+| `manual_intake` | on | New ticket button, home "Submit a New Ticket", intake form |
+| `district_map` | on | Map panel and rail, map action on home, map on the share page |
+| `transcript_matching` | off | V2. No transcript code ships in V1; CI enforces it (`pnpm check:bundle`) |
+| `email_intake` | off | V3 |
+| `asset_generation` | off | V3 |
+| `data_aggregation` | off | V3 |
 
-Project layout:
+Keys are typed in `src/lib/features.ts`; read them with `useFeature("district_map")`. Flags only hide UI. Anything that costs money or touches secrets must also be checked server-side.
+
+## Frontend
 
 ```text
-.
-├── data/                    # transcripts, gold/annotator/rejected tickets, ticket types
-├── lib/                     # extraction (AI SDK), loaders, scoring
-├── prompts/                 # versioned extraction prompts
-├── scripts/                 # run / score / log / split_paragraphs
-├── runs/, results.csv       # saved extraction runs and their scores
-└── src/
-	├── App.tsx              # portal shell, navigation, ticket workspace state
-	├── TicketTable.tsx      # editable, resizable tickets table
-	├── LocationCell.tsx     # Map column: places + GeoSearch picker
-	├── TranscriptView.tsx   # transcript with draggable evidence highlights
-	├── MapView.tsx          # Leaflet map, CB3 boundary, ticket pins
-	├── goldTickets.ts       # ticket types, demo tickets from data/
-	├── transcript.ts        # paragraphs, global offsets, span helpers
-	├── geosearch.ts         # NYC GeoSearch client
-	└── data/cb3-boundary.geojson
+src/
+├── main.tsx                 # entry; starts analytics
+├── App.tsx                  # auth gate, share-page route, portal shell, ticket workspace state
+├── SignIn.tsx               # email + password sign-in (no sign-up: accounts are invite-only)
+├── PublicBoard.tsx          # /share/<token>: read-only table and map
+├── ShareLink.tsx            # staff dialog: copy or replace the share link
+├── TicketTable.tsx          # editable, resizable ticket table (spec 6.2 column order)
+├── IntakeForm.tsx           # new ticket form (manual_intake)
+├── MapView.tsx              # Leaflet map, board boundary, ticket pins (district_map)
+├── LocationCell.tsx         # places on a ticket + NYC GeoSearch picker
+├── geosearch.ts             # GeoSearch client, biased to the board's borough
+├── db.ts                    # the Supabase client, nothing else
+├── lib/
+│   ├── board.tsx            # BoardProvider, useBoard, useFeature, useBoardSwitcher, roles
+│   ├── features.ts          # FeatureKey: the single list of flag keys
+│   └── analytics.ts         # Google Analytics 4 (off unless VITE_GA_MEASUREMENT_ID is set)
+├── features/tickets/
+│   ├── types.ts             # Ticket, Status, Source, Place
+│   ├── rows.ts              # Ticket <-> database row mapping (no database access)
+│   └── api.ts               # load, insert, update, delete tickets; board staff
+├── TranscriptView.tsx, transcript.ts, meetings.ts, goldTickets.ts
+│                            # V2 transcript code and CB3 demo data. Not imported by the app.
+└── index.css                # Tailwind v4 and all styles; ticket type colors by css_class
 ```
 
-Map tiles come from OpenStreetMap's public tile servers, which are fine for a demo; a production deployment should use a keyed tile provider.
+Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` loads the user's memberships and platform-admin status, picks a board (last used, else first membership, else first board), loads its row and flags, and only then renders the portal. Switching boards remounts the portal so no state carries over. Ticket edits are saved about 600 ms after typing stops: new tickets are inserted, changed ones updated by id.
 
-## Staging
+## Usage analytics
 
-The `staging` branch is intended for Netlify branch deploys; `main` remains the production branch. In Netlify, enable a branch deploy for `staging` under **Project configuration → Developer settings → Continuous deployment → Branches and deploy contexts**. Pushes to `staging` then deploy to `staging--<site-name>.netlify.app`.
+`src/lib/analytics.ts` loads Google Analytics 4 only when `VITE_GA_MEASUREMENT_ID` is set (production only on Netlify). It sends:
 
-## Engineering practices
+- Screen views: `/`, `/tickets`, `/sign-in`, `/share/:token`.
+- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`.
+- User properties: `board_id`, `role`.
 
-- Keep shared records and cross-view state in the owning app/data layer; keep view-only state local.
-- Model domain values with explicit TypeScript types and reuse the same records across views.
-- Treat transcripts, uploads, and user content as untrusted input. Validate on the server.
-- Never put API keys or publishing tokens in frontend source or `VITE_*` variables. Model calls run server-side.
-- Version prompts and score every prompt or model change with the eval harness before rollout.
-- Preserve accessible names and keyboard operation for icon-only controls, tabs, and table actions.
-- After UI or TypeScript changes, run `pnpm build` and check the affected workflow in the browser.
+It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens. Every hit's page address is rewritten before it leaves the browser.
 
-## MIT License
+## Environments and deploys
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for the full license text.
+| Where | What runs | Configuration |
+| --- | --- | --- |
+| Local | `pnpm dev` on http://localhost:5173 | `.env.local` (git-ignored): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, optional `VITE_GA_MEASUREMENT_ID` |
+| Deploy previews | Netlify builds every pull request | Netlify environment variables (no GA id) |
+| Production | Netlify builds `main` | Netlify environment variables, including `VITE_GA_MEASUREMENT_ID` |
+| Database | Supabase project `enanmsnprjviztiiemtn` | Migrations in `supabase/migrations/`; see [`supabase/README.md`](../supabase/README.md) |
+
+All environments currently use the same Supabase project. A separate staging project is planned (spec section 9, step 9).
+
+Netlify's build runs `pnpm install --frozen-lockfile --force` before building so a stale dependency cache can't break it, and serves `index.html` for unknown paths so `/share/...` links work.
+
+## External services
+
+| Service | Used for | Notes |
+| --- | --- | --- |
+| Supabase | Auth, Postgres, Storage | Free plan pauses after about a week of inactivity; the daily keep-alive workflow calls `ping()`. Upgrade before real staff depend on it. Built-in email only reaches the project's team; inviting by email needs custom SMTP. |
+| Netlify | Hosting and previews | |
+| Google Analytics 4 | Usage analytics | Sets cookies. Check whether the boards need a consent banner. |
+| NYC GeoSearch | Address and place search | Free, no key. Cannot resolve intersections; staff place those by hand. |
+| OpenStreetMap | Map tiles | Public tile servers are fine for light use; switch to a keyed provider for heavy traffic. |

@@ -224,7 +224,11 @@ Provide one view `board_ticket_metrics`, created `with (security_invoker = true)
 | Open age | median and max of `now() - submitted_at` over open tickets |
 | By source | counts per `source` (becomes the manual vs AI split in V2) |
 
-Show these as a compact strip above the ticket table. No charts library in V1.
+~~Show these as a compact strip above the ticket table. No charts library in V1.~~
+
+**Changed 2026-11-02:** the strip was built (PR #10) and removed. "Metrics" meant usage analytics, not ticket statistics. The `board_ticket_metrics` and `board_ticket_counts` views stay in the database, unused by the app, for a later report.
+
+Usage analytics: Google Analytics 4, loaded by `src/lib/analytics.ts` only when `VITE_GA_MEASUREMENT_ID` is set. It sends screen views (`/`, `/tickets`, `/sign-in`, `/share/:token`), the events `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced` and `board_switched`, and the user properties `board_id` and `role`. It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens.
 
 ### 6.4 Explicitly out of V1
 
@@ -271,7 +275,7 @@ git push origin 'refs/tags/archive/*'
 5. **Auth and client (local Claude Code).** Section 5, `BoardProvider`, sign-in screen, `db.ts` insert/update split, removal of `VITE_BOARD` and the sample fallback. Release order, no downtime: 3a is already applied, deploy the client, create staff users and `board_members` rows, confirm sign-in works, then apply 3b. Include the cross-board denial test.
 6. **Remove hardcoding.** The remaining rows of section 7 (`App.tsx` branding, `MapView`, `geosearch`, `goldTickets`, `meetings`, logos).
 7. **Feature flags.** `features.ts`, `useFeature`, nav and component gating. Verify with `transcript_matching` false that no transcript code is reachable from the UI.
-8. **Columns and metrics.** Section 6.2 and 6.3.
+8. **Columns and metrics.** Section 6.2 and 6.3. Done; the metrics strip was then replaced by usage analytics (section 6.3).
 9. **Environments.** Netlify deploy contexts mapped to production and staging Supabase projects. Delete the old remote branches only after step 5 is deployed and verified.
 
 ## 10. Open decisions (do not guess, ask)
@@ -294,7 +298,7 @@ Still open:
 - Cross-board read and write attempts fail at the database.
 - Creating tickets concurrently never produces duplicate numbers within a board.
 - Turning `manual_intake` or `district_map` off in `boards.features` hides the feature with no code change.
-- The metrics strip matches a hand count on the seeded data.
+- Usage analytics report page views and events in Google Analytics, with no share tokens or personal data.
 - The keep-alive workflow has run green at least once from the Actions tab.
 
 ## 12. Supabase and GitHub setup runbook (user does these in the dashboards)

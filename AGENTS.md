@@ -11,17 +11,19 @@ Ticket tracker for NYC community boards. Staff review tickets from board meeting
 | `pnpm dev` | Vite dev server |
 | `pnpm typecheck` | `tsc --noEmit` over `src/` and `vite.config.ts` |
 | `pnpm build` | Production build to `dist/` |
+| `pnpm check:bundle` | After `build`: fails if transcript code or meeting data is in the bundle |
 | `pnpm format` | oxfmt |
 | `pnpm evals:run`, `evals:score`, `evals:log` | Extraction evals in `evals/`. Needs `ANTHROPIC_API_KEY` in `.env.local` |
 
-CI runs `typecheck` and `build` on every pull request. Both must pass before merging.
+CI runs `typecheck`, `build` and `check:bundle` on every pull request. All must pass before merging.
 
 ## Layout
 
-- `src/` is the web app. `src/index.css` holds Tailwind v4 (`@import 'tailwindcss';`) and global styles. No Tailwind or PostCSS config file.
-- `evals/` is the extraction and scoring harness (`lib/`, `scripts/`, `prompts/`, `runs/`, `data/`). It is not bundled into the app. The app currently imports a few files from `evals/data/` as bundled sample data; the spec removes that.
-- `supabase/` holds migrations and seeds. `scripts/` holds app-side tooling.
-- `docs/` holds the spec and the target architecture.
+- `src/` is the web app. `src/lib/` holds `board.tsx` (BoardProvider, useBoard, useFeature, roles), `features.ts` (FeatureKey) and `analytics.ts`. `src/features/tickets/` holds ticket types, row mapping and queries. `src/index.css` holds Tailwind v4 (`@import 'tailwindcss';`) and global styles. No Tailwind or PostCSS config file.
+- `src/TranscriptView.tsx`, `transcript.ts`, `meetings.ts` and `goldTickets.ts` are V2 transcript code and CB3 demo data. The app must not import them (`check:bundle` enforces it); only `scripts/make_supabase_seed.mjs` does.
+- `evals/` is the extraction and scoring harness (`lib/`, `scripts/`, `prompts/`, `runs/`, `data/`). It is not bundled into the app.
+- `supabase/` holds `migrations/`, admin SQL in `scripts/` (run by hand, not migrations) and seeds. `scripts/` holds app-side tooling.
+- `docs/` holds `architecture.md` (how it works today), `refactor-spec.md` (scope and decisions) and `ideal-state.md` (V2/V3 vision).
 - The page title (`Loopback`) and language are set directly in `index.html`. `.figma/make/site.json` is gone. `vite.config.ts` still carries the Figma Make dev-only plugins; leave them until the spec says otherwise.
 
 ## Rules
@@ -31,7 +33,9 @@ CI runs `typecheck` and `build` on every pull request. Both must pass before mer
 - Tenant isolation is enforced by Postgres RLS, not by client filters. Never put a service-role key or any secret in the browser. `VITE_*` variables are public.
 - Insert new tickets and update existing ones separately. Send `number: 0` for a new ticket; the database assigns it. A mixed upsert can renumber tickets.
 - Migrations are new files only. Never edit an applied migration. Make schema changes additive first, then breaking in a later migration.
-- Feature flags resolve through `board_effective_features`. Anything that costs money or touches secrets must also be checked server-side.
+- Feature flags resolve through `board_effective_features`. Add keys to `src/lib/features.ts` and read them with `useFeature`. Anything that costs money or touches secrets must also be checked server-side.
+- Roles: platform admin (`platform_admins`) and staff (`board_members`). Writes are gated by `can_edit_board()`. Public read access is only through the share-link functions, never `anon` table grants.
+- Analytics (`src/lib/analytics.ts`) must never carry ticket content, names, emails, user ids or share tokens.
 - Use double quotes for strings containing apostrophes. Export components as default exports.
 - No em dashes in code comments, docs or commit messages.
 - Secrets live in `.env.local` (git-ignored), Netlify and GitHub secrets.
