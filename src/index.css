@@ -121,6 +121,21 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .portal-nav > button { display: flex; align-items: center; justify-content: center; gap: 7px; border: 0; border-right: 1px solid #aeb4bc; background: white; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; }
 .portal-nav > button:hover { background: #f5fbfc; }
 .portal-nav > button.active { box-shadow: inset 0 -3px #2bb7d5; }
+.portal-nav > button.nav-signout { justify-self: end; padding: 0 14px; border-right: 0; border-left: 1px solid #aeb4bc; color: #4c5561; font-size: 13px; }
+
+/* Sign-in screen and the board loading state. Board-neutral on purpose. */
+.sign-in { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: #f5f7f8; }
+.sign-in-card { width: min(380px, 100%); display: flex; flex-direction: column; gap: 14px; padding: 28px 24px; border: 1px solid #d9dde2; border-radius: 8px; background: #fff; }
+.sign-in-logo { width: 44px; height: 44px; object-fit: contain; }
+.sign-in-card h1 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 26px; }
+.sign-in-card p { margin: 0; color: #4c5561; font-size: 13px; line-height: 1.45; }
+.sign-in-card label { display: flex; flex-direction: column; gap: 5px; color: #4c5561; font-size: 12px; font-weight: 600; }
+.sign-in-card input { height: 38px; padding: 0 10px; border: 1px solid #aeb4bc; border-radius: 5px; color: #11182c; font-size: 14px; font-weight: 400; }
+.sign-in-card button { height: 40px; border: 0; border-radius: 5px; background: #11182c; color: #fff; font-weight: 600; cursor: pointer; }
+.sign-in-card button:disabled { opacity: .6; cursor: progress; }
+.sign-in-card .sign-in-error { color: #a3263c; font-weight: 600; }
+.board-status { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; color: #4c5561; font-size: 14px; text-align: center; }
+.board-status-signout { padding: 6px 14px; border: 1px solid #aeb4bc; border-radius: 5px; background: #fff; cursor: pointer; }
 
 /* Home: the CB9 photo under a dark wash so the white headline stays readable over the bright sky. */
 .home-view { width: 100%; flex: 1; min-height: 0; display: flex; background: #2a3242; }

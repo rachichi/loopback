@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ClipboardList, Filter, House, MapPin, PanelRightClose, PanelRightOpen, Plus, ScrollText, Search, X } from "lucide-react";
+import { ClipboardList, Filter, House, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, ScrollText, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
-import { initialTickets, statuses, withSpans, type EvidenceSpan, type Status, type Ticket } from "./goldTickets";
+import { statuses, withSpans, type EvidenceSpan, type Status, type Ticket } from "./goldTickets";
 import TicketTable from "./TicketTable";
 import TranscriptView from "./TranscriptView";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import { meetingById, meetings } from "./meetings";
-import { db, loadTickets, saveTickets } from "./db";
+import type { Session } from "@supabase/supabase-js";
+import { db } from "./db";
+import { insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
+import { BoardProvider, useBoard } from "./lib/board";
+import SignIn from "./SignIn";
 
-/** Where the tickets live: bundled sample data (no database configured) or Supabase. */
-type Sync = "sample" | "loading" | "saving" | "saved" | "error";
+/** The state of the tickets in Supabase. */
+type Sync = "loading" | "saving" | "saved" | "error";
 const syncLabel: Record<Sync, string> = {
-  sample: "Sample data · changes aren't saved",
   loading: "Loading…",
   saving: "Saving…",
   saved: "Saved",
@@ -51,6 +54,7 @@ function PortalHeader({ view, setView }: { view: View; setView: (view: View) => 
       <nav className="portal-nav">
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
+        <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
       </nav>
       {view === "tickets" && (
         <div className="title-band">
@@ -174,17 +178,40 @@ function Toolbar({
   );
 }
 
+/** Signed out: the sign-in screen. Signed in: the portal for the user's board, once it has loaded. */
 export default function App() {
-  const [tickets, setTickets] = useState(db ? [] : initialTickets);
-  const [selectedId, setSelectedId] = useState(db ? "" : initialTickets[0].id);
-  const selected = tickets.find((ticket) => ticket.id === selectedId) ?? tickets[0];
-  const [sync, setSync] = useState<Sync>(db ? "loading" : "sample");
-
-  // The last version of each ticket known to be in the database; a ticket whose object differs has unsaved edits.
-  const persisted = useRef(new Map<string, Ticket>());
+  // undefined until the stored session has been read, so a signed-in user never sees the sign-in screen flash.
+  const [session, setSession] = useState<Session | null | undefined>(undefined);
   useEffect(() => {
-    if (!db) return;
-    loadTickets()
+    db.auth.getSession().then(({ data }) => setSession(data.session));
+    const { data } = db.auth.onAuthStateChange((_event, next) => setSession(next));
+    return () => data.subscription.unsubscribe();
+  }, []);
+
+  if (session === undefined) return null;
+  if (!session) return <SignIn />;
+  // Keyed by user so signing in as someone else starts from a clean portal, not the last user's state.
+  return (
+    <BoardProvider key={session.user.id} userId={session.user.id}>
+      <Portal />
+    </BoardProvider>
+  );
+}
+
+function Portal() {
+  const board = useBoard();
+  const [tickets, setTickets] = useState<Ticket[]>([]);
+  const [selectedId, setSelectedId] = useState("");
+  const selected = tickets.find((ticket) => ticket.id === selectedId) ?? tickets[0];
+  const [sync, setSync] = useState<Sync>("loading");
+
+  // The last version of each ticket known to be in the database; a ticket whose object differs has unsaved
+  // edits, and a ticket with no entry has never been saved and needs an insert.
+  const persisted = useRef(new Map<string, Ticket>());
+  // New tickets whose insert is in flight. Edits made meanwhile are saved as an update once it returns.
+  const inserting = useRef(new Set<string>());
+  useEffect(() => {
+    loadTickets(board.id)
       .then((loaded) => {
         for (const ticket of loaded) persisted.current.set(ticket.id, ticket);
         setTickets(loaded);
@@ -192,15 +219,26 @@ export default function App() {
         setSync("saved");
       })
       .catch((error) => { console.error(error); setSync("error"); });
-  }, []);
-  // Save edits shortly after typing stops; a failed save is retried with the next edit.
+  }, [board.id]);
+  // Save shortly after typing stops: insert new tickets, update changed ones. A failed save is retried with the next edit.
   useEffect(() => {
-    if (!db) return;
-    const changed = tickets.filter((ticket) => persisted.current.get(ticket.id) !== ticket);
-    if (!changed.length) return;
+    if (sync === "loading") return;
+    const fresh = tickets.filter((ticket) => !persisted.current.has(ticket.id) && !inserting.current.has(ticket.id));
+    const changed = tickets.filter((ticket) => persisted.current.has(ticket.id) && persisted.current.get(ticket.id) !== ticket);
+    if (!fresh.length && !changed.length) return;
     setSync("saving");
     const timer = window.setTimeout(() => {
-      saveTickets(changed)
+      for (const ticket of fresh) inserting.current.add(ticket.id);
+      const inserts = fresh.map((sent) =>
+        insertTicket(sent, board.id)
+          .then((saved) => {
+            persisted.current.set(saved.id, saved);
+            // Keep any edits made while the insert was in flight; they differ from `saved`, so they get updated next.
+            setTickets((current) => current.map((ticket) => ticket.id !== saved.id ? ticket : ticket === sent ? saved : { ...ticket, number: saved.number }));
+          })
+          .finally(() => inserting.current.delete(sent.id)),
+      );
+      Promise.all([...inserts, updateTickets(changed, board.id)])
         .then(() => {
           for (const ticket of changed) persisted.current.set(ticket.id, ticket);
           setSync("saved");
@@ -208,7 +246,7 @@ export default function App() {
         .catch((error) => { console.error(error); setSync("error"); });
     }, 600);
     return () => window.clearTimeout(timer);
-  }, [tickets]);
+  }, [tickets, board.id, sync === "loading"]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | Status>("All");
   const [sideTab, setSideTab] = useState<"transcript" | "map">("transcript");
@@ -243,9 +281,9 @@ export default function App() {
 
   // New intake tickets go to the top, and the filters reset so the new row is in view.
   const addTicket = (fields: IntakeFields) => {
-    const number = String(Math.max(0, ...tickets.map((ticket) => Number(ticket.number) || 0)) + 1);
+    // The database assigns the number when the ticket is inserted; until then it shows blank.
     // Every board shares one table, so ids must be unique across boards, not just within this one.
-    const ticket: Ticket = { ...fields, id: crypto.randomUUID(), number, meetingIds: [], spans: [], evidence: {} };
+    const ticket: Ticket = { ...fields, id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {} };
     setTickets((current) => [ticket, ...current]);
     setSelectedId(ticket.id);
     setQuery("");
@@ -302,7 +340,7 @@ export default function App() {
         <PortalHeader view={view} setView={setView} />
         <main className="workspace-message">
           {sync === "loading" && "Loading tickets…"}
-          {sync === "error" && "Couldn't load tickets from Supabase. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env.local, and that supabase/schema.sql has been run."}
+          {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
         </main>
         <PortalFooter />
       </div>

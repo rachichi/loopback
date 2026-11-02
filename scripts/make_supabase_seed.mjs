@@ -6,7 +6,7 @@ import { createServer } from "vite";
 // The ticket data imports transcripts with Vite's ?raw, so load it through Vite.
 const server = await createServer({ server: { middlewareMode: true }, appType: "custom", logLevel: "error" });
 const { initialTickets } = await server.ssrLoadModule("/src/goldTickets.ts");
-const { toRow } = await server.ssrLoadModule("/src/db.ts");
+const { toRow } = await server.ssrLoadModule("/src/features/tickets/rows.ts");
 await server.close();
 
 // Array columns are typed by schema.sql; an empty array can't tell text[] from jsonb on its own.
@@ -20,7 +20,7 @@ const sql = (value, column) => {
 };
 
 // The bundled sample tickets come from Manhattan CB3's meetings, whatever board the app is set to.
-const rows = initialTickets.map((ticket) => ({ ...toRow(ticket), board: "m-cb-3" }));
+const rows = initialTickets.map((ticket) => toRow(ticket, "m-cb-3"));
 const columns = Object.keys(rows[0]);
 const values = rows.map((row) => `  (${columns.map((column) => sql(row[column], column)).join(", ")})`);
 writeFileSync(
