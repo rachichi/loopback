@@ -2,14 +2,17 @@
 import { useEffect, useState, type FormEvent } from "react";
 import loopbackLogo from "./assets/logo.png";
 import { db } from "./db";
-import { trackEvent, trackPage } from "./lib/analytics";
+import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  useEffect(() => trackPage("/sign-in", "Sign in"), []);
+  useEffect(() => {
+    setAnalyticsUser(null);
+    trackPage("/sign-in", "Sign in");
+  }, []);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();

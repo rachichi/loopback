@@ -120,7 +120,8 @@ export function trackEvent(name: EventName, params: Record<string, string | numb
 }
 
 /** Who is using the app, by board and role only. Added to every later page view and event. This is not
- *  Better Stack's `user` call, which would attach an id and email to everything. */
-export function setAnalyticsUser(props: { board_id: string; role: string }): void {
-  userProps = { ...props };
+ *  Better Stack's `user` call, which would attach an id and email to everything. Pass null on sign-out so
+ *  the next sign-in is not reported with the previous user's board and role. */
+export function setAnalyticsUser(props: { board_id: string; role: string } | null): void {
+  userProps = props ? { ...props } : {};
 }
