@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Calendar, CircleChevronDown, MapPin, SquareCheck, Type, type LucideIcon } from "lucide-react";
+import { Calendar, CircleChevronDown, MapPin, SquareCheck, Trash2, Type, type LucideIcon } from "lucide-react";
 import LocationCell from "./LocationCell";
 import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard, useTypeClass } from "./lib/board";
@@ -45,6 +45,7 @@ export default function TicketTable({
   onSelect,
   onChange,
   onShowOnMap,
+  onDelete,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -55,6 +56,8 @@ export default function TicketTable({
   onSelect: (ticket: Ticket) => void;
   onChange: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
   onShowOnMap: (id: string, placeIndex: number) => void;
+  /** Omitted for read-only users, which hides the delete buttons. */
+  onDelete?: (ticket: Ticket) => void;
 }) {
   const { ticketTypes } = useBoard();
   const typeClass = useTypeClass();
@@ -86,8 +89,9 @@ export default function TicketTable({
     window.addEventListener("mouseup", up);
   };
   const gridStyle = {
-    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")} minmax(0, 1fr)`,
-    "--ticket-width": `${34 + columns.reduce((sum, c) => sum + widths[c.key], 0)}px`,
+    // The trailing column holds the delete button, so it keeps 40px even when the table scrolls sideways.
+    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")} minmax(40px, 1fr)`,
+    "--ticket-width": `${34 + columns.reduce((sum, c) => sum + widths[c.key], 0) + 40}px`,
   } as CSSProperties;
 
   const text = (ticket: Ticket, field: "title" | "requester" | "summary" | "submittedBy", label: string, rows = 2) => (
@@ -187,6 +191,19 @@ export default function TicketTable({
           </div>
           <div>{text(ticket, "submittedBy", "Submitted by")}</div>
           <div>{date(ticket, "submittedAt", "Submitted")}</div>
+          <div className="row-actions">
+            {onDelete && (
+              <button
+                type="button"
+                className="row-delete"
+                aria-label={`Delete ticket ${ticket.number || ticket.title}`}
+                title="Delete ticket"
+                onClick={(event) => { event.stopPropagation(); onDelete(ticket); }}
+              >
+                <Trash2 size={14} />
+              </button>
+            )}
+          </div>
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}
     </div>

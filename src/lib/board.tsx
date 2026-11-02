@@ -1,11 +1,18 @@
-// The signed-in user's board: name, logo, boundary, ticket types and resolved feature flags.
-// Loaded once after sign-in in three steps (board_members, then boards, then board_effective_features).
-// Nothing below the provider renders until the board has resolved, so no board-specific UI can show
-// with missing or stale data.
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+// The signed-in user's board: name, logo, boundary, ticket types, resolved feature flags and their role.
+// Loaded after sign-in: the user's memberships and platform-admin status, then the chosen board's row and
+// its flags from board_effective_features. Nothing below the provider renders until the board has
+// resolved, so no board-specific UI can show with missing or stale data.
+//
+// Roles (spec: supabase/migrations/20261102140000_roles.sql). The database enforces them; the UI only
+// mirrors them so volunteers aren't offered controls that would fail.
+//   platform_admin  every board, read and write
+//   staff           their board, read and write (the legacy board role "admin" counts as staff)
+//   volunteer       their board, read only
+import { createContext, Fragment, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { db } from "../db";
 
 export type BoardTicketType = { label: string; css_class: string; definition: string };
+export type Role = "platform_admin" | "staff" | "volunteer";
 
 export type Board = {
   id: string;
@@ -18,40 +25,59 @@ export type Board = {
   ticketTypes: BoardTicketType[];
   /** Resolved flags from board_effective_features. Read them through useFeature. */
   features: Record<string, boolean>;
-  role: "admin" | "staff";
+  role: Role;
+  /** Whether the user can create, edit and delete this board's tickets. */
+  canEdit: boolean;
 };
+
+/** A board the user can switch to: every board for a platform admin, their own boards otherwise. */
+export type BoardOption = { id: string; name: string };
+
+type Access = { boards: BoardOption[]; memberships: Map<string, string>; platformAdmin: boolean };
 
 type BoardState =
   | { status: "loading" }
-  | { status: "ready"; board: Board }
+  | { status: "ready"; board: Board; boards: BoardOption[] }
   | { status: "no-board" }
   | { status: "error"; message: string };
 
 const BoardContext = createContext<Board | null>(null);
+const SwitcherContext = createContext<{ boards: BoardOption[]; switchBoard: (id: string) => void } | null>(null);
 
-async function loadBoard(userId: string): Promise<Board | null> {
-  // A user can belong to more than one board. V1 has no board switcher, so take the first by id.
-  const { data: member, error: memberError } = await db
-    .from("board_members")
-    .select("board_id, role")
-    .eq("user_id", userId)
-    .order("board_id")
-    .limit(1)
-    .maybeSingle();
-  if (memberError) throw memberError;
-  if (!member) return null;
+// The last board picked in the switcher, per browser. A convenience only; it may be unavailable.
+const STORAGE_KEY = "loopback.boardId";
+const readStoredBoard = () => { try { return localStorage.getItem(STORAGE_KEY); } catch { return null; } };
+const storeBoard = (id: string) => { try { localStorage.setItem(STORAGE_KEY, id); } catch { /* storage unavailable */ } };
 
+async function loadAccess(userId: string): Promise<Access> {
+  const [members, admin] = await Promise.all([
+    db.from("board_members").select("board_id, role").eq("user_id", userId),
+    db.from("platform_admins").select("user_id").eq("user_id", userId).maybeSingle(),
+  ]);
+  if (members.error) throw members.error;
+  if (admin.error) throw admin.error;
+  const memberships = new Map<string, string>((members.data ?? []).map((row) => [row.board_id, row.role]));
+  const platformAdmin = Boolean(admin.data);
+  if (!platformAdmin && !memberships.size) return { boards: [], memberships, platformAdmin };
+
+  // RLS already limits boards to the user's own unless they are a platform admin.
+  const { data, error } = await db.from("boards").select("id, name").order("name");
+  if (error) throw error;
+  return { boards: (data ?? []) as BoardOption[], memberships, platformAdmin };
+}
+
+async function loadBoard(boardId: string, access: Access): Promise<Board> {
   const { data: row, error: boardError } = await db
     .from("boards")
     .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types")
-    .eq("id", member.board_id)
+    .eq("id", boardId)
     .single();
   if (boardError) throw boardError;
 
   const { data: flags, error: flagsError } = await db
     .from("board_effective_features")
     .select("features")
-    .eq("board_id", member.board_id)
+    .eq("board_id", boardId)
     .maybeSingle();
   if (flagsError) throw flagsError;
 
@@ -60,6 +86,9 @@ async function loadBoard(userId: string): Promise<Board | null> {
   for (const [key, value] of Object.entries((flags?.features ?? {}) as Record<string, unknown>)) {
     features[key] = value === true;
   }
+
+  const membership = access.memberships.get(boardId);
+  const role: Role = access.platformAdmin ? "platform_admin" : membership === "volunteer" ? "volunteer" : "staff";
 
   return {
     id: row.id,
@@ -70,8 +99,18 @@ async function loadBoard(userId: string): Promise<Board | null> {
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
     features,
-    role: member.role,
+    role,
+    canEdit: role !== "volunteer",
   };
+}
+
+/** The board to open: the last one picked if still allowed, else the user's first membership, else the first board. */
+function initialBoard(access: Access): string | undefined {
+  const allowed = new Set(access.boards.map((board) => board.id));
+  const stored = readStoredBoard();
+  if (stored && allowed.has(stored)) return stored;
+  const member = [...access.memberships.keys()].sort().find((id) => allowed.has(id));
+  return member ?? access.boards[0]?.id;
 }
 
 /** Shown in place of the app while the board loads or when it can't. Deliberately board-neutral. */
@@ -88,22 +127,44 @@ function BoardStatus({ children }: { children: ReactNode }) {
 
 export function BoardProvider({ userId, children }: { userId: string; children: ReactNode }) {
   const [state, setState] = useState<BoardState>({ status: "loading" });
+  const [access, setAccess] = useState<Access | null>(null);
+  const [boardId, setBoardId] = useState<string | undefined>();
 
   useEffect(() => {
     let cancelled = false;
     setState({ status: "loading" });
-    loadBoard(userId)
-      .then((board) => {
-        if (!cancelled) setState(board ? { status: "ready", board } : { status: "no-board" });
+    loadAccess(userId)
+      .then((loaded) => {
+        if (cancelled) return;
+        const first = initialBoard(loaded);
+        if (!first) { setState({ status: "no-board" }); return; }
+        setAccess(loaded);
+        setBoardId(first);
       })
       .catch((error: unknown) => {
         console.error(error);
         if (!cancelled) setState({ status: "error", message: error instanceof Error ? error.message : String(error) });
       });
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [userId]);
+
+  useEffect(() => {
+    if (!access || !boardId) return;
+    let cancelled = false;
+    setState({ status: "loading" });
+    loadBoard(boardId, access)
+      .then((board) => { if (!cancelled) setState({ status: "ready", board, boards: access.boards }); })
+      .catch((error: unknown) => {
+        console.error(error);
+        if (!cancelled) setState({ status: "error", message: error instanceof Error ? error.message : String(error) });
+      });
+    return () => { cancelled = true; };
+  }, [access, boardId]);
+
+  const switchBoard = useCallback((id: string) => {
+    storeBoard(id);
+    setBoardId(id);
+  }, []);
 
   if (state.status === "loading") return <BoardStatus>Loading your board…</BoardStatus>;
   if (state.status === "no-board") {
@@ -114,7 +175,14 @@ export function BoardProvider({ userId, children }: { userId: string; children: 
     );
   }
   if (state.status === "error") return <BoardStatus>Couldn't load your board: {state.message}</BoardStatus>;
-  return <BoardContext.Provider value={state.board}>{children}</BoardContext.Provider>;
+  return (
+    <SwitcherContext.Provider value={{ boards: state.boards, switchBoard }}>
+      <BoardContext.Provider value={state.board}>
+        {/* Keyed by board, so switching boards starts the portal fresh instead of carrying over tickets. */}
+        <Fragment key={state.board.id}>{children}</Fragment>
+      </BoardContext.Provider>
+    </SwitcherContext.Provider>
+  );
 }
 
 /** The current board. Only valid below BoardProvider, which renders its children once the board has resolved. */
@@ -129,6 +197,13 @@ export function useBoard(): Board {
 export function useTypeClass(): (type: string) => string {
   const { ticketTypes } = useBoard();
   return (type) => ticketTypes.find((item) => item.label === type)?.css_class || "other";
+}
+
+/** The boards the user can switch between, and the switch itself. */
+export function useBoardSwitcher() {
+  const switcher = useContext(SwitcherContext);
+  if (!switcher) throw new Error("useBoardSwitcher() must be used inside <BoardProvider>.");
+  return switcher;
 }
 
 /** Whether a feature is on for the current board. Unknown keys are off. */
