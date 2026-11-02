@@ -22,7 +22,7 @@ CI runs `typecheck` and `build` on every pull request. Both must pass before mer
 - `evals/` is the extraction and scoring harness (`lib/`, `scripts/`, `prompts/`, `runs/`, `data/`). It is not bundled into the app. The app currently imports a few files from `evals/data/` as bundled sample data; the spec removes that.
 - `supabase/` holds migrations and seeds. `scripts/` holds app-side tooling.
 - `docs/` holds the spec and the target architecture.
-- `vite.config.ts` still carries Figma Make dev-only plugins and reads `.figma/make/site.json` for the page title. Leave them until the spec says otherwise.
+- The page title (`Loopback`) and language are set directly in `index.html`. `.figma/make/site.json` is gone. `vite.config.ts` still carries the Figma Make dev-only plugins; leave them until the spec says otherwise.
 
 ## Rules
 
