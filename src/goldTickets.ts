@@ -1,63 +1,12 @@
 // Demo tickets: the adjudicated gold sets for the bundled meetings (see meetings.ts).
+// Not imported by the app. scripts/make_supabase_seed.mjs uses it to write supabase/seed.sql, and V2's
+// transcript matching will use it again. Ticket types and colors come from boards.ticket_types.
 import train1Csv from "../evals/data/train1_goldtickets-Grid view.csv?raw";
 import train2Csv from "../evals/data/train2_goldtickets-Grid view.csv?raw";
 import annotatorCsv from "../evals/data/Annotator Tickets-Grid view.csv?raw";
 import { meetingById } from "./meetings";
-import { paragraphIdsFromSpans, spansFromParagraphIds, type Span } from "./transcript";
-
-export const ticketTypes = [
-  "Quality of Life Complaint",
-  "Public Safety Issue",
-  "Liquor License",
-  "Land Use Request",
-  "Transportation Request",
-  "Other",
-  "Budget Priority",
-  "Board Administration",
-] as const;
-export type TicketType = (typeof ticketTypes)[number];
-
-export const statuses = ["Open", "In Progress", "Closed"] as const;
-export type Status = (typeof statuses)[number];
-
-/** A geocoded point a ticket refers to. */
-export type Place = {
-  name: string;
-  lat: number;
-  lng: number;
-  /** "geosearch" = matched by NYC GeoSearch; "manual" = placed by hand (search pick-up, pin drag, or seed data). */
-  source: "geosearch" | "manual";
-};
-
-/** A highlight: a character range in one meeting's transcript. */
-export type EvidenceSpan = Span & { meetingId: string };
-
-/** The location as said in the meeting, plus the mapped places it refers to (zero or more). */
-export type TicketLocation = { text: string; places: Place[] };
-
-export type Ticket = {
-  id: string;
-  number: string;
-  title: string;
-  type: TicketType;
-  status: Status;
-  location: TicketLocation;
-  requester: string;
-  summary: string;
-  urgent: boolean;
-  /** Due date as YYYY-MM-DD, or "" for none. */
-  deadline: string;
-  /** Who logged the ticket: the meeting it was drawn from, or the person who filled in the intake form. */
-  submittedBy: string;
-  /** Date logged as YYYY-MM-DD. */
-  submittedAt: string;
-  /** Every meeting where the issue was discussed, oldest first; empty for a ticket from the intake form. */
-  meetingIds: string[];
-  /** Highlighted character ranges in those meetings' transcripts; the source of truth for evidence. */
-  spans: EvidenceSpan[];
-  /** Paragraph ids the spans touch, per meeting id (derived; kept for display and search). */
-  evidence: Record<string, string[]>;
-};
+import { paragraphIdsFromSpans, spansFromParagraphIds } from "./transcript";
+import type { EvidenceSpan, Place, Status, Ticket } from "./features/tickets/types";
 
 function evidenceOf(meetingIds: string[], spans: EvidenceSpan[]): Record<string, string[]> {
   return Object.fromEntries(meetingIds.map((id) => [
@@ -70,31 +19,6 @@ function evidenceOf(meetingIds: string[], spans: EvidenceSpan[]): Record<string,
 export function withSpans(ticket: Ticket, spans: EvidenceSpan[]): Ticket {
   return { ...ticket, spans, evidence: evidenceOf(ticket.meetingIds, spans) };
 }
-
-/** Today's local date as YYYY-MM-DD, the default for a new intake ticket. */
-export function today(): string {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-}
-
-/** CSS class per type; the class sets the tag and highlight colors in index.css. */
-export const typeClass: Record<TicketType, string> = {
-  "Quality of Life Complaint": "quality",
-  "Public Safety Issue": "safety",
-  "Liquor License": "liquor",
-  "Land Use Request": "land-use",
-  "Transportation Request": "transport",
-  Other: "other",
-  "Budget Priority": "budget",
-  "Board Administration": "admin",
-};
-
-/** Status values reuse the existing to-do / in-progress / complete styles. */
-export const statusClass: Record<Status, string> = {
-  Open: "to-do",
-  "In Progress": "in-progress",
-  Closed: "complete",
-};
 
 // Mapped places for the 9/29/26 gold tickets. GeoSearch matches are its coordinates; it can't
 // resolve intersections or garbled names, so those are approximate manual points.
@@ -169,7 +93,7 @@ const meetingTickets = goldSets.flatMap(({ meetingId, rows, places, annotators }
       id: `${meetingId}-${r.gold_id}`,
       number: "",
       title: r.title,
-      type: r.type as TicketType,
+      type: r.type,
       status: r.status as Status,
       location: { text: r.location_raw, places: places[r.gold_id] ?? [] },
       requester: r.requester || (source?.requester ?? ""),

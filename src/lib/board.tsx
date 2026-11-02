@@ -121,6 +121,13 @@ export function useBoard(): Board {
   return board;
 }
 
+/** Maps a ticket type label to its css_class from boards.ticket_types. The class sets the tag and
+ *  highlight colors in src/index.css. A label the board doesn't define gets the neutral "other" style. */
+export function useTypeClass(): (type: string) => string {
+  const { ticketTypes } = useBoard();
+  return (type) => ticketTypes.find((item) => item.label === type)?.css_class || "other";
+}
+
 /** Whether a feature is on for the current board. Unknown keys are off. */
 export function useFeature(key: string): boolean {
   return useBoard().features[key] === true;

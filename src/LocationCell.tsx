@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Plus, X } from "lucide-react";
 import { searchPlaces } from "./geosearch";
-import type { Place, TicketLocation } from "./goldTickets";
+import type { Place, TicketLocation } from "./features/tickets/types";
+import { useBoard } from "./lib/board";
 
 const titleCase = (text: string) => text.toLowerCase().replace(/\b([a-z])/g, (c) => c.toUpperCase());
 
@@ -20,6 +21,7 @@ export default function LocationCell({
   /** Omitted where there's no map to show (the intake form); the chips are then plain labels. */
   onShowOnMap?: (placeIndex: number) => void;
 }) {
+  const { borough } = useBoard();
   const [adding, setAdding] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
@@ -34,14 +36,14 @@ export default function LocationCell({
     const timer = window.setTimeout(async () => {
       setStatus("loading");
       try {
-        setResults(await searchPlaces(query.trim(), controller.signal));
+        setResults(await searchPlaces(query.trim(), borough, controller.signal));
         setStatus("idle");
       } catch (error) {
         if (!controller.signal.aborted) setStatus("error");
       }
     }, 250);
     return () => { controller.abort(); window.clearTimeout(timer); };
-  }, [adding, query]);
+  }, [adding, query, borough]);
 
   // The table scrolls and clips overflow, so the suggestion list is a fixed-position portal.
   useEffect(() => {

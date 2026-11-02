@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import LocationCell from "./LocationCell";
 import DictateButton, { canDictate } from "./DictateButton";
-import { statuses, ticketTypes, today, type Status, type Ticket, type TicketLocation, type TicketType } from "./goldTickets";
+import { statuses, today, type Status, type Ticket, type TicketLocation } from "./features/tickets/types";
+import { useBoard } from "./lib/board";
 
 /** The fields a person fills in; the parent assigns the id and number. */
 export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans" | "evidence">;
@@ -15,7 +16,8 @@ export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: I
   const [title, setTitle] = useState("");
   const [submittedBy, setSubmittedBy] = useState("");
   const [submittedAt, setSubmittedAt] = useState(today);
-  const [type, setType] = useState<TicketType | "">("");
+  const { ticketTypes } = useBoard();
+  const [type, setType] = useState("");
   const [urgent, setUrgent] = useState(false);
   const [deadline, setDeadline] = useState("");
   const [location, setLocation] = useState<TicketLocation>({ text: "", places: [] });
@@ -76,9 +78,9 @@ export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: I
           </label>
           <label>
             <span>Type</span>
-            <select value={type} onChange={(event) => setType(event.target.value as TicketType | "")}>
+            <select value={type} onChange={(event) => setType(event.target.value)}>
               <option value="">Not sure yet</option>
-              {ticketTypes.map((item) => <option key={item}>{item}</option>)}
+              {ticketTypes.map((item) => <option key={item.label} title={item.definition}>{item.label}</option>)}
             </select>
           </label>
           <label>
