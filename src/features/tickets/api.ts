@@ -37,3 +37,11 @@ export async function updateTickets(tickets: Ticket[], board: string): Promise<v
     }),
   );
 }
+
+/** Deletes a ticket by id. Staff and platform admins only; RLS hides the row from anyone else, which
+ *  shows up as zero rows deleted rather than an error. */
+export async function deleteTicket(id: string): Promise<void> {
+  const { data, error } = await db.from("tickets").delete().eq("id", id).select("id");
+  if (error) throw error;
+  if (!data?.length) throw new Error(`Ticket ${id} was not deleted (missing, or you can't delete on this board).`);
+}

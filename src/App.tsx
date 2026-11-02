@@ -7,8 +7,8 @@ import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
-import { insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
-import { BoardProvider, useBoard } from "./lib/board";
+import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
+import { BoardProvider, useBoard, useBoardSwitcher, type Role } from "./lib/board";
 import SignIn from "./SignIn";
 
 /** The state of the tickets in Supabase. */
@@ -41,6 +41,25 @@ function Logo() {
 
 type View = "home" | "tickets";
 
+const roleLabel: Record<Role, string> = { platform_admin: "Platform admin", staff: "Staff", volunteer: "Volunteer (read only)" };
+
+/** Right end of the nav: a board switcher when the user has more than one board, their role, and sign-out. */
+function AccountControls() {
+  const { id, role } = useBoard();
+  const { boards, switchBoard } = useBoardSwitcher();
+  return (
+    <div className="nav-account">
+      {boards.length > 1 && (
+        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => switchBoard(event.target.value)}>
+          {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
+        </select>
+      )}
+      <span className={`role-badge ${role}`}>{roleLabel[role]}</span>
+      <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
+    </div>
+  );
+}
+
 function PortalHeader({ view, setView }: { view: View; setView: (view: View) => void }) {
   const [showNotice, setShowNotice] = useState(true);
   return (
@@ -57,7 +76,7 @@ function PortalHeader({ view, setView }: { view: View; setView: (view: View) => 
       <nav className="portal-nav">
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
-        <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
+        <AccountControls />
       </nav>
       {view === "tickets" && (
         <div className="title-band">
@@ -77,12 +96,12 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   onLookUp: () => void;
   onNewTicket: () => void;
 }) {
-  const { name, backgroundUrl } = useBoard();
+  const { name, backgroundUrl, canEdit } = useBoard();
   const [searchTerm, setSearchTerm] = useState("");
   const actions = [
     { label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap },
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
-    { label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket },
+    ...(canEdit ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
   ];
   return (
     <main className="home-view">
@@ -170,6 +189,7 @@ function Toolbar({
   onNew: () => void;
   sync: Sync;
 }) {
+  const { canEdit } = useBoard();
   return (
     <div className="table-toolbar">
       <div className="table-meta">
@@ -184,7 +204,7 @@ function Toolbar({
             <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
           </select>
         </div>
-        <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>
+        {canEdit && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
       </div>
     </div>
   );
@@ -296,6 +316,33 @@ function Portal() {
   };
   const closeIntake = useCallback(() => setIntakeOpen(false), []);
 
+  // Deleting asks first, waits for the database, and only then removes the row, so a failed delete leaves it in place.
+  const removeTicket = async (ticket: Ticket) => {
+    const label = ticket.number ? `#${ticket.number} "${ticket.title}"` : `"${ticket.title}"`;
+    if (inserting.current.has(ticket.id)) {
+      window.alert(`Ticket ${label} is still being saved. Try again in a moment.`);
+      return;
+    }
+    if (!window.confirm(`Delete ticket ${label}? This can't be undone.`)) return;
+    const remove = () => {
+      persisted.current.delete(ticket.id);
+      setTickets((current) => current.filter((item) => item.id !== ticket.id));
+      if (selectedId === ticket.id) setSelectedId("");
+    };
+    // A ticket that was never saved only exists in this browser.
+    if (!persisted.current.has(ticket.id)) { remove(); return; }
+    setSync("saving");
+    try {
+      await deleteTicket(ticket.id);
+      remove();
+      setSync("saved");
+    } catch (error) {
+      console.error(error);
+      setSync("error");
+      window.alert(`Couldn't delete ticket ${label}. ${error instanceof Error ? error.message : ""}`);
+    }
+  };
+
   const selectTicket = (ticket: Ticket) => setSelectedId(ticket.id);
 
   const onMapHover = useCallback((id: string | null) => setHover({ id, from: "map" }), []);
@@ -342,7 +389,11 @@ function Portal() {
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : "No tickets yet. Add the first one with New ticket."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} />
+          {/* Volunteers are read only: a disabled fieldset disables every control in the table at once. The
+              database enforces this too (can_edit_board), so this only avoids offering edits that would fail. */}
+          <fieldset className="ticket-fieldset" disabled={!board.canEdit}>
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : board.canEdit ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={showOnMap} onDelete={board.canEdit ? removeTicket : undefined} />
+          </fieldset>
         </section>
         {sidebarOpen ? (
           <aside className="insights-pane">
@@ -360,7 +411,7 @@ function Portal() {
           </aside>
         )}
       </main>
-      {intakeOpen && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
+      {intakeOpen && board.canEdit && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
       <PortalFooter />
     </div>
   );
