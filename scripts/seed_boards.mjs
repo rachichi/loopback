@@ -70,7 +70,7 @@ const features = data.type === "FeatureCollection" ? data.features : [data];
 const byCd = new Map(); // BoroCD -> polygons[]
 const skipped = [];
 for (const f of features) {
-  const key = Object.keys(f.properties ?? {}).find((k) => k.toLowerCase() === "borocd");
+  const key = Object.keys(f.properties ?? {}).find((k) => ["borocd", "boro_cd"].includes(k.toLowerCase()));
   const cd = Number(f.properties?.[key]);
   const boro = Math.floor(cd / 100), num = cd % 100;
   if (!BOROUGHS[boro] || num < 1 || num > BOROUGHS[boro].count) { skipped.push(String(f.properties?.[key])); continue; }
