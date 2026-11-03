@@ -84,6 +84,14 @@ The Edge Function `supabase/functions/match-transcript` takes a `meeting_id` and
 
 The prompt ships with the function as `match-transcript/prompt.ts`, generated from `evals/prompts/v5.md` by `node scripts/build_match_prompt.mjs` (CI fails if it is stale). Try a prompt change with `pnpm evals:run` before regenerating and deploying.
 
+In the app, with the flag on:
+
+- **Transcript column** in the ticket table: one tag per meeting in `meeting_ids`. Clicking a tag opens the Transcript tab on that meeting, scrolled to the ticket's highlights. A "to review" badge opens the ticket's pending suggestions. A strip above the table counts suggested new tickets.
+- **Transcript tab** in the right panel, next to Map: meeting picker, "Find ticket updates" (runs `match-transcript`; running it again replaces the meeting's pending suggestions), the suggestions to review, and the transcript. Each suggestion shows its evidence paragraphs and each proposed field as current and proposed. **Approve** applies it as proposed, **Edit** lets staff change the fields first, **Reject** dismisses it. Pending suggestions are underlined in the transcript; approved highlights are shaded in the ticket type's colour and can be dragged to tighten them.
+- The panel (`src/features/transcript/TranscriptPanel.tsx`), `TranscriptView` and the paragraph code load with `React.lazy`, so they are a separate chunk that boards without the flag never download. `pnpm check:bundle` fails if they reach the entry chunk, or if the CB3 demo data reaches any chunk.
+- Transcripts are fetched one meeting at a time when shown. The table only loads meeting titles and dates and the pending suggestions.
+- Approving a suggestion on a ticket with unsaved edits is refused until the edits are saved, because the database merges the suggestion into the stored ticket.
+
 ## Feature flags
 
 A flag's value for a board is the board's override in `boards.features` if present, otherwise the global `feature_flags.default_enabled`. The app reads resolved values from `board_effective_features` and nowhere else.
@@ -92,7 +100,7 @@ A flag's value for a board is the board's override in `boards.features` if prese
 | --- | --- | --- |
 | `manual_intake` | on | New ticket button, home "Submit a New Ticket", intake form |
 | `district_map` | on | Map panel and rail, map action on home, map on the share page |
-| `transcript_matching` | off | V2. No transcript code ships in V1; CI enforces it (`pnpm check:bundle`) |
+| `transcript_matching` | off | V2. Transcript column and tab, AI suggestions to review. Checked again server-side by `match-transcript`. The transcript UI is a lazy chunk; CI keeps it out of the entry chunk (`pnpm check:bundle`) |
 | `email_intake` | off | V3 |
 | `asset_generation` | off | V3 |
 | `data_aggregation` | off | V3 |
@@ -123,8 +131,15 @@ src/
 │   ├── types.ts             # Ticket, Status, Source, Place
 │   ├── rows.ts              # Ticket <-> database row mapping (no database access)
 │   └── api.ts               # load, insert, update, delete tickets; board staff
-├── TranscriptView.tsx, transcript.ts, meetings.ts, goldTickets.ts
-│                            # V2 transcript code and CB3 demo data. Not imported by the app.
+├── features/transcript/     # transcript_matching (V2)
+│   ├── types.ts             # MeetingInfo, Suggestion
+│   ├── api.ts               # meetings, one transcript, pending suggestions, run matching, approve, reject
+│   ├── TranscriptPanel.tsx  # the Transcript tab; lazy-loaded
+│   └── SuggestionCard.tsx   # one suggestion: evidence, current and proposed fields, approve / edit / reject
+├── TranscriptView.tsx       # transcript with evidence highlights and drag-to-edit (loaded by TranscriptPanel)
+├── transcript.ts            # paragraphs and spans; re-exports supabase/functions/_shared/transcript.ts
+├── meetings.ts, goldTickets.ts
+│                            # CB3 demo transcripts and gold tickets. Only scripts/make_supabase_seed.mjs imports them.
 └── index.css                # Tailwind v4 and all styles; ticket type colors by css_class
 ```
 
@@ -135,7 +150,7 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 `src/lib/analytics.ts` loads Better Stack's JS tag only when `VITE_BETTERSTACK_TOKEN` is set (production only on Netlify). It is never loaded on the share page or on any address with a query string or hash: the tag adds the real address to every event it sends (session start, page hidden, memory) and cannot be told not to, and those addresses carry share and auth tokens. It sends:
 
 - Screen views (`page-load`, then `page-change`): `/`, `/tickets`, `/sign-in`. Automatic page views are off; the app sends these itself with a cleaned address. Each view of a board's screen carries `board_id`, so views are attributed to the board shown even after a platform admin switches boards.
-- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`.
+- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`, and for transcript matching `transcript_opened`, `matching_run` (counts of updates and new suggestions), `suggestion_approved` and `suggestion_rejected` (kind, and whether staff edited it).
 - On every view and event, once known: `board_id` and `role` (set by `setAnalyticsUser` and cleared on the sign-in screen; Better Stack's own `user` call is not used, because it attaches ids and emails).
 - Web vitals and frontend errors. Errors go through the Sentry SDK inside the tag; `beforeSend` and `beforeBreadcrumb` clean URLs, drop cookies and headers, and drop click and console breadcrumbs.
 

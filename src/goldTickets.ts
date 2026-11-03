@@ -135,17 +135,3 @@ for (const { ticket, issue } of meetingTickets) {
   newer.evidence = { ...ticket.evidence, ...newer.evidence };
 }
 export const initialTickets: Ticket[] = merged.map((ticket, index) => ({ ...ticket, number: String(index + 1) }));
-
-/** ["P15", "P17", "P18", "P19"] -> "P15, P17–P19" */
-export function formatEvidence(evidence: string[]): string {
-  const nums = [...new Set(evidence.map((id) => Number(id.slice(1))))].sort((a, b) => a - b);
-  const parts: string[] = [];
-  for (let i = 0; i < nums.length; i++) {
-    let j = i;
-    while (j + 1 < nums.length && nums[j + 1] === nums[j] + 1) j++;
-    parts.push(j > i ? `P${nums[i]}–P${nums[j]}` : `P${nums[i]}`);
-    i = j;
-  }
-  return parts.join(", ");
-}
-

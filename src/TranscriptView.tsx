@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { EvidenceSpan, Ticket } from "./features/tickets/types";
-import type { Meeting } from "./meetings";
+import type { TranscriptMeeting } from "./features/transcript/types";
 import { normalizeSpan, paragraphIndexAt, type Span } from "./transcript";
 
 type Drag = { ticketId: string; index: number; edge: "start" | "end" };
@@ -36,18 +36,28 @@ export default function TranscriptView({
   onSpanChange,
   jump,
   typeClass,
+  pendingIds,
+  actions,
+  aside,
 }: {
-  meetings: Meeting[];
+  /** Every meeting in the picker, newest first. Only the shown one needs its paragraphs. */
+  meetings: { id: string; title: string }[];
   /** Ticket type label to css_class, from useTypeClass(). */
   typeClass: (type: string) => string;
   /** The meeting whose transcript is shown. */
-  meeting: Meeting;
+  meeting: TranscriptMeeting;
   onMeetingChange: (meetingId: string) => void;
   tickets: Ticket[];
   hoveredId: string | null;
   onHover: (id: string | null) => void;
   onSpanChange: (ticketId: string, index: number, span: EvidenceSpan) => void;
   jump: { id: string | null; n: number };
+  /** Ids in `tickets` that stand for pending AI suggestions: drawn dashed, with no drag handles. */
+  pendingIds?: Set<string>;
+  /** Buttons for the heading, next to the paragraph count. */
+  actions?: ReactNode;
+  /** Shown between the heading and the transcript, e.g. the suggestions to review. */
+  aside?: ReactNode;
 }) {
   const { paragraphs } = meeting;
   const tickets = allTickets.filter((ticket) => ticket.meetingIds.includes(meeting.id));
@@ -142,10 +152,14 @@ export default function TranscriptView({
             </select>
             <button type="button" aria-label="Older meeting" title="Older meeting" disabled={position >= meetings.length - 1} onClick={() => onMeetingChange(meetings[position + 1].id)}><ChevronRight size={16} /></button>
           </div>
-          <p>Meeting {position + 1} of {meetings.length} · {tickets.length} tickets · hover a highlight and drag its ends to edit</p>
+          <p>Meeting {position + 1} of {meetings.length} · {tickets.filter((ticket) => !pendingIds?.has(ticket.id)).length} tickets · hover a highlight and drag its ends to edit</p>
         </div>
-        <span>{paragraphs.length} paragraphs</span>
+        <div className="transcript-actions">
+          {actions}
+          <span>{paragraphs.length} paragraphs</span>
+        </div>
       </header>
+      {aside}
       <ol className="transcript-body" ref={bodyRef} onMouseLeave={() => hover(null)}>
         {paragraphs.map((paragraph) => {
           const inside = placed.filter(({ span }) => span.start < paragraph.end && span.end > paragraph.start);
@@ -165,12 +179,12 @@ export default function TranscriptView({
               const owner = covering.find(({ ticket }) => ticket.id === activeId) ?? covering[0];
               // Handles live inside the mark, pinned to its first and last character, so they
               // can never wrap onto a different line than the text they bound.
-              const ends = covering.filter(({ ticket }) => ticket.id === activeId);
+              const ends = covering.filter(({ ticket }) => ticket.id === activeId && !pendingIds?.has(ticket.id));
               pieces.push(
                 <mark
                   key={a}
                   data-start={a}
-                  className={`hl ${typeClass(owner.ticket.type)} ${owner.ticket.id === activeId ? "active" : ""}`}
+                  className={`hl ${typeClass(owner.ticket.type)} ${owner.ticket.id === activeId ? "active" : ""} ${pendingIds?.has(owner.ticket.id) ? "pending" : ""}`}
                   title={covering.map(({ ticket }) => `${ticket.number} · ${ticket.title}`).join("\n")}
                   onMouseEnter={() => hover(owner.ticket.id)}
                 >
