@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ChevronDown, ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
+import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable from "./TicketTable";
@@ -8,7 +8,7 @@ import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTicket, insertTicket, loadBoardStaff, loadTickets, updateTickets, type StaffMember } from "./features/tickets/api";
-import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
+import { BoardProvider, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 import ShareLink from "./ShareLink";
@@ -44,57 +44,24 @@ function Logo() {
 
 type View = "home" | "tickets";
 
-const roleLabel: Record<Role, string> = { platform_admin: "Platform admin", staff: "Staff" };
+/** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
+type Account = { name: string; email: string; avatarUrl: string | null };
 
-/** Right end of the nav: share link, a board switcher when the user has more than one board, their role, and sign-out. */
-function AccountControls() {
-  const { id, role } = useBoard();
-  const { boards, switchBoard } = useBoardSwitcher();
-  const [sharing, setSharing] = useState(false);
-  const closeShare = useCallback(() => setSharing(false), []);
+/** Up to two initials for the avatar when there is no photo. */
+const initials = (name: string) => name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join("");
+
+function Avatar({ account, size }: { account: Account; size: number }) {
+  // A photo that fails to load falls back to initials.
+  const [failed, setFailed] = useState(false);
   return (
-    <div className="nav-account">
-      <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
-      {sharing && <ShareLink onClose={closeShare} />}
-      {boards.length > 1 && (
-        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
-          {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
-        </select>
-      )}
-      {role && <span className={`role-badge ${role}`}>{roleLabel[role]}</span>}
-      <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
-    </div>
+    <span className="avatar" style={{ width: size, height: size, fontSize: size * 0.4 }} aria-hidden="true">
+      {account.avatarUrl && !failed ? <img src={account.avatarUrl} alt="" onError={() => setFailed(true)} /> : initials(account.name)}
+    </span>
   );
 }
 
-function PortalHeader({ view, setView }: { view: View; setView: (view: View) => void }) {
-  const mapOn = useFeature("district_map");
-  return (
-    <>
-      <header className="portal-header">
-        <div className="brand-block">
-          <Logo />
-        </div>
-      </header>
-      <nav className="portal-nav">
-        <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
-        <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
-        <AccountControls />
-      </nav>
-      {view === "tickets" && (
-        <div className="title-band">
-          <div>
-            <h1>Tickets</h1>
-            <span>{mapOn ? "Review and update tickets, and see where they are on the map" : "Review and update tickets"}</span>
-          </div>
-        </div>
-      )}
-    </>
-  );
-}
-
-/** The signed-in person's name on the home banner, with a menu holding sign-out. */
-function HeroAccount({ userName }: { userName: string }) {
+/** The avatar at the right end of the nav. Clicking it opens a menu with the account and sign-out. */
+function AccountMenu({ account }: { account: Account }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -109,22 +76,73 @@ function HeroAccount({ userName }: { userName: string }) {
     };
   }, [open]);
   return (
-    <div className="hero-account" ref={ref}>
-      <button type="button" className="hero-account-button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
-        <span>{userName}</span>
-        <ChevronDown size={18} strokeWidth={3} />
+    <div className="nav-profile" ref={ref}>
+      <button type="button" className="nav-profile-button" aria-label={`Account: ${account.name}`} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        <Avatar account={account} size={30} />
       </button>
       {open && (
-        <div className="hero-account-menu" role="menu">
-          <button type="button" role="menuitem" onClick={() => void db.auth.signOut()}>Sign out</button>
+        <div className="account-menu" role="menu">
+          <div className="account-menu-who">
+            <Avatar account={account} size={56} />
+            <div>
+              <strong>{account.name}</strong>
+              {account.name !== account.email && <span>{account.email}</span>}
+            </div>
+          </div>
+          <button type="button" role="menuitem" onClick={() => void db.auth.signOut()}><LogOut size={18} /> Sign out</button>
         </div>
       )}
     </div>
   );
 }
 
-function HomeView({ userName, onShowMap, onLookUp, onNewTicket }: {
-  userName: string;
+/** Right end of the nav: share link, a board switcher when the user has more than one board, and the account menu. */
+function AccountControls({ account }: { account: Account }) {
+  const { id } = useBoard();
+  const { boards, switchBoard } = useBoardSwitcher();
+  const [sharing, setSharing] = useState(false);
+  const closeShare = useCallback(() => setSharing(false), []);
+  return (
+    <div className="nav-account">
+      <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
+      {sharing && <ShareLink onClose={closeShare} />}
+      {boards.length > 1 && (
+        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
+          {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
+        </select>
+      )}
+      <AccountMenu account={account} />
+    </div>
+  );
+}
+
+function PortalHeader({ view, setView, account }: { view: View; setView: (view: View) => void; account: Account }) {
+  const mapOn = useFeature("district_map");
+  return (
+    <>
+      <header className="portal-header">
+        <div className="brand-block">
+          <Logo />
+        </div>
+      </header>
+      <nav className="portal-nav">
+        <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
+        <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
+        <AccountControls account={account} />
+      </nav>
+      {view === "tickets" && (
+        <div className="title-band">
+          <div>
+            <h1>Tickets</h1>
+            <span>{mapOn ? "Review and update tickets, and see where they are on the map" : "Review and update tickets"}</span>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function HomeView({ onShowMap, onLookUp, onNewTicket }: {
   onShowMap: () => void;
   onLookUp: () => void;
   onNewTicket: () => void;
@@ -152,16 +170,13 @@ function HomeView({ userName, onShowMap, onLookUp, onNewTicket }: {
               <h1>hey 👋,<br />how can we<br />help you?</h1>
             </div>
           </div>
-          <div className="hero-side">
-            <HeroAccount userName={userName} />
-            <div className="hero-actions">
-              {actions.map(({ label, icon: Icon, onClick }) => (
-                <button key={label} onClick={onClick}>
-                  <span>{label}</span>
-                  <Icon size={20} />
-                </button>
-              ))}
-            </div>
+          <div className="hero-actions">
+            {actions.map(({ label, icon: Icon, onClick }) => (
+              <button key={label} onClick={onClick}>
+                <span>{label}</span>
+                <Icon size={20} />
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -260,17 +275,22 @@ export default function App() {
   if (shareToken) return <PublicBoard token={shareToken} />;
   if (session === undefined) return null;
   if (!session) return <SignIn />;
-  // The name comes from auth user metadata (supabase/scripts/set_staff_names.sql); accounts without one show their email.
-  const userName = (session.user.user_metadata?.full_name as string | undefined) || session.user.email || "Account";
+  // Accounts without a full_name show their email; without an avatar_url, their initials.
+  const email = session.user.email ?? "";
+  const account: Account = {
+    name: (session.user.user_metadata?.full_name as string | undefined) || email || "Account",
+    email,
+    avatarUrl: (session.user.user_metadata?.avatar_url as string | undefined) || null,
+  };
   // Keyed by user so signing in as someone else starts from a clean portal, not the last user's state.
   return (
     <BoardProvider key={session.user.id} userId={session.user.id}>
-      <Portal userName={userName} />
+      <Portal account={account} />
     </BoardProvider>
   );
 }
 
-function Portal({ userName }: { userName: string }) {
+function Portal({ account }: { account: Account }) {
   const board = useBoard();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -411,9 +431,8 @@ function Portal({ userName }: { userName: string }) {
   if (view === "home") {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} />
+        <PortalHeader view={view} setView={setView} account={account} />
         <HomeView
-          userName={userName}
           onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
           onLookUp={() => setView("tickets")}
           onNewTicket={() => { setView("tickets"); setIntakeOpen(true); }}
@@ -427,7 +446,7 @@ function Portal({ userName }: { userName: string }) {
   if (sync === "loading" || (sync === "error" && !tickets.length)) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} />
+        <PortalHeader view={view} setView={setView} account={account} />
         <main className="workspace-message">
           {sync === "loading" && "Loading tickets…"}
           {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
@@ -439,7 +458,7 @@ function Portal({ userName }: { userName: string }) {
 
   return (
     <div className="portal">
-      <PortalHeader view={view} setView={setView} />
+      <PortalHeader view={view} setView={setView} account={account} />
       <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
