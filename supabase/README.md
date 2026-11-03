@@ -67,6 +67,7 @@ Re-running the baseline would re-create the demo policies and reopen anonymous a
 | `add_platform_admin.sql` | Makes an existing account a platform admin. Set the email, run. |
 | `create_board_test_staff.sql` | One plus-addressed staff account per board (`you+<board id>@domain`) for testing what each board's staff see. Writes to `auth.users` directly; never commit the password you set. |
 | `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering and feature flags. Always rolls back; results are in the error message. |
+| `create_staging_board.sql` | Creates or refreshes the `staging` board: a copy of `m-cb-3`'s boundary and ticket types with every feature flag on, for trying V2 and V3 features. No share link, no staff. |
 
 Common one-liners (staff, flags, logos, ticket types) are in the root [`README.md`](../README.md#as-a-platform-admin-supabase-sql-editor).
 
