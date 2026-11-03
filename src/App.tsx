@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
+import { ChevronDown, ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, today, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable from "./TicketTable";
@@ -98,7 +98,7 @@ function AccountMenu({ account }: { account: Account }) {
 
 /** Right end of the nav: share link, a board switcher when the user has more than one board, and the account menu. */
 function AccountControls({ account }: { account: Account }) {
-  const { id } = useBoard();
+  const { id, name } = useBoard();
   const { boards, switchBoard } = useBoardSwitcher();
   const [sharing, setSharing] = useState(false);
   const closeShare = useCallback(() => setSharing(false), []);
@@ -107,9 +107,14 @@ function AccountControls({ account }: { account: Account }) {
       <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
       {sharing && <ShareLink onClose={closeShare} />}
       {boards.length > 1 && (
-        <select className="board-switcher" aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
-          {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
-        </select>
+        // A native select is as wide as its longest option; the hidden copy of the current name sizes it to that name instead.
+        <div className="board-switcher">
+          <span className="board-switcher-sizer" aria-hidden="true">{name}</span>
+          <select aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
+            {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
+          </select>
+          <ChevronDown className="board-switcher-chevron" size={14} aria-hidden="true" />
+        </div>
       )}
       <AccountMenu account={account} />
     </div>
