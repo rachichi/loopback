@@ -7,7 +7,6 @@ import { db } from "./db";
 import { StaticBoardProvider, useBoard, useFeature, useTypeClass, type Board } from "./lib/board";
 import { statusClass, type Status, type Ticket } from "./features/tickets/types";
 import { featureFlags } from "./lib/features";
-import { setAnalyticsUser, trackPage } from "./lib/analytics";
 import MapView from "./MapView";
 
 type PublicBoardRow = {
@@ -131,12 +130,6 @@ export default function PublicBoard({ token }: { token: string }) {
 
 function PublicView({ tickets }: { tickets: Ticket[] }) {
   const typeClass = useTypeClass();
-  const { id: boardId } = useBoard();
-  // The token never reaches analytics: the page is reported as /share/:token.
-  useEffect(() => {
-    setAnalyticsUser({ board_id: boardId, role: "public" });
-    trackPage("/share/:token", "Public board", boardId);
-  }, [boardId]);
   const mapOn = useFeature("district_map");
   const [selectedId, setSelectedId] = useState("");
   const [hoveredId, setHoveredId] = useState<string | null>(null);
