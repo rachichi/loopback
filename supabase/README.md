@@ -66,6 +66,7 @@ Re-running the baseline would re-create the demo policies and reopen anonymous a
 | --- | --- |
 | `add_platform_admin.sql` | Makes an existing account a platform admin. Set the email, run. |
 | `create_board_test_staff.sql` | One plus-addressed staff account per board (`you+<board id>@domain`) for testing what each board's staff see. Writes to `auth.users` directly; never commit the password you set. |
+| `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering and feature flags. Always rolls back; results are in the error message. |
 
 Common one-liners (staff, flags, logos, ticket types) are in the root [`README.md`](../README.md#as-a-platform-admin-supabase-sql-editor).
 
