@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
+import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable from "./TicketTable";
@@ -8,7 +8,7 @@ import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTicket, insertTicket, loadBoardStaff, loadTickets, updateTickets, type StaffMember } from "./features/tickets/api";
-import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
+import { BoardProvider, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 import ShareLink from "./ShareLink";
@@ -44,11 +44,61 @@ function Logo() {
 
 type View = "home" | "tickets";
 
-const roleLabel: Record<Role, string> = { platform_admin: "Platform admin", staff: "Staff" };
+/** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
+type Account = { name: string; email: string; avatarUrl: string | null };
 
-/** Right end of the nav: share link, a board switcher when the user has more than one board, their role, and sign-out. */
-function AccountControls() {
-  const { id, role } = useBoard();
+/** Up to two initials for the avatar when there is no photo. */
+const initials = (name: string) => name.split(/[\s@.]+/).filter(Boolean).slice(0, 2).map((part) => part[0].toUpperCase()).join("");
+
+function Avatar({ account, size }: { account: Account; size: number }) {
+  // A photo that fails to load falls back to initials.
+  const [failed, setFailed] = useState(false);
+  return (
+    <span className="avatar" style={{ width: size, height: size, fontSize: size * 0.4 }} aria-hidden="true">
+      {account.avatarUrl && !failed ? <img src={account.avatarUrl} alt="" onError={() => setFailed(true)} /> : initials(account.name)}
+    </span>
+  );
+}
+
+/** The avatar at the right end of the nav. Clicking it opens a menu with the account and sign-out. */
+function AccountMenu({ account }: { account: Account }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onPointer = (event: MouseEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+  return (
+    <div className="nav-profile" ref={ref}>
+      <button type="button" className="nav-profile-button" aria-label={`Account: ${account.name}`} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
+        <Avatar account={account} size={30} />
+      </button>
+      {open && (
+        <div className="account-menu" role="menu">
+          <div className="account-menu-who">
+            <Avatar account={account} size={56} />
+            <div>
+              <strong>{account.name}</strong>
+              {account.name !== account.email && <span>{account.email}</span>}
+            </div>
+          </div>
+          <button type="button" role="menuitem" onClick={() => void db.auth.signOut()}><LogOut size={18} /> Sign out</button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** Right end of the nav: share link, a board switcher when the user has more than one board, and the account menu. */
+function AccountControls({ account }: { account: Account }) {
+  const { id } = useBoard();
   const { boards, switchBoard } = useBoardSwitcher();
   const [sharing, setSharing] = useState(false);
   const closeShare = useCallback(() => setSharing(false), []);
@@ -61,30 +111,24 @@ function AccountControls() {
           {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
         </select>
       )}
-      {role && <span className={`role-badge ${role}`}>{roleLabel[role]}</span>}
-      <button type="button" className="nav-signout" onClick={() => void db.auth.signOut()}><LogOut size={15} /> Sign out</button>
+      <AccountMenu account={account} />
     </div>
   );
 }
 
-function PortalHeader({ view, setView }: { view: View; setView: (view: View) => void }) {
+function PortalHeader({ view, setView, account }: { view: View; setView: (view: View) => void; account: Account }) {
   const mapOn = useFeature("district_map");
-  const [showNotice, setShowNotice] = useState(true);
   return (
     <>
-      <header className={`portal-header ${showNotice ? "notice-header" : ""}`}>
-        <div className="brand-block notice-brand">
+      <header className="portal-header">
+        <div className="brand-block">
           <Logo />
-          {showNotice && <div className="construction-notice" role="status">
-            <span>⚠️ This portal is under construction. Some features are still missing.</span>
-            <button type="button" aria-label="Dismiss construction notice" onClick={() => setShowNotice(false)}><X size={18} /></button>
-          </div>}
         </div>
       </header>
       <nav className="portal-nav">
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
-        <AccountControls />
+        <AccountControls account={account} />
       </nav>
       {view === "tickets" && (
         <div className="title-band">
@@ -98,8 +142,7 @@ function PortalHeader({ view, setView }: { view: View; setView: (view: View) => 
   );
 }
 
-function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
-  onSearch: (query: string) => void;
+function HomeView({ onShowMap, onLookUp, onNewTicket }: {
   onShowMap: () => void;
   onLookUp: () => void;
   onNewTicket: () => void;
@@ -107,7 +150,6 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
   const { name, backgroundUrl } = useBoard();
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
-  const [searchTerm, setSearchTerm] = useState("");
   const actions = [
     ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
@@ -127,10 +169,6 @@ function HomeView({ onSearch, onShowMap, onLookUp, onNewTicket }: {
               <p className="hero-board">{name}</p>
               <h1>hey 👋,<br />how can we<br />help you?</h1>
             </div>
-            <form className="hero-search" role="search" onSubmit={(event) => { event.preventDefault(); onSearch(searchTerm.trim()); }}>
-              <input aria-label="Search tickets" value={searchTerm} onChange={(event) => setSearchTerm(event.target.value)} placeholder="I want to..." />
-              <button aria-label="Search" type="submit"><Search size={24} strokeWidth={3} /></button>
-            </form>
           </div>
           <div className="hero-actions">
             {actions.map(({ label, icon: Icon, onClick }) => (
@@ -237,15 +275,22 @@ export default function App() {
   if (shareToken) return <PublicBoard token={shareToken} />;
   if (session === undefined) return null;
   if (!session) return <SignIn />;
+  // Accounts without a full_name show their email; without an avatar_url, their initials.
+  const email = session.user.email ?? "";
+  const account: Account = {
+    name: (session.user.user_metadata?.full_name as string | undefined) || email || "Account",
+    email,
+    avatarUrl: (session.user.user_metadata?.avatar_url as string | undefined) || null,
+  };
   // Keyed by user so signing in as someone else starts from a clean portal, not the last user's state.
   return (
     <BoardProvider key={session.user.id} userId={session.user.id}>
-      <Portal />
+      <Portal account={account} />
     </BoardProvider>
   );
 }
 
-function Portal() {
+function Portal({ account }: { account: Account }) {
   const board = useBoard();
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [selectedId, setSelectedId] = useState("");
@@ -386,9 +431,8 @@ function Portal() {
   if (view === "home") {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} />
+        <PortalHeader view={view} setView={setView} account={account} />
         <HomeView
-          onSearch={(value) => { setQuery(value); setStatus("All"); setUrgency("all"); setView("tickets"); }}
           onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
           onLookUp={() => setView("tickets")}
           onNewTicket={() => { setView("tickets"); setIntakeOpen(true); }}
@@ -402,7 +446,7 @@ function Portal() {
   if (sync === "loading" || (sync === "error" && !tickets.length)) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} />
+        <PortalHeader view={view} setView={setView} account={account} />
         <main className="workspace-message">
           {sync === "loading" && "Loading tickets…"}
           {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
@@ -414,7 +458,7 @@ function Portal() {
 
   return (
     <div className="portal">
-      <PortalHeader view={view} setView={setView} />
+      <PortalHeader view={view} setView={setView} account={account} />
       <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
