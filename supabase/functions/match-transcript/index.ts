@@ -83,6 +83,9 @@ Deno.serve(async (req) => {
     global: { headers: { Authorization: authorization } },
     auth: { persistSession: false, autoRefreshToken: false },
   });
+  // The public anon key is a valid JWT too, so check for a signed-in user before touching any table.
+  const { data: caller } = await asUser.auth.getUser(authorization.slice("Bearer ".length));
+  if (!caller.user) return json(401, { error: "Sign in first." });
 
   const { data: meeting, error: meetingError } = await asUser
     .from("meetings")
