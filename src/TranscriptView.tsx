@@ -54,7 +54,7 @@ export default function TranscriptView({
   jump: { id: string | null; n: number };
   /** Ids in `tickets` that stand for pending AI suggestions: drawn dashed, with no drag handles. */
   pendingIds?: Set<string>;
-  /** A button next to the meeting picker. */
+  /** A button at the end of the meeting picker's line. */
   pickerAction?: ReactNode;
   /** Shown between the heading and the transcript, e.g. the suggestions to review. */
   aside?: ReactNode;
@@ -155,7 +155,6 @@ export default function TranscriptView({
           </div>
           <p>Meeting {position + 1} of {meetings.length} · {tickets.filter((ticket) => !pendingIds?.has(ticket.id)).length} tickets · hover a highlight and drag its ends to edit</p>
         </div>
-        <span>{paragraphs.length} paragraphs</span>
       </header>
       {aside}
       <ol className="transcript-body" ref={bodyRef} onMouseLeave={() => hover(null)}>

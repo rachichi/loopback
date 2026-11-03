@@ -86,7 +86,7 @@ The prompt ships with the function as `match-transcript/prompt.ts`, generated fr
 
 In the app, with the flag on:
 
-- **Auto Match & Generate Tickets**, next to the meeting picker in the Transcript tab (right panel, next to Map), runs `match-transcript` on the shown meeting. Running it again replaces that meeting's suggestions still waiting for review. Afterwards the table switches to the Review tab.
+- **Generate**, at the end of the meeting title line in the Transcript tab (right panel, next to Map), runs `match-transcript` on the shown meeting. Running it again replaces that meeting's suggestions still waiting for review. Afterwards the table switches to the Review tab.
 - **Review tab**, after All, Urgent and Non-urgent. Each pending suggestion is a greyed-out, read-only row. An update shows in place of its ticket with the proposed values; a new ticket shows at the top, marked New. Changed fields are underlined, and hovering one shows the value before. A row waiting for review also counts under Urgent or Non-urgent. **Reviewed** applies it (`apply_ticket_suggestion`) and the row becomes a normal, editable ticket. **Reject** dismisses it. Staff edit a suggestion by accepting it and then editing the ticket.
 - **Transcript column**: one tag per meeting in `meeting_ids`. Clicking a tag opens that transcript, scrolled to the ticket's highlights. On a review row, the meeting the suggestion came from is tinted purple.
 - **Transcript tab**: a pending suggestion's paragraphs are underlined, and hovering its row lights them up (they share the row's id, `review-<suggestion id>`). Approved highlights are shaded in the ticket type's colour and can be dragged to tighten them.
@@ -137,7 +137,7 @@ src/
 │   ├── types.ts             # MeetingInfo, Suggestion
 │   ├── api.ts               # meetings, one transcript, pending suggestions, run matching, approve, reject
 │   ├── review.ts            # pending suggestions as greyed-out Review rows (main bundle)
-│   └── TranscriptPanel.tsx  # the Transcript tab and Auto Match & Generate Tickets; lazy-loaded
+│   └── TranscriptPanel.tsx  # the Transcript tab and the Generate button; lazy-loaded
 ├── TranscriptView.tsx       # transcript with evidence highlights and drag-to-edit (loaded by TranscriptPanel)
 ├── transcript.ts            # paragraphs and spans; re-exports supabase/functions/_shared/transcript.ts
 ├── meetings.ts, goldTickets.ts

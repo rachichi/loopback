@@ -1,7 +1,7 @@
 // The Transcript tab of the right panel (transcript_matching). Loaded with React.lazy, so this file,
 // TranscriptView and the paragraph code stay out of the main bundle for boards without the flag.
 //
-// "Auto Match & Generate Tickets" runs match-transcript on the shown meeting. Its suggestions are reviewed
+// Generate runs match-transcript on the shown meeting. Its suggestions are reviewed
 // in the ticket table's Review tab; here they are underlined in the transcript, with the same ids as their
 // table rows, so hovering either one lights up the other.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -109,15 +109,26 @@ export default function TranscriptPanel({
     }
   };
 
+  // The sparkle takes the same teal-to-blue-to-purple gradient as the label (.generate in index.css).
   const button = canEdit && (
     <button
       type="button"
-      className="auto-match"
+      className="generate"
       disabled={matching}
       onClick={run}
-      title={info.matchedAt ? `Last run ${new Date(info.matchedAt).toLocaleString()}. Running again replaces the suggestions still in Review.` : "Match this transcript to the board's open tickets and draft tickets for anything new"}
+      title={`Match this transcript to the board's open tickets and draft tickets for anything new. Results go to the Review tab.${info.matchedAt ? ` Last run ${new Date(info.matchedAt).toLocaleString()}; running again replaces the suggestions still in Review.` : ""}`}
     >
-      <Sparkles size={13} /> {matching ? "Matching… about 30 seconds" : "Auto Match & Generate Tickets"}
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
+        <defs>
+          <linearGradient id="generate-ombre" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#3fd8b4" />
+            <stop offset=".55" stopColor="#2bb7d5" />
+            <stop offset="1" stopColor="#8a63b5" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <Sparkles size={15} color="url(#generate-ombre)" />
+      <span>{matching ? "Generating…" : "Generate"}</span>
     </button>
   );
 

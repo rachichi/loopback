@@ -386,13 +386,14 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 .review-actions button:disabled { opacity: .5; cursor: progress; }
 .tab-count { min-width: 16px; padding: 1px 5px; border-radius: 999px; background: #8a63b5; color: white; font-size: 8px; }
 .transcript-empty { padding: 32px 18px; color: #7d858f; font-size: 11px; text-align: center; background: white; flex: 1; }
-/* The heading's left side takes the room it needs and the button wraps under the picker when the panel is narrow. */
+/* The meeting title and Generate share one line: the title shortens with an ellipsis, the button keeps its size. */
 .transcript-heading > div:first-child { min-width: 0; flex: 1 1 auto; }
-.meeting-picker { flex-wrap: wrap; row-gap: 6px; }
-.meeting-picker select { flex: 0 1 auto; }
-.meeting-picker button.auto-match { width: auto; height: 28px; margin-left: 6px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border-radius: 4px; background: #11182c; color: white; font-size: 10px; font-weight: 600; white-space: nowrap; }
-.meeting-picker button.auto-match:hover:not(:disabled) { background: #2c3742; color: white; }
-.meeting-picker button.auto-match:disabled { opacity: .7; color: white; cursor: progress; }
+.meeting-picker { min-width: 0; }
+.meeting-picker select { min-width: 0; flex: 0 1 auto; }
+.meeting-picker button.generate { width: auto; height: 32px; margin-left: auto; padding: 0 16px 0 13px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #eef1f4; border-radius: 999px; background: #fbfcfd; box-shadow: 0 2px 8px rgba(17, 24, 44, .08), inset 0 1px 0 white; font-size: 13px; font-weight: 600; cursor: pointer; transition: box-shadow .15s, transform .15s; }
+.meeting-picker button.generate span { background: linear-gradient(90deg, #3fd8b4, #2bb7d5 45%, #8a63b5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.meeting-picker button.generate:hover:not(:disabled) { background: white; box-shadow: 0 4px 14px rgba(43, 183, 213, .22), inset 0 1px 0 white; transform: translateY(-1px); }
+.meeting-picker button.generate:disabled { opacity: .65; cursor: progress; }
 .match-status { padding: 7px 18px; border-bottom: 1px solid #e3e6ea; background: #fafbfc; color: #4c5561; font-size: 9px; }
 .match-status .match-error { color: #b3263e; }
 /* A pending suggestion's paragraphs: underlined in the type color until staff review it. */
