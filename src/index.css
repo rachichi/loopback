@@ -95,7 +95,12 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .portal-nav .nav-account > :last-child { border-right: 1px solid var(--nav-rule); }
 .nav-share { display: flex; align-items: center; gap: 7px; padding: 0 16px; border: 0; background: #fff; color: #111; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 .nav-share:hover { background: #111; color: #fff; }
-.nav-account .board-switcher { min-width: 0; max-width: 240px; padding: 0 10px; border-top: 0; border-bottom: 0; border-right: 0; border-radius: 0; background: #fff; font-size: 13px; font-weight: 600; cursor: pointer; }
+/* The hidden name sets the width; the select sits on top of it, so its longest option doesn't widen the cell. */
+.nav-account .board-switcher { position: relative; min-width: 0; display: flex; align-items: center; background: #fff; font-size: 13px; font-weight: 600; }
+.board-switcher-sizer, .board-switcher select { padding: 0 34px 0 14px; white-space: nowrap; }
+.board-switcher-sizer { overflow: hidden; visibility: hidden; }
+.board-switcher select { position: absolute; inset: 0; width: 100%; border: 0; border-radius: 0; background: transparent; appearance: none; text-overflow: ellipsis; cursor: pointer; }
+.board-switcher-chevron { position: absolute; right: 12px; pointer-events: none; }
 .nav-profile { position: relative; display: flex; }
 .nav-profile-button { display: grid; place-items: center; padding: 0 12px; border: 0; background: #fff; cursor: pointer; }
 .nav-profile-button:hover, .nav-profile-button[aria-expanded="true"] { background: #111; }
