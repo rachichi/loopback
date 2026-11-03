@@ -143,13 +143,13 @@ The SQL for all of this is written and mostly applied. Use these files as migrat
 | `20261102120100_boards_seed.sql` | Applied | Yes |
 | `20261102120150_feature_flags.sql` | Applied | Yes |
 | `20261102120200_tenant_policies_and_numbering.sql` | Applied | Yes, additive. The demo policies stay. |
-| `20261102120300_drop_demo_policies.sql` | **Not applied.** Run after the new client is deployed and a staff user can sign in. | No, removes anonymous access |
+| `20261102120300_drop_demo_policies.sql` | Applied in the SQL editor, so not in the migration history | No, removes anonymous access |
 
 These were applied with the Supabase MCP tool, which stamps its own version numbers, so the CLI's migration list will not match the filenames. See `supabase/README.md`.
 
 3a was tested inside a transaction that always rolled back (nothing persisted): a `b-cb-9` user saw 5 of the 29 tickets and none from `m-cb-3`; a cross-board insert was denied; a cross-board update changed 0 rows; moving a ticket to another board was denied; a new ticket sent with `number: 0` got number 6; `closed_at` was set on close; a staff user could not delete; effective flags resolved to the defaults. Production was checked afterwards: still 29 tickets, `next_ticket_no` still 6 and 25.
 
-Production held 29 tickets (24 `m-cb-3`, 5 `b-cb-9`). Until 3b is applied, the demo policies still let anyone with the anon key read and write all 29.
+Production held 29 tickets (24 `m-cb-3`, 5 `b-cb-9`). 3b is applied, so the anon key no longer reads or writes any ticket.
 
 Data moves already done by migration 2: `m-cb-3` and `b-cb-9` exist in `boards`, `m-cb-3` has its boundary (from `src/data/cb3-boundary.geojson`), and both have the 8 ticket types with definitions. Remaining: boundaries for `b-cb-9` and the other 57 boards via `scripts/seed_boards.mjs` (section 9, step 4). Statuses stay global (`Open`, `In Progress`, `Closed`).
 
@@ -194,7 +194,7 @@ Roles (decided 2026-11-02, migrations `20261102140000_roles.sql` and `2026110216
 
 Public share links. Each board has a random `boards.share_token` (24 characters). `anon` still has no access to any table: the share page calls two `security definer` functions, `public_board(token)` and `public_board_tickets(token)`, which return only number, title, type, status, urgent, deadline, location text and places, and submitted date. Requester, summary, `submitted_by`, meeting ids, spans, `created_by` and `owner_id` are never returned. Staff and platform admins replace a board's link with `rotate_share_token(b)`, which stops every copy of the old link.
 
-Acceptance test (write it as a SQL script or a Vitest integration test against the staging project): a user in `b-cb-9` cannot select, insert, update or delete a ticket with `board = 'm-cb-3'`, including by changing `board` in an update.
+Acceptance test: a user in `b-cb-9` cannot select, insert, update or delete a ticket with `board = 'm-cb-3'`, including by changing `board` in an update. This is `supabase/scripts/check_tenant_isolation.sql`, which also checks ticket numbering and feature flag resolution and rolls everything back. It passed in production on 2026-11-02, after 3b: each test user saw only their own board (5 and 24 tickets), a new `b-cb-9` ticket got number 8 (the next `next_ticket_no`; numbers are not reused after a delete), all four cross-board writes were denied or changed 0 rows, a `b-cb-9` override turned `district_map` off for that board only, and the default turned it off and on for all 59 boards. The anonymous `curl` against `/rest/v1/tickets` returned `[]`.
 
 ## 6. V1 product scope
 
