@@ -208,8 +208,9 @@ Acceptance test: a user in `b-cb-9` cannot select, insert, update or delete a ti
 
 ### 6.2 Critical columns (answers the open question on the sketch)
 
-Table columns, in order: `#`, Title, Type, Status, Urgent, Deadline, Location, Requester, Owner, Summary, Source, Submitted (date + by).
-Hidden by default, available in a detail panel: `created_by`, `closed_at`, `meeting_ids`, evidence spans.
+Table columns, in order: `#`, Title, Type, Status, Urgent, Deadline, Location, Summary, Source. The checkbox column has no row position number; `#` is the ticket's number.
+Stored but not shown in the table: `requester`, `owner_id`, `submitted_by`, `submitted_at`, `created_by`, `closed_at`, `meeting_ids`, evidence spans.
+The intake form does not ask for requester, submitted by or the date. `submitted_at` is the local date the ticket is logged, and for a manual ticket the `tickets_submitted_by` trigger sets `submitted_by` to the signed-in user's email.
 
 ### 6.3 Metrics (answers the open question on the sketch)
 

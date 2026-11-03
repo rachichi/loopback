@@ -207,10 +207,6 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .ticket-row.hovered { background: rgb(var(--hl) / .18); box-shadow: inset 3px 0 rgb(var(--hl)); }
 .check-cell { justify-content: center; }
 .check-cell input { width: 12px; height: 12px; accent-color: #2bb7d5; }
-.row-number { color: #9aa1aa; font-size: 8px; font-variant-numeric: tabular-nums; }
-.ticket-row .check-cell input { display: none; }
-.ticket-row:hover .check-cell input, .ticket-row .check-cell:has(input:checked) input { display: block; }
-.ticket-row:hover .row-number, .ticket-row .check-cell:has(input:checked) .row-number { display: none; }
 .service-number { flex-direction: column; align-items: flex-start !important; justify-content: center; }
 .service-number span { padding-left: 4px; color: #167b94; font-weight: 700; font-variant-numeric: tabular-nums; }
 .ticket-title { flex-direction: column; align-items: flex-start !important; justify-content: center; color: #1a2234; font-weight: 500; line-height: 1.3; }
@@ -433,10 +429,8 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 /* district_map off: the tickets take the full width. */
 .workspace.no-map, .public-layout.no-map { grid-template-columns: minmax(0, 1fr); }
 
-/* Ticket table: number, owner, source and submitted cells (spec section 6.2). */
+/* Ticket table: number and source cells (spec section 6.2). */
 .number-cell { color: #4c5561; font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; padding-top: 10px; }
-.cell-owner { width: 100%; font-size: 10px; background: transparent; cursor: pointer; }
 .tag.source { padding: 3px 8px; font-size: 8px; font-weight: 600; background: #eef1f3; color: #4c5561; }
 .tag.source.transcript { background: #ece4f5; color: #5b3a7a; }
 .tag.source.email { background: #e1eef8; color: #1f5f91; }
-.submitted-cell { display: flex; flex-direction: column; gap: 2px; }

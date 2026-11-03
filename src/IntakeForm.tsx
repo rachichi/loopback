@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import LocationCell from "./LocationCell";
 import DictateButton, { canDictate } from "./DictateButton";
-import { statuses, today, type Status, type Ticket, type TicketLocation } from "./features/tickets/types";
+import { statuses, type Status, type Ticket, type TicketLocation } from "./features/tickets/types";
 import { useBoard } from "./lib/board";
 
-/** The fields a person fills in; the parent assigns the id and number. */
-export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans" | "evidence" | "ownerId" | "source" | "closedAt" | "createdBy">;
+/** The fields a person fills in. The parent sets the id and submission date; the database assigns the
+ *  number and sets submitted_by to the signed-in user. */
+export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans" | "evidence" | "ownerId" | "source" | "closedAt" | "createdBy" | "requester" | "submittedBy" | "submittedAt">;
 
 /** Dictated text is appended, so people can speak a field in several goes or fix a typed start. */
 const append = (current: string, text: string) => (current.trim() ? `${current.trimEnd()} ${text}` : text);
@@ -14,14 +15,11 @@ const append = (current: string, text: string) => (current.trim() ? `${current.t
 /** A structured intake form for a request that arrives outside a meeting (email, call, walk-in). */
 export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: IntakeFields) => void; onClose: () => void }) {
   const [title, setTitle] = useState("");
-  const [submittedBy, setSubmittedBy] = useState("");
-  const [submittedAt, setSubmittedAt] = useState(today);
   const { ticketTypes } = useBoard();
   const [type, setType] = useState("");
   const [urgent, setUrgent] = useState(false);
   const [deadline, setDeadline] = useState("");
   const [location, setLocation] = useState<TicketLocation>({ text: "", places: [] });
-  const [requester, setRequester] = useState("");
   const [summary, setSummary] = useState("");
   const [status, setStatus] = useState<Status>("Open");
   const titleRef = useRef<HTMLInputElement>(null);
@@ -37,14 +35,11 @@ export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: I
     event.preventDefault();
     onSubmit({
       title: title.trim(),
-      submittedBy: submittedBy.trim(),
-      submittedAt: submittedAt || today(),
       // Type is optional on intake; an untyped request is filed as Other until someone triages it.
       type: type || "Other",
       urgent,
       deadline,
       location: { ...location, text: location.places.map((place) => place.name).join("; ") },
-      requester: requester.trim(),
       summary: summary.trim(),
       status,
     });
@@ -64,17 +59,6 @@ export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: I
               <input ref={titleRef} required value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Broken streetlight on Avenue B" />
               <DictateButton label="Title" onText={(text) => setTitle((current) => append(current, text))} />
             </div>
-          </label>
-          <label>
-            <span>Submitted by <em>required</em></span>
-            <div className="dictate-field">
-              <input required value={submittedBy} onChange={(event) => setSubmittedBy(event.target.value)} placeholder="Your name" />
-              <DictateButton label="Submitted by" onText={(text) => setSubmittedBy((current) => append(current, text))} />
-            </div>
-          </label>
-          <label>
-            <span>Date submitted</span>
-            <input type="date" required value={submittedAt} onChange={(event) => setSubmittedAt(event.target.value)} />
           </label>
           <label>
             <span>Type</span>
@@ -101,13 +85,6 @@ export default function IntakeForm({ onSubmit, onClose }: { onSubmit: (fields: I
             <span>Map</span>
             <LocationCell location={location} label="the new request" onChange={setLocation} />
           </div>
-          <label className="wide">
-            <span>Requester</span>
-            <div className="dictate-field">
-              <input value={requester} onChange={(event) => setRequester(event.target.value)} placeholder="Who is asking (person or organization)" />
-              <DictateButton label="Requester" onText={(text) => setRequester((current) => append(current, text))} />
-            </div>
-          </label>
           <label className="wide">
             <span>Summary</span>
             <div className="dictate-field">

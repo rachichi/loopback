@@ -30,8 +30,8 @@ export async function insertTicket(ticket: Ticket, board: string): Promise<Ticke
 export async function updateTickets(tickets: Ticket[], board: string): Promise<void> {
   await Promise.all(
     tickets.map(async (ticket) => {
-      const { id: _id, board: _board, number: _number, ...fields } = toRow(ticket, board);
-      // source, closed_at and created_by are never sent: the database owns them.
+      const { id: _id, board: _board, number: _number, submitted_by: _by, submitted_at: _at, ...fields } = toRow(ticket, board);
+      // source, closed_at, created_by and the submission fields are never sent: they are fixed at insert.
       const { data, error } = await db.from("tickets").update({ ...fields, owner_id: ticket.ownerId }).eq("id", ticket.id).select("id");
       if (error) throw error;
       // RLS hides rows the user may not touch, which shows up as zero rows updated rather than an error.
@@ -46,18 +46,4 @@ export async function deleteTicket(id: string): Promise<void> {
   const { data, error } = await db.from("tickets").delete().eq("id", id).select("id");
   if (error) throw error;
   if (!data?.length) throw new Error(`Ticket ${id} was not deleted (missing, or you can't delete on this board).`);
-}
-
-/** Someone a ticket can be assigned to. `name` is null for accounts without a full_name in their metadata. */
-export type StaffMember = { userId: string; email: string; name: string | null };
-
-/** How a staff member is shown: their name, or their email when they have none. */
-export const staffLabel = (member: StaffMember) => member.name ?? member.email;
-
-/** The board's staff, for the Owner column. Reads board_staff_named(), which only answers the board's staff
- *  and platform admins. */
-export async function loadBoardStaff(board: string): Promise<StaffMember[]> {
-  const { data, error } = await db.rpc("board_staff_named", { b: board });
-  if (error) throw error;
-  return ((data ?? []) as { user_id: string; email: string; name: string | null }[]).map((row) => ({ userId: row.user_id, email: row.email, name: row.name }));
 }
