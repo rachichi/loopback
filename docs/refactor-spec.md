@@ -47,8 +47,9 @@ Read from the hand-drawn journey. Dot colors: purple = V1, blue = V2, green = V3
 | Ticket table | V1 | none | Exists. Critical columns and metrics defined in section 6. |
 | District map | V1 | `district_map` | Exists (`MapView.tsx`). Boundary becomes per board. |
 | Admin panel + features on/off | V2 | none | V1 ships the `boards.features` column and `useFeature()`. The admin UI is V2. |
-| Transcript matching (Block Party) | V2 | `transcript_matching` | `TranscriptView`, extraction, evidence spans. Dark in V1. |
-| Human approve / edit of every AI output | V2 | with `transcript_matching` | The sketch shows these nodes green. Placed in V2 because transcript matching creates AI drafts that need review. Confirm. |
+| Transcript matching (Block Party) | V2 | `transcript_matching` | In progress on the `staging` board (2026-11-03). Staff log tickets during the meeting; the transcript arrives about 24 hours later and `match-transcript` suggests updates to those tickets (evidence paragraphs, changed fields) and new tickets for issues staff missed. Transcripts are loaded by hand into `meetings` until the Block Party connection exists. See `docs/architecture.md`. |
+| Human approve / edit of every AI output | V2 | with `transcript_matching` | Confirmed V2 (2026-11-03): every suggestion is approved, edited then approved, or rejected by staff in the Transcript tab. Decisions are kept in `ticket_suggestions`. |
+| Meeting minutes | V3 | `meeting_minutes` | Requested 2026-11-03. Boards must post minutes within two weeks of a meeting. A "Generate meeting minutes" button on a processed transcript, prompted with the board's past minutes. Not built yet. |
 | Email intake | V3 | `email_intake` | |
 | Asset generation: social posts, resolutions, meeting minutes (docx/pdf) | V3 | `asset_generation` | |
 | Aggregate to borough presidents and mayors | V3 | `data_aggregation` | Cross-board. Conflicts with tenant isolation, see section 8. |
@@ -289,7 +290,7 @@ Resolved on 2026-11-02:
 
 Still open:
 1. Who toggles features: platform admins only (assumed) or board admins too.
-2. Approve/reject placement in V2 (assumed) versus V3.
+2. ~~Approve/reject placement in V2 (assumed) versus V3.~~ Resolved 2026-11-03: V2, with transcript matching.
 3. Supabase staging project: a second free project (assumed). Free projects are paused after about a week of low activity (Supabase docs give no exact threshold). The keep-alive Action is a workaround, not a guarantee. Upgrade production to a paid plan before real board staff depend on it.
 4. The user downloads the Community Districts GeoJSON from NYC Open Data (dataset `5crt-au7u`) and confirms the terms of use on the dataset's About page. The license text could not be read when this spec was written. Do not invent boundaries.
 

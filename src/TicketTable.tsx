@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { Calendar, CircleChevronDown, Hash, Inbox, MapPin, SquareCheck, Trash2, Type, type LucideIcon } from "lucide-react";
+import { Calendar, CircleChevronDown, FileText, Hash, Inbox, MapPin, Sparkles, SquareCheck, Trash2, Type, type LucideIcon } from "lucide-react";
 import LocationCell from "./LocationCell";
 import { sourceLabel, statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard, useTypeClass } from "./lib/board";
@@ -9,8 +9,8 @@ type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "dea
 
 // Resizable columns (after the fixed checkbox column), in pixels. The icon shows the field type, Airtable-style.
 const columns: readonly { key: string; label: string; width: number; icon: LucideIcon; fieldType: string }[] = [
-  // Order from spec section 6.2. Requester, owner, submitted by and date, created_by, closed_at, meeting ids
-  // and evidence are stored but not columns.
+  // Order from spec section 6.2. Requester, owner, submitted by and date, created_by, closed_at and evidence
+  // are stored but not columns. Meeting ids show in the Transcript column when transcript_matching is on.
   { key: "number", label: "#", width: 56, icon: Hash, fieldType: "Ticket number (assigned by the database)" },
   { key: "title", label: "Title", width: 220, icon: Type, fieldType: "Text" },
   { key: "type", label: "Type", width: 140, icon: CircleChevronDown, fieldType: "Single select" },
@@ -20,11 +20,25 @@ const columns: readonly { key: string; label: string; width: number; icon: Lucid
   { key: "location", label: "Map", width: 160, icon: MapPin, fieldType: "Map locations" },
   { key: "summary", label: "Summary", width: 320, icon: Type, fieldType: "Text" },
   { key: "source", label: "Source", width: 90, icon: Inbox, fieldType: "Where the ticket came from (read only)" },
+  // Only with transcript_matching.
+  { key: "transcript", label: "Transcript", width: 180, icon: FileText, fieldType: "Meetings where it was discussed; click one to open its transcript" },
 ] as const;
 type ColumnKey = (typeof columns)[number]["key"];
 const MIN_WIDTH = 60;
 const STORAGE_KEY = "loopback.ticketColumnWidths";
 const defaultWidths = Object.fromEntries(columns.map((c) => [c.key, c.width])) as Record<ColumnKey, number>;
+
+/** What the Transcript column needs from the transcript feature. Omitted when transcript_matching is off. */
+export type TranscriptColumn = {
+  /** Short name of a meeting, or undefined for a meeting this board doesn't have. */
+  meetingLabel: (meetingId: string) => string | undefined;
+  /** Pending AI suggestions for a ticket. */
+  pendingCount: (ticketId: string) => number;
+  /** Open a meeting's transcript at the ticket's highlights. */
+  onShow: (ticketId: string, meetingId: string) => void;
+  /** Open the transcript on the ticket's pending suggestions. */
+  onShowSuggestions: (ticketId: string) => void;
+};
 
 // Widths are a per-viewer convenience, so browser storage is enough; it may be unavailable.
 function loadWidths(): Record<ColumnKey, number> {
@@ -46,6 +60,7 @@ export default function TicketTable({
   onChange,
   onShowOnMap,
   onDelete,
+  transcript,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -59,6 +74,7 @@ export default function TicketTable({
   onShowOnMap?: (id: string, placeIndex: number) => void;
   /** Omitted for read-only users, which hides the delete buttons. */
   onDelete?: (ticket: Ticket) => void;
+  transcript?: TranscriptColumn;
 }) {
   const { ticketTypes } = useBoard();
   const typeClass = useTypeClass();
@@ -89,10 +105,11 @@ export default function TicketTable({
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseup", up);
   };
+  const shown = transcript ? columns : columns.filter((column) => column.key !== "transcript");
   const gridStyle = {
     // The trailing column holds the delete button, so it keeps 40px even when the table scrolls sideways.
-    "--ticket-cols": `34px ${columns.map((c) => `${widths[c.key]}px`).join(" ")} minmax(40px, 1fr)`,
-    "--ticket-width": `${34 + columns.reduce((sum, c) => sum + widths[c.key], 0) + 40}px`,
+    "--ticket-cols": `34px ${shown.map((c) => `${widths[c.key]}px`).join(" ")} minmax(40px, 1fr)`,
+    "--ticket-width": `${34 + shown.reduce((sum, c) => sum + widths[c.key], 0) + 40}px`,
   } as CSSProperties;
 
   const text = (ticket: Ticket, field: "title" | "summary", label: string, rows = 2) => (
@@ -119,7 +136,7 @@ export default function TicketTable({
     <div className="table-scroll" ref={scrollRef} style={gridStyle} onMouseLeave={() => onHover(null)}>
       <div className="ticket-grid ticket-head" role="row">
         <div className="check-cell"><input type="checkbox" aria-label="Select all" /></div>
-        {columns.map((column) => (
+        {shown.map((column) => (
           <div key={column.key} className="resizable-head" title={column.fieldType}>
             <column.icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
             {/* Without the map the column holds places only, so it's labelled Location. */}
@@ -188,6 +205,7 @@ export default function TicketTable({
             : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} /></div>}
           <div>{text(ticket, "summary", "Summary", 3)}</div>
           <div><span className={`tag source ${ticket.source}`}>{sourceLabel[ticket.source] ?? ticket.source}</span></div>
+          {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
           <div className="row-actions">
             {onDelete && (
               <button
@@ -204,5 +222,39 @@ export default function TicketTable({
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}
     </div>
+  );
+}
+
+/** Meeting tags, newest last as stored, and a badge for pending suggestions. */
+function transcriptCell(ticket: Ticket, transcript: TranscriptColumn) {
+  const pending = transcript.pendingCount(ticket.id);
+  return (
+    <>
+      {ticket.meetingIds.map((meetingId) => {
+        const label = transcript.meetingLabel(meetingId);
+        if (!label) return null;
+        return (
+          <button
+            key={meetingId}
+            type="button"
+            className="meeting-tag"
+            title={`${label}\nClick to open the transcript`}
+            onClick={(event) => { event.stopPropagation(); transcript.onShow(ticket.id, meetingId); }}
+          >
+            {label}
+          </button>
+        );
+      })}
+      {pending > 0 && (
+        <button
+          type="button"
+          className="suggestion-badge"
+          title="AI suggestions from a transcript, waiting for review"
+          onClick={(event) => { event.stopPropagation(); transcript.onShowSuggestions(ticket.id); }}
+        >
+          <Sparkles size={10} /> {pending} to review
+        </button>
+      )}
+    </>
   );
 }

@@ -76,3 +76,16 @@ export function normalizeSpan(paragraphs: Paragraph[], span: Span): Span {
   if (end <= start) end = Math.min(start + 1, paragraphs[paragraphIndexAt(paragraphs, start)].end);
   return { start, end };
 }
+
+/** ["P15", "P17", "P18", "P19"] -> "P15, P17–P19" */
+export function formatEvidence(evidence: string[]): string {
+  const nums = [...new Set(evidence.map((id) => Number(id.slice(1))))].sort((a, b) => a - b);
+  const parts: string[] = [];
+  for (let i = 0; i < nums.length; i++) {
+    let j = i;
+    while (j + 1 < nums.length && nums[j + 1] === nums[j] + 1) j++;
+    parts.push(j > i ? `P${nums[i]}–P${nums[j]}` : `P${nums[i]}`);
+    i = j;
+  }
+  return parts.join(", ");
+}
