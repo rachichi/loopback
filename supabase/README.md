@@ -30,6 +30,7 @@ Every file below is applied in production.
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
 | `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: staff with display names |
 | `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
+| `20261103120000_suggestion_stats.sql` | Additive | `board_suggestion_stats`: accepted and rejected AI suggestions and distinct reviewers per board |
 
 ### Writing a migration
 
@@ -86,6 +87,16 @@ Common one-liners (staff, flags, logos, ticket types) are in the root [`README.m
 | `public_board(token)` | Anyone | The board's name, borough, logo, background, boundary, ticket types and flags |
 | `public_board_tickets(token)` | Anyone | Number, title, type, status, urgent, deadline, location, submitted date |
 | `ping()` | Anyone | `true`; called daily by the keep-alive workflow |
+
+## Edge Functions (`functions/`)
+
+| Function | What it does | Secrets |
+| --- | --- | --- |
+| `match-transcript` | Matches one meeting's transcript to the board's open tickets and stores `ticket_suggestions`. Checks `can_edit_board` and `transcript_matching` as the caller. See [`docs/architecture.md`](../docs/architecture.md#transcript-matching-v2-transcript_matching). | `ANTHROPIC_API_KEY` |
+
+`_shared/` holds code used by the functions and elsewhere: `extract.ts` (also the eval harness's extractor) and `transcript.ts` (also the app's paragraph splitter). Each function's `deno.json` maps the bare imports (`ai`, `@ai-sdk/anthropic`, `zod`, `@supabase/supabase-js`) to `npm:` specifiers.
+
+Deploy `match-transcript` with its own files and the shared ones: `index.ts`, `deno.json`, `prompt.ts`, `../_shared/extract.ts`, `../_shared/transcript.ts`. With the CLI: `supabase functions deploy match-transcript --project-ref enanmsnprjviztiiemtn`. Keep JWT verification on. Set the key once in the dashboard (Edge Functions, Secrets) or with `supabase secrets set ANTHROPIC_API_KEY=...`. After editing `evals/prompts/v5.md`, run `node scripts/build_match_prompt.mjs` before deploying.
 
 ## Seeding all 59 boards
 

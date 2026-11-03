@@ -1,5 +1,9 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { basename, dirname, join } from "node:path";
 import { parse } from "csv-parse/sync";
+import type { Paragraph, PreviousTicket, TicketType } from "../../supabase/functions/_shared/extract.ts";
+
+export { STATUSES, type Paragraph, type Status, type TicketType } from "../../supabase/functions/_shared/extract.ts";
 
 // Airtable exports keep their "-Grid view" names; override any of these with CLI flags.
 export const DATA_FILES = {
@@ -18,13 +22,22 @@ export const MEETINGS = [
 
 export const GOLD_BY_TRANSCRIPT: Record<string, string> = Object.fromEntries(MEETINGS.map((m) => [m.transcript, m.gold]));
 
+/**
+ * Title and date of a meeting from the meetings.json next to its transcript (data/b-cb-9/), or undefined
+ * for transcripts without one (the CB3 meetings).
+ */
+export function meetingInfo(transcript: string): { title: string; date: string } | undefined {
+  const manifest = join(dirname(transcript), "meetings.json");
+  if (!existsSync(manifest)) return undefined;
+  const raw = basename(transcript).replace(/^psplit_/, "raw_");
+  const entry = (JSON.parse(readFileSync(manifest, "utf8")) as { file: string; title: string; held_on: string }[]).find((m) => m.file === raw);
+  return entry && { title: entry.title, date: entry.held_on };
+}
+
 /** "data/psplit_train2.txt" -> "train2" */
 export function meetingName(transcript: string): string {
   return transcript.replace(/^.*\//, "").replace(/\.txt$/, "").replace(/^psplit_/, "");
 }
-
-export const STATUSES = ["Open", "In Progress", "Closed"] as const;
-export type Status = (typeof STATUSES)[number];
 
 export type Ticket = {
   id: string;
@@ -35,11 +48,11 @@ export type Ticket = {
   location_raw?: string;
   requester?: string;
   summary?: string;
+  /** Existing ticket the model linked this issue to (prompts from v5 on). */
+  matches_ticket?: string;
 };
 
 export type GoldTicket = Ticket & { sourceTickets: string[]; adjudicationNote: string; issue: string };
-
-export type TicketType = { name: string; definition: string };
 
 // Shape written by scripts/run.ts and read by scripts/score.ts.
 export type RunFile = {
@@ -57,8 +70,6 @@ export type RunFile = {
   /** Gold file of the previous meeting whose tickets were given to the model as history. */
   previous?: string;
 };
-
-export type Paragraph = { id: string; text: string };
 
 function readCsv(path: string): Record<string, string>[] {
   return parse(readFileSync(path, "utf8"), { columns: true, bom: true, skip_empty_lines: true });
@@ -106,6 +117,20 @@ export function loadGold(path = DATA_FILES.gold): GoldTicket[] {
     // Airtable exports name the column "Issue" or "Issues" depending on the table.
     issue: (r.Issue ?? r.Issues ?? "").trim(),
   }));
+}
+
+/**
+ * Tickets to give the model as history (--previous): a gold CSV (the previous meeting's tickets), or a
+ * board's existing tickets with a `number` column (data/b-cb-9/staging_seed_tickets.csv), which are
+ * listed by number so a matching prompt can name them.
+ */
+export function loadPrevious(path: string): PreviousTicket[] {
+  return readCsv(path).map((r) => {
+    const ticket: PreviousTicket = { title: r.title.trim(), type: r.type.trim(), status: r.status.trim(), summary: r.summary?.trim() };
+    // Gold CSVs have no number column; they stay in the format earlier prompts were run with.
+    if (!r.number?.trim()) return ticket;
+    return { ...ticket, number: r.number.trim(), location: r.location_raw?.trim() || undefined, loggedOn: r.submitted_at?.trim() || undefined };
+  });
 }
 
 export type AnnotatorTicket = Ticket & { annotator: string };
