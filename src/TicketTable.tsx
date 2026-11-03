@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Calendar, CircleChevronDown, Hash, Inbox, MapPin, SquareCheck, Trash2, Type, UserRound, type LucideIcon } from "lucide-react";
 import LocationCell from "./LocationCell";
 import { sourceLabel, statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
-import type { StaffMember } from "./features/tickets/api";
+import { staffLabel, type StaffMember } from "./features/tickets/api";
 import { useBoard, useTypeClass } from "./lib/board";
 
 // The ticket number is assigned by the database and fixed.
@@ -208,7 +208,7 @@ export default function TicketTable({
               onChange={(event) => onChange(ticket.id, { ownerId: event.target.value || null })}
             >
               <option value="">Unassigned</option>
-              {staff.map((member) => <option key={member.userId} value={member.userId}>{member.email}</option>)}
+              {staff.map((member) => <option key={member.userId} value={member.userId}>{staffLabel(member)}</option>)}
               {/* An owner who has since left the board stays visible rather than silently reading as Unassigned. */}
               {ticket.ownerId && !staff.some((member) => member.userId === ticket.ownerId) && <option value={ticket.ownerId}>Former staff member</option>}
             </select>

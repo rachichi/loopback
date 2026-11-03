@@ -48,13 +48,16 @@ export async function deleteTicket(id: string): Promise<void> {
   if (!data?.length) throw new Error(`Ticket ${id} was not deleted (missing, or you can't delete on this board).`);
 }
 
-/** Someone a ticket can be assigned to. */
-export type StaffMember = { userId: string; email: string };
+/** Someone a ticket can be assigned to. `name` is null for accounts without a full_name in their metadata. */
+export type StaffMember = { userId: string; email: string; name: string | null };
 
-/** The board's staff, for the Owner column. Reads board_staff(), which only answers the board's staff
+/** How a staff member is shown: their name, or their email when they have none. */
+export const staffLabel = (member: StaffMember) => member.name ?? member.email;
+
+/** The board's staff, for the Owner column. Reads board_staff_named(), which only answers the board's staff
  *  and platform admins. */
 export async function loadBoardStaff(board: string): Promise<StaffMember[]> {
-  const { data, error } = await db.rpc("board_staff", { b: board });
+  const { data, error } = await db.rpc("board_staff_named", { b: board });
   if (error) throw error;
-  return ((data ?? []) as { user_id: string; email: string }[]).map((row) => ({ userId: row.user_id, email: row.email }));
+  return ((data ?? []) as { user_id: string; email: string; name: string | null }[]).map((row) => ({ userId: row.user_id, email: row.email, name: row.name }));
 }
