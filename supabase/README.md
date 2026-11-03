@@ -28,6 +28,8 @@ Every file below is applied in production.
 | `20261102160000_public_share_links.sql` | Mixed | `boards.share_token`, `public_board()`, `public_board_tickets()`, `rotate_share_token()`; removes the volunteer role |
 | `20261102170000_public_board_features.sql` | Additive | `public_board()` also returns the board's flags |
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
+| `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: staff with display names |
+| `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
 
 ### Writing a migration
 
@@ -66,8 +68,9 @@ Re-running the baseline would re-create the demo policies and reopen anonymous a
 | --- | --- |
 | `add_platform_admin.sql` | Makes an existing account a platform admin. Set the email, run. |
 | `create_board_test_staff.sql` | One plus-addressed staff account per board (`you+<board id>@domain`) for testing what each board's staff see. Writes to `auth.users` directly; never commit the password you set. |
-| `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering and feature flags. Always rolls back; results are in the error message. |
-| `create_staging_board.sql` | Creates or refreshes the `staging` board: a copy of `m-cb-3`'s boundary and ticket types with every feature flag on, for trying V2 and V3 features. No share link, no staff. |
+| `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering, meeting and suggestion access, and feature flags. Always rolls back; results are in the error message. |
+| `create_staging_board.sql` | Creates or refreshes the `staging` board: a copy of `b-cb-9`'s borough, boundary and ticket types with every feature flag on, for trying V2 and V3 features. No share link, no staff. |
+| `seed_staging_tickets.sql` | About two hand-logged tickets per meeting in `evals/data/b-cb-9/` on the `staging` board, for transcript matching to enhance. Load the meetings first: `node scripts/load_meetings.mjs staging evals/data/b-cb-9/raw_*.txt`. |
 
 Common one-liners (staff, flags, logos, ticket types) are in the root [`README.md`](../README.md#as-a-platform-admin-supabase-sql-editor).
 
@@ -78,6 +81,8 @@ Common one-liners (staff, flags, logos, ticket types) are in the root [`README.m
 | `is_board_member(b)`, `is_platform_admin()`, `can_edit_board(b)` | Used inside policies | Booleans for the signed-in user |
 | `board_staff(b)` | Signed-in | The board's staff and emails, if the caller is its staff or a platform admin |
 | `rotate_share_token(b)` | Signed-in | A new share token, if the caller can edit the board |
+| `apply_ticket_suggestion(s, edited)` | Signed-in, `security invoker` | Approves a pending suggestion (staff's edited fields, or as proposed) and returns the ticket |
+| `reject_ticket_suggestion(s)` | Signed-in, `security invoker` | Rejects a pending suggestion |
 | `public_board(token)` | Anyone | The board's name, borough, logo, background, boundary, ticket types and flags |
 | `public_board_tickets(token)` | Anyone | Number, title, type, status, urgent, deadline, location, submitted date |
 | `ping()` | Anyone | `true`; called daily by the keep-alive workflow |

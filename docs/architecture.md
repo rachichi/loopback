@@ -64,6 +64,8 @@ The database enforces all of this. The UI only hides what a role can't use.
 | `platform_admins` | Who can manage everything | `user_id` |
 | `feature_flags` | Global flag defaults | `key`, `default_enabled`, `requires_board_setup` |
 | `tickets` | Every board's tickets | `id`, `board`, `number` (per board), `title`, `type`, `status`, `urgent`, `deadline`, `location_text`, `places`, `requester`, `owner_id`, `summary`, `source`, `submitted_by`, `submitted_at`, `closed_at`, `created_by`, `meeting_ids`, `spans` |
+| `meetings` | One row per meeting transcript (V2, transcript matching) | `id`, `board`, `title`, `held_on`, `transcript` (one paragraph per line), `source` (`upload` or `blockparty`), `external_id`, `youtube_id`, `matched_at` |
+| `ticket_suggestions` | AI-proposed ticket updates and new tickets from one meeting, and staff's decision on each | `board`, `meeting_id`, `ticket_id` (null for a new ticket until approved), `kind` (`update` or `new`), `evidence` (paragraph ids), `spans`, `changes`, `applied`, `reason`, `status` (`pending`, `approved`, `rejected`), `decided_by`, `decided_at`, `model`, `prompt_version` |
 
 Triggers do the bookkeeping the client must not:
 
@@ -71,6 +73,8 @@ Triggers do the bookkeeping the client must not:
 - **Ticket numbers.** A new ticket is inserted with `number = 0`; the trigger assigns the board's next number under a row lock, so concurrent inserts never collide. The client inserts new tickets and updates existing ones separately; a mixed upsert would renumber.
 - **`closed_at`** is set when status becomes `Closed` and cleared when reopened.
 - **`created_by`** defaults to the signed-in user.
+
+`meetings` columns map onto Block Party's meetings table (`id` to `external_id`, `cb_id` to `board`, `meeting_youtube_id` to `youtube_id`, `creation_date` to `held_on`, `full_transcript` to `transcript`) so a later sync can fill it. Until then transcripts are loaded by hand with `scripts/load_meetings.mjs`. Board members read a board's meetings and suggestions; only platform admins (and the service role) write meetings or create suggestions. Staff decide suggestions through `apply_ticket_suggestion(s, edited)` and `reject_ticket_suggestion(s)`, which are `security invoker`, so the ticket and suggestion policies apply. Approving an update merges the fields into the ticket and adds the meeting and highlights; approving a new ticket inserts it with `number = 0` and `source = 'transcript'`. Decided suggestions are kept as the audit trail.
 
 Views: `board_effective_features` (each board's resolved flags, read by the app) and `board_ticket_metrics` / `board_ticket_counts` (ticket statistics, not used by the app today). All are `security_invoker`, so RLS applies.
 
@@ -86,6 +90,7 @@ A flag's value for a board is the board's override in `boards.features` if prese
 | `email_intake` | off | V3 |
 | `asset_generation` | off | V3 |
 | `data_aggregation` | off | V3 |
+| `meeting_minutes` | off | V3. Draft meeting minutes from a processed transcript |
 
 Keys are typed in `src/lib/features.ts`; read them with `useFeature("district_map")`. Flags only hide UI. Anything that costs money or touches secrets must also be checked server-side.
 
@@ -143,7 +148,7 @@ Most of the tag's features are on by default and can only be switched off in Bet
 
 All environments currently use the same Supabase project. A separate staging project is planned (spec section 9, step 9).
 
-To try flagged features before a real board gets them, use the `staging` board ("Staging Board"). It has every feature flag on and copies `m-cb-3`'s boundary and ticket types. It is a normal board row in the same database, created by [`supabase/scripts/create_staging_board.sql`](../supabase/scripts/create_staging_board.sql).
+To try flagged features before a real board gets them, use the `staging` board ("Staging Board"). It has every feature flag on and copies `b-cb-9`'s borough, boundary and ticket types, because the transcripts in `evals/data/b-cb-9/` are that board's. `supabase/scripts/seed_staging_tickets.sql` gives it about two hand-logged tickets per meeting for transcript matching to work on. It is a normal board row in the same database, created by [`supabase/scripts/create_staging_board.sql`](../supabase/scripts/create_staging_board.sql).
 
 Netlify's build runs `pnpm install --frozen-lockfile --force` before building so a stale dependency cache can't break it, and serves `index.html` for unknown paths so `/share/...` links work.
 

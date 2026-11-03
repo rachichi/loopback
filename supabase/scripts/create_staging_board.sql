@@ -2,9 +2,10 @@
 -- them. NOT a migration. Paste into the Supabase SQL editor and run. Safe to re-run: it copies the source
 -- board's boundary and ticket types again and turns on any flag added since the last run.
 --
--- Copies the boundary and ticket types of source_board, since the transcripts and gold tickets in evals/
--- are from that board. Every flag is set as an explicit override (true), so the board keeps them on even
--- if a global default is turned off. Re-runs keep the board's name, ticket counter and share token.
+-- Copies the borough, boundary and ticket types of source_board. That is Brooklyn CB9, because the
+-- meeting transcripts for transcript matching (evals/data/b-cb-9/, loaded with scripts/load_meetings.mjs)
+-- are that board's. Every flag is set as an explicit override (true), so the board keeps them on even if
+-- a global default is turned off. Re-runs keep the board's name, ticket counter and share token.
 --
 -- No share token is set, so the board has no public link until someone rotates one in the app. No staff
 -- are added: platform admins see every board. For a staff view, run create_board_test_staff.sql, which
@@ -14,7 +15,7 @@ do $$
 declare
   board_id     constant text := 'staging';
   board_name   constant text := 'Staging Board';
-  source_board constant text := 'm-cb-3';
+  source_board constant text := 'b-cb-9';
   src          public.boards%rowtype;
 begin
   select * into src from public.boards where id = source_board;
@@ -28,6 +29,7 @@ begin
     (select coalesce(jsonb_object_agg(key, true), '{}'::jsonb) from public.feature_flags)
   )
   on conflict (id) do update set
+    borough          = excluded.borough,
     boundary_geojson = excluded.boundary_geojson,
     ticket_types     = excluded.ticket_types,
     features         = excluded.features;
