@@ -74,9 +74,17 @@ function bs(...args: unknown[]): void {
   window.betterstack?.(...args);
 }
 
+/** True when the address itself is secret. The tag adds location.href to every event it sends (session
+ *  start, page hidden, memory) and has no hook to change it, so on these pages it is not loaded at all:
+ *  share links carry the token in the path, and auth links put tokens in the query string or hash. */
+function secretAddress(): boolean {
+  const { pathname, search, hash } = window.location;
+  return pathname.startsWith("/share/") || search !== "" || hash !== "";
+}
+
 /** Loads Better Stack's tag once. Safe to call when analytics is off. */
 export function initAnalytics(): void {
-  if (!token || started) return;
+  if (!token || started || secretAddress()) return;
   started = true;
   // Same queue as Better Stack's snippet: calls made before b.js loads wait in `q`.
   const stub: BetterStack = (...args: unknown[]) => {
