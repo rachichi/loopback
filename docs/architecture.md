@@ -33,7 +33,7 @@ flowchart LR
 
 - **One deployment, many boards.** All 59 NYC community boards share one site, one database and one `tickets` table. Nothing board-specific is in the code: name, borough, logo, background, boundary, ticket types and feature flags come from the `boards` row.
 - **No server of our own.** The browser talks to Supabase directly with the public (publishable) key. Postgres row-level security (RLS) decides what each request may read or write. There is no API layer to bypass it.
-- **Secrets never reach the browser.** `VITE_*` variables are public by design. Anything needing a secret key would run in a Supabase Edge Function (none exist today).
+- **Secrets never reach the browser.** `VITE_*` variables are public by design. Anything needing a secret key runs in a Supabase Edge Function: today only `match-transcript`, which holds the Anthropic key.
 
 ## Who can do what
 
@@ -77,6 +77,12 @@ Triggers do the bookkeeping the client must not:
 `meetings` columns map onto Block Party's meetings table (`id` to `external_id`, `cb_id` to `board`, `meeting_youtube_id` to `youtube_id`, `creation_date` to `held_on`, `full_transcript` to `transcript`) so a later sync can fill it. Until then transcripts are loaded by hand with `scripts/load_meetings.mjs`. Board members read a board's meetings and suggestions; only platform admins (and the service role) write meetings or create suggestions. Staff decide suggestions through `apply_ticket_suggestion(s, edited)` and `reject_ticket_suggestion(s)`, which are `security invoker`, so the ticket and suggestion policies apply. Approving an update merges the fields into the ticket and adds the meeting and highlights; approving a new ticket inserts it with `number = 0` and `source = 'transcript'`. Decided suggestions are kept as the audit trail.
 
 Views: `board_effective_features` (each board's resolved flags, read by the app) and `board_ticket_metrics` / `board_ticket_counts` (ticket statistics, not used by the app today). All are `security_invoker`, so RLS applies.
+
+## Transcript matching (V2, `transcript_matching`)
+
+The Edge Function `supabase/functions/match-transcript` takes a `meeting_id` and the caller's session. With the caller's own client (so RLS applies) it loads the meeting, checks `can_edit_board` and the board's `transcript_matching` flag, and reads the board's ticket types and open tickets. It splits the transcript into paragraphs with the same code the browser uses (`_shared/transcript.ts`), then runs the eval harness's extractor (`_shared/extract.ts`, Claude Haiku 5.5, prompt `evals/prompts/v5.md`). The open tickets go in by number; the model names the ticket an issue is about in `matches_ticket`. A match becomes an `update` suggestion holding only the fields that changed (status, summary, location, requester); anything else becomes a `new` suggestion. A number that is not an open ticket falls back to `new`. Paragraph ids become highlight spans. The function replaces the meeting's pending suggestions with the service role and sets `meetings.matched_at`; decided suggestions are kept.
+
+The prompt ships with the function as `match-transcript/prompt.ts`, generated from `evals/prompts/v5.md` by `node scripts/build_match_prompt.mjs` (CI fails if it is stale). Try a prompt change with `pnpm evals:run` before regenerating and deploying.
 
 ## Feature flags
 

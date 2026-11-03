@@ -3,12 +3,12 @@
  *
  *   tsx scripts/run.ts --model claude-haiku-5-5 --prompt prompts/v2.md --n 3
  *
- * Flags: --previous <gold csv> (previous meeting's tickets, as history) --transcript data/psplit_train1.txt --model <id> --prompt <md> --n 1
+ * Flags: --previous <csv> (previous meeting's gold tickets, or a board's numbered tickets for a matching prompt) --transcript data/psplit_train1.txt --model <id> --prompt <md> --n 1
  */
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename } from "node:path";
 import { parseArgs } from "node:util";
-import { DATA_FILES, loadGold, loadParagraphs, meetingName, loadTicketTypes, type RunFile } from "../lib/data.ts";
+import { DATA_FILES, loadParagraphs, loadPrevious, meetingInfo, meetingName, loadTicketTypes, type RunFile } from "../lib/data.ts";
 import { extract, MODELS, type ModelId } from "../lib/extract.ts";
 
 for (const envFile of [".env.local", "../.env.local"]) if (existsSync(envFile)) process.loadEnvFile(envFile);
@@ -30,7 +30,7 @@ const n = Number(args.n);
 
 const paragraphs = loadParagraphs(args.transcript);
 const types = loadTicketTypes();
-const previous = args.previous ? loadGold(args.previous) : undefined;
+const previous = args.previous ? loadPrevious(args.previous) : undefined;
 mkdirSync("runs", { recursive: true });
 
 // Runs on the gold (train) transcript keep the plain name; any other meeting is tagged
@@ -46,7 +46,7 @@ const nextPath = () => {
 for (let k = 0; k < n; k++) {
   const path = nextPath();
   const started = Date.now();
-  const result = await extract({ paragraphs, types, model, promptPath: args.prompt, previous });
+  const result = await extract({ paragraphs, types, model, promptPath: args.prompt, previous, meeting: meetingInfo(args.transcript) });
   const run: RunFile = {
     prompt: promptVersion,
     model,

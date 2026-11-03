@@ -87,6 +87,16 @@ Common one-liners (staff, flags, logos, ticket types) are in the root [`README.m
 | `public_board_tickets(token)` | Anyone | Number, title, type, status, urgent, deadline, location, submitted date |
 | `ping()` | Anyone | `true`; called daily by the keep-alive workflow |
 
+## Edge Functions (`functions/`)
+
+| Function | What it does | Secrets |
+| --- | --- | --- |
+| `match-transcript` | Matches one meeting's transcript to the board's open tickets and stores `ticket_suggestions`. Checks `can_edit_board` and `transcript_matching` as the caller. See [`docs/architecture.md`](../docs/architecture.md#transcript-matching-v2-transcript_matching). | `ANTHROPIC_API_KEY` |
+
+`_shared/` holds code used by the functions and elsewhere: `extract.ts` (also the eval harness's extractor) and `transcript.ts` (also the app's paragraph splitter). Each function's `deno.json` maps the bare imports (`ai`, `@ai-sdk/anthropic`, `zod`, `@supabase/supabase-js`) to `npm:` specifiers.
+
+Deploy `match-transcript` with its own files and the shared ones: `index.ts`, `deno.json`, `prompt.ts`, `../_shared/extract.ts`, `../_shared/transcript.ts`. With the CLI: `supabase functions deploy match-transcript --project-ref enanmsnprjviztiiemtn`. Keep JWT verification on. Set the key once in the dashboard (Edge Functions, Secrets) or with `supabase secrets set ANTHROPIC_API_KEY=...`. After editing `evals/prompts/v5.md`, run `node scripts/build_match_prompt.mjs` before deploying.
+
 ## Seeding all 59 boards
 
 1. Download the Community Districts GeoJSON from NYC Open Data (dataset `5crt-au7u`, Export) and check its terms of use.
