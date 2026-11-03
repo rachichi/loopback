@@ -76,7 +76,7 @@ Triggers do the bookkeeping the client must not:
 
 `meetings` columns map onto Block Party's meetings table (`id` to `external_id`, `cb_id` to `board`, `meeting_youtube_id` to `youtube_id`, `creation_date` to `held_on`, `full_transcript` to `transcript`) so a later sync can fill it. Until then transcripts are loaded by hand with `scripts/load_meetings.mjs`. Board members read a board's meetings and suggestions; only platform admins (and the service role) write meetings or create suggestions. Staff decide suggestions through `apply_ticket_suggestion(s, edited)` and `reject_ticket_suggestion(s)`, which are `security invoker`, so the ticket and suggestion policies apply. Approving an update merges the fields into the ticket and adds the meeting and highlights; approving a new ticket inserts it with `number = 0` and `source = 'transcript'`. Decided suggestions are kept as the audit trail.
 
-Views: `board_effective_features` (each board's resolved flags, read by the app) and `board_ticket_metrics` / `board_ticket_counts` (ticket statistics, not used by the app today). All are `security_invoker`, so RLS applies.
+Views: `board_effective_features` (each board's resolved flags, read by the app), `board_ticket_metrics` / `board_ticket_counts` (ticket statistics, not used by the app today) and `board_suggestion_stats` (per board and kind: pending, accepted, rejected, accepted %, and how many distinct people reviewed and accepted, from `decided_by`). All are `security_invoker`, so RLS applies.
 
 ## Transcript matching (V2, `transcript_matching`)
 
@@ -86,8 +86,10 @@ The prompt ships with the function as `match-transcript/prompt.ts`, generated fr
 
 In the app, with the flag on:
 
-- **Transcript column** in the ticket table: one tag per meeting in `meeting_ids`. Clicking a tag opens the Transcript tab on that meeting, scrolled to the ticket's highlights. A "to review" badge opens the ticket's pending suggestions. A strip above the table counts suggested new tickets.
-- **Transcript tab** in the right panel, next to Map: meeting picker, "Find ticket updates" (runs `match-transcript`; running it again replaces the meeting's pending suggestions), the suggestions to review, and the transcript. Each suggestion shows its evidence paragraphs and each proposed field as current and proposed. **Approve** applies it as proposed, **Edit** lets staff change the fields first, **Reject** dismisses it. Pending suggestions are underlined in the transcript; approved highlights are shaded in the ticket type's colour and can be dragged to tighten them.
+- **Auto Match & Generate Tickets**, next to the meeting picker in the Transcript tab (right panel, next to Map), runs `match-transcript` on the shown meeting. Running it again replaces that meeting's suggestions still waiting for review. Afterwards the table switches to the Review tab.
+- **Review tab**, after All, Urgent and Non-urgent. Each pending suggestion is a greyed-out, read-only row. An update shows in place of its ticket with the proposed values; a new ticket shows at the top, marked New. Changed fields are underlined, and hovering one shows the value before. A row waiting for review also counts under Urgent or Non-urgent. **Reviewed** applies it (`apply_ticket_suggestion`) and the row becomes a normal, editable ticket. **Reject** dismisses it. Staff edit a suggestion by accepting it and then editing the ticket.
+- **Transcript column**: one tag per meeting in `meeting_ids`. Clicking a tag opens that transcript, scrolled to the ticket's highlights. On a review row, the meeting the suggestion came from is tinted purple.
+- **Transcript tab**: a pending suggestion's paragraphs are underlined, and hovering its row lights them up (they share the row's id, `review-<suggestion id>`). Approved highlights are shaded in the ticket type's colour and can be dragged to tighten them.
 - The panel (`src/features/transcript/TranscriptPanel.tsx`), `TranscriptView` and the paragraph code load with `React.lazy`, so they are a separate chunk that boards without the flag never download. `pnpm check:bundle` fails if they reach the entry chunk, or if the CB3 demo data reaches any chunk.
 - Transcripts are fetched one meeting at a time when shown. The table only loads meeting titles and dates and the pending suggestions.
 - Approving a suggestion on a ticket with unsaved edits is refused until the edits are saved, because the database merges the suggestion into the stored ticket.
@@ -134,8 +136,8 @@ src/
 ├── features/transcript/     # transcript_matching (V2)
 │   ├── types.ts             # MeetingInfo, Suggestion
 │   ├── api.ts               # meetings, one transcript, pending suggestions, run matching, approve, reject
-│   ├── TranscriptPanel.tsx  # the Transcript tab; lazy-loaded
-│   └── SuggestionCard.tsx   # one suggestion: evidence, current and proposed fields, approve / edit / reject
+│   ├── review.ts            # pending suggestions as greyed-out Review rows (main bundle)
+│   └── TranscriptPanel.tsx  # the Transcript tab and Auto Match & Generate Tickets; lazy-loaded
 ├── TranscriptView.tsx       # transcript with evidence highlights and drag-to-edit (loaded by TranscriptPanel)
 ├── transcript.ts            # paragraphs and spans; re-exports supabase/functions/_shared/transcript.ts
 ├── meetings.ts, goldTickets.ts
@@ -150,7 +152,7 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 `src/lib/analytics.ts` loads Better Stack's JS tag only when `VITE_BETTERSTACK_TOKEN` is set (production only on Netlify). It is never loaded on the share page or on any address with a query string or hash: the tag adds the real address to every event it sends (session start, page hidden, memory) and cannot be told not to, and those addresses carry share and auth tokens. It sends:
 
 - Screen views (`page-load`, then `page-change`): `/`, `/tickets`, `/sign-in`. Automatic page views are off; the app sends these itself with a cleaned address. Each view of a board's screen carries `board_id`, so views are attributed to the board shown even after a platform admin switches boards.
-- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`, and for transcript matching `transcript_opened`, `matching_run` (counts of updates and new suggestions), `suggestion_approved` and `suggestion_rejected` (kind, and whether staff edited it).
+- Events: `login`, `ticket_created`, `ticket_deleted`, `share_link_copied`, `share_link_replaced`, `board_switched`, and for transcript matching `transcript_opened`, `matching_run` (counts of updates and new suggestions) and `suggestion_reviewed` (one per Reviewed or Reject: `kind` new or update, `outcome` accepted or rejected, `fields_changed`). Each also carries `role`, so accept rates can be split between staff and platform admins. The events can't count people, since they carry no user ids; `board_suggestion_stats` in the database does.
 - On every view and event, once known: `board_id` and `role` (set by `setAnalyticsUser` and cleared on the sign-in screen; Better Stack's own `user` call is not used, because it attaches ids and emails).
 - Web vitals and frontend errors. Errors go through the Sentry SDK inside the tag; `beforeSend` and `beforeBreadcrumb` clean URLs, drop cookies and headers, and drop click and console breadcrumbs.
 

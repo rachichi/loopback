@@ -30,6 +30,7 @@ Every file below is applied in production.
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
 | `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: staff with display names |
 | `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
+| `20261103120000_suggestion_stats.sql` | Additive | `board_suggestion_stats`: accepted and rejected AI suggestions and distinct reviewers per board |
 
 ### Writing a migration
 

@@ -2,9 +2,9 @@
 //
 // Transcript matching (V2) is behind the transcript_matching flag. Its panel, TranscriptView and the
 // paragraph code are loaded with a dynamic import() (src/App.tsx), so they land in a separate chunk that
-// only boards with the flag download. The entry chunk must not contain them. The Transcript column and the
-// meeting and suggestion queries are in the entry chunk on purpose: they render nothing without the flag
-// and carry no transcript text.
+// only boards with the flag download. The entry chunk must not contain them. The Transcript column, the
+// Review tab's rows and the meeting and suggestion queries are in the entry chunk on purpose: they render
+// nothing without the flag and carry no transcript text.
 //
 // The bundled CB3 demo transcripts and gold tickets (src/meetings.ts, src/goldTickets.ts) must not be in
 // any chunk: transcripts come from the database.
@@ -17,7 +17,7 @@ const dir = "dist/assets";
 // Markers from src/TranscriptView.tsx, src/features/transcript/TranscriptPanel.tsx and src/transcript.ts.
 const notInEntry = [
   "hl-handle", // TranscriptView drag handles
-  "suggestion:", // TranscriptPanel stand-in ids for pending suggestions
+  "match-status", // TranscriptPanel status line under the meeting picker
   "buildParagraphs", // transcript.ts (unminified name survives in some builds)
 ];
 // Markers from src/meetings.ts and the bundled demo transcripts.

@@ -363,49 +363,39 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .hl-handle::before { content: ""; position: absolute; top: 0; bottom: 0; left: 4.5px; width: 3px; border-radius: 1px; background: rgb(var(--hl)); }
 body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select: none; }
 
-/* Transcript matching: the Transcript column, the review list and pending highlights. */
+/* Transcript matching: the Transcript column, the Review tab's rows, the auto-match button and pending highlights. */
 .transcript-cell { flex-wrap: wrap; align-content: center; gap: 4px; }
-.suggestion-badge { padding: 3px 7px; display: inline-flex; align-items: center; gap: 3px; border: 1px dashed #8a63b5; border-radius: 999px; background: #f6f1fb; color: #5b3a7a; font-size: 8px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.suggestion-badge:hover { background: #ece4f5; }
-.new-suggestions { margin: 0; padding: 8px 12px; border: 0; border-bottom: 1px solid #e0d6ec; background: #f6f1fb; color: #5b3a7a; font-size: 10px; font-weight: 600; text-align: left; cursor: pointer; }
-.new-suggestions:hover { background: #ece4f5; }
+.meeting-tag.suggested { background: #ece4f5; color: #5b3a7a; box-shadow: inset 0 0 0 1px #c9b4e0; }
+.urgency-tabs button.review.active { border-bottom-color: #8a63b5; color: #5b3a7a; }
+.urgency-tabs button.review span { background: #ece4f5; color: #5b3a7a; }
+/* A suggestion waiting for review: greyed out and read only until Reviewed. */
+.review-row { background: #f6f7f8; }
+.review-row:hover, .review-row.hovered { background: #f1edf6; }
+.review-row .dim { opacity: .55; }
+.review-row .read-only { color: #4c5561; font-size: 10px; line-height: 1.4; }
+.review-row .review-summary { align-items: flex-start; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+.review-title { flex-direction: column; align-items: flex-start !important; justify-content: center; gap: 6px; }
+.review-title > span { color: #1a2234; font-size: 11px; font-weight: 500; line-height: 1.35; }
+.ai-changed { border-bottom: 1.5px dotted #8a63b5; cursor: help; }
+.tag.ai-new { padding: 2px 7px; background: #ece4f5; color: #5b3a7a; font-size: 8px; font-weight: 700; }
+.review-actions { display: flex; gap: 5px; }
+.review-actions button { padding: 3px 8px; display: inline-flex; align-items: center; gap: 3px; border: 1px solid #cbd0d6; border-radius: 4px; background: white; color: #2c3742; font-size: 9px; font-weight: 600; cursor: pointer; }
+.review-actions button.reviewed { border-color: #237348; background: #237348; color: white; }
+.review-actions button.reviewed:hover:not(:disabled) { background: #1b5c39; }
+.review-actions button.reject:hover:not(:disabled) { border-color: #b3263e; color: #b3263e; }
+.review-actions button:disabled { opacity: .5; cursor: progress; }
 .tab-count { min-width: 16px; padding: 1px 5px; border-radius: 999px; background: #8a63b5; color: white; font-size: 8px; }
 .transcript-empty { padding: 32px 18px; color: #7d858f; font-size: 11px; text-align: center; background: white; flex: 1; }
-.transcript-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.transcript-actions > span { color: #9299a2; font-size: 8px; white-space: nowrap; }
-.find-updates { padding: 6px 10px; display: inline-flex; align-items: center; gap: 5px; border: 0; border-radius: 4px; background: #11182c; color: white; font-size: 10px; font-weight: 600; white-space: nowrap; cursor: pointer; }
-.find-updates:hover:not(:disabled) { background: #2c3742; }
-.find-updates:disabled { opacity: .6; cursor: progress; }
-.suggestions { max-height: 45%; flex: 0 0 auto; overflow: auto; border-bottom: 1px solid #e3e6ea; background: #fafbfc; }
-.suggestions-heading { position: sticky; top: 0; z-index: 2; padding: 8px 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: #fafbfc; font-size: 10px; }
-.suggestions-heading button { padding: 0; border: 0; background: none; color: #167b94; font-size: 9px; text-decoration: underline; cursor: pointer; }
-.suggestions-error { color: #b3263e; font-size: 9px; }
-.suggestions ul { margin: 0; padding: 0 12px 10px; display: flex; flex-direction: column; gap: 8px; list-style: none; }
-.suggestion-card { padding: 10px 12px; border: 1px solid #e3e6ea; border-left: 3px solid rgb(var(--hl)); border-radius: 4px; background: white; font-size: 10px; }
-.suggestion-card.active { box-shadow: 0 0 0 2px rgb(var(--hl) / .35); }
-.suggestion-card header { display: flex; align-items: center; gap: 6px; }
-.suggestion-card header strong { min-width: 0; overflow: hidden; color: #11182c; text-overflow: ellipsis; white-space: nowrap; }
-.tag.suggestion-kind { padding: 2px 7px; font-size: 8px; font-weight: 600; }
-.tag.suggestion-kind.update { background: #dceefa; color: #246a96; }
-.tag.suggestion-kind.new { background: #ece4f5; color: #5b3a7a; }
-.suggestion-evidence { margin: 5px 0 0; padding: 0; border: 0; background: none; color: #167b94; font-size: 9px; font-weight: 600; cursor: pointer; }
-.suggestion-evidence:hover { text-decoration: underline; }
-.suggestion-fields { margin: 6px 0 0; display: flex; flex-direction: column; gap: 5px; }
-.suggestion-fields > div { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 6px; }
-.suggestion-fields dt { color: #7d858f; font-size: 9px; }
-.suggestion-fields dd { margin: 0; display: flex; flex-direction: column; gap: 2px; color: #2c3742; line-height: 1.45; }
-.suggestion-fields del { color: #9aa1aa; }
-.suggestion-fields ins { text-decoration: none; }
-.suggestion-fields textarea, .suggestion-fields select, .suggestion-fields input { width: 100%; padding: 4px 6px; border: 1px solid #cbd0d6; border-radius: 3px; font: inherit; resize: vertical; }
-.suggestion-note { margin: 6px 0 0; color: #7d858f; font-size: 9px; }
-.suggestion-actions { margin-top: 8px; display: flex; gap: 6px; }
-.suggestion-actions button { padding: 4px 9px; display: inline-flex; align-items: center; gap: 4px; border: 1px solid #cbd0d6; border-radius: 4px; background: white; color: #2c3742; font-size: 9px; font-weight: 600; cursor: pointer; }
-.suggestion-actions button:hover:not(:disabled) { background: #eef1f3; }
-.suggestion-actions button.approve { border-color: #237348; background: #237348; color: white; }
-.suggestion-actions button.approve:hover:not(:disabled) { background: #1b5c39; }
-.suggestion-actions button.reject:hover:not(:disabled) { border-color: #b3263e; color: #b3263e; background: white; }
-.suggestion-actions button:disabled { opacity: .5; cursor: default; }
-/* A pending suggestion's paragraphs: underlined in the type color until staff approve it. */
+/* The heading's left side takes the room it needs and the button wraps under the picker when the panel is narrow. */
+.transcript-heading > div:first-child { min-width: 0; flex: 1 1 auto; }
+.meeting-picker { flex-wrap: wrap; row-gap: 6px; }
+.meeting-picker select { flex: 0 1 auto; }
+.meeting-picker button.auto-match { width: auto; height: 28px; margin-left: 6px; padding: 0 10px; display: inline-flex; align-items: center; gap: 5px; border-radius: 4px; background: #11182c; color: white; font-size: 10px; font-weight: 600; white-space: nowrap; }
+.meeting-picker button.auto-match:hover:not(:disabled) { background: #2c3742; color: white; }
+.meeting-picker button.auto-match:disabled { opacity: .7; color: white; cursor: progress; }
+.match-status { padding: 7px 18px; border-bottom: 1px solid #e3e6ea; background: #fafbfc; color: #4c5561; font-size: 9px; }
+.match-status .match-error { color: #b3263e; }
+/* A pending suggestion's paragraphs: underlined in the type color until staff review it. */
 .transcript-body mark.hl.pending { background: transparent; box-shadow: inset 0 -2px 0 rgb(var(--hl) / .55); }
 .transcript-body mark.hl.pending.active { background: rgb(var(--hl) / .14); box-shadow: inset 0 -2px 0 rgb(var(--hl)); }
 

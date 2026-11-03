@@ -37,7 +37,7 @@ export default function TranscriptView({
   jump,
   typeClass,
   pendingIds,
-  actions,
+  pickerAction,
   aside,
 }: {
   /** Every meeting in the picker, newest first. Only the shown one needs its paragraphs. */
@@ -54,8 +54,8 @@ export default function TranscriptView({
   jump: { id: string | null; n: number };
   /** Ids in `tickets` that stand for pending AI suggestions: drawn dashed, with no drag handles. */
   pendingIds?: Set<string>;
-  /** Buttons for the heading, next to the paragraph count. */
-  actions?: ReactNode;
+  /** A button next to the meeting picker. */
+  pickerAction?: ReactNode;
   /** Shown between the heading and the transcript, e.g. the suggestions to review. */
   aside?: ReactNode;
 }) {
@@ -151,13 +151,11 @@ export default function TranscriptView({
               {meetings.map((item) => <option key={item.id} value={item.id}>{item.title}</option>)}
             </select>
             <button type="button" aria-label="Older meeting" title="Older meeting" disabled={position >= meetings.length - 1} onClick={() => onMeetingChange(meetings[position + 1].id)}><ChevronRight size={16} /></button>
+            {pickerAction}
           </div>
           <p>Meeting {position + 1} of {meetings.length} · {tickets.filter((ticket) => !pendingIds?.has(ticket.id)).length} tickets · hover a highlight and drag its ends to edit</p>
         </div>
-        <div className="transcript-actions">
-          {actions}
-          <span>{paragraphs.length} paragraphs</span>
-        </div>
+        <span>{paragraphs.length} paragraphs</span>
       </header>
       {aside}
       <ol className="transcript-body" ref={bodyRef} onMouseLeave={() => hover(null)}>
