@@ -142,6 +142,8 @@ Most of the tag's features are on by default and can only be switched off in Bet
 
 All environments currently use the same Supabase project. A separate staging project is planned (spec section 9, step 9).
 
+To try flagged features before a real board gets them, use the `staging` board ("Staging Board"). It has every feature flag on and copies `m-cb-3`'s boundary and ticket types. It is a normal board row in the same database, created by [`supabase/scripts/create_staging_board.sql`](../supabase/scripts/create_staging_board.sql).
+
 Netlify's build runs `pnpm install --frozen-lockfile --force` before building so a stale dependency cache can't break it, and serves `index.html` for unknown paths so `/share/...` links work.
 
 ## External services
