@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
-import { statuses, type Status, type Ticket } from "./features/tickets/types";
+import { statuses, today, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable from "./TicketTable";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
-import { deleteTicket, insertTicket, loadBoardStaff, loadTickets, updateTickets, type StaffMember } from "./features/tickets/api";
+import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
 import { BoardProvider, useBoard, useBoardSwitcher, useFeature, type Role } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
@@ -257,11 +257,6 @@ function Portal() {
   const persisted = useRef(new Map<string, Ticket>());
   // New tickets whose insert is in flight. Edits made meanwhile are saved as an update once it returns.
   const inserting = useRef(new Set<string>());
-  // The board's staff, for the Owner column. Without it the column still shows Unassigned and current owners.
-  const [staff, setStaff] = useState<StaffMember[]>([]);
-  useEffect(() => {
-    loadBoardStaff(board.id).then(setStaff).catch((error) => console.error("Couldn't load staff for the Owner column", error));
-  }, [board.id]);
   useEffect(() => {
     loadTickets(board.id)
       .then((loaded) => {
@@ -322,7 +317,7 @@ function Portal() {
   const filtered = useMemo(() => tickets.filter((ticket) => {
     const matchesStatus = status === "All" || ticket.status === status;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.requester} ${ticket.summary} ${ticket.submittedBy}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.summary}`.toLowerCase().includes(search);
     return matchesStatus && matchesQuery;
   }), [tickets, query, status]);
   const rows = useMemo(() => filtered.filter((ticket) => inTab(ticket, urgency)), [filtered, urgency]);
@@ -333,9 +328,10 @@ function Portal() {
 
   // New intake tickets go to the top, and the filters reset so the new row is in view.
   const addTicket = (fields: IntakeFields) => {
-    // The database assigns the number when the ticket is inserted; until then it shows blank.
+    // The database assigns the number when the ticket is inserted; until then it shows blank. It also sets
+    // submitted_by to the signed-in user's email. Requester is no longer collected.
     // Every board shares one table, so ids must be unique across boards, not just within this one.
-    const ticket: Ticket = { ...fields, id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {}, ownerId: null, source: "manual", closedAt: null, createdBy: null };
+    const ticket: Ticket = { ...fields, requester: "", submittedBy: "", submittedAt: today(), id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {}, ownerId: null, source: "manual", closedAt: null, createdBy: null };
     setTickets((current) => [ticket, ...current]);
     setSelectedId(ticket.id);
     setQuery("");
@@ -419,7 +415,7 @@ function Portal() {
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} staff={staff} />
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} />
         </section>
         {/* district_map off: no map panel, no rail, and the Map cells don't open one. */}
         {!mapOn ? null : sidebarOpen ? (

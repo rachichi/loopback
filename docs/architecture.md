@@ -40,7 +40,7 @@ flowchart LR
 | Role | How it is granted | Can do |
 | --- | --- | --- |
 | **Platform admin** | A row in `platform_admins` | Every board: read, create, edit and delete tickets, replace share links. Switch between all boards in the app. Manage boards, flags and members (SQL today). |
-| **Staff** | A row in `board_members` with `role = 'staff'` (legacy `'admin'` counts as staff) | Their own board: read, create, edit and delete tickets, assign owners, copy or replace the share link. |
+| **Staff** | A row in `board_members` with `role = 'staff'` (legacy `'admin'` counts as staff) | Their own board: read, create, edit and delete tickets, copy or replace the share link. |
 | **Public** | Holding a board's share link, `/share/<token>` | One board, read only: number, title, type, status, urgent, deadline, location, submitted date. Never requester, summary, submitted-by, owner, meetings or transcripts. |
 
 The database enforces all of this. The UI only hides what a role can't use.
@@ -53,7 +53,7 @@ The database enforces all of this. The UI only hides what a role can't use.
 | Change board settings and flags | `boards` update policy: platform admin only |
 | Public share page | `public_board(token)` and `public_board_tickets(token)`: `security definer` functions that return only the allowed columns. `anon` has no access to any table. |
 | Replace a share link | `rotate_share_token(b)`: checks `can_edit_board(b)` |
-| Owner dropdown | `board_staff(b)`: lists a board's staff and emails to that board's staff and platform admins |
+| List a board's staff | `board_staff(b)`: lists a board's staff and emails to that board's staff and platform admins. Not used by the app since the Owner column was removed. |
 
 ## Data model
 
@@ -67,6 +67,7 @@ The database enforces all of this. The UI only hides what a role can't use.
 
 Triggers do the bookkeeping the client must not:
 
+- **Submitted by.** A manual ticket's `submitted_by` is set on insert by the `tickets_submitted_by` trigger to the signed-in user's email; `submitted_at` is the local date it was logged. Updates never send either. Neither is shown in the table.
 - **Ticket numbers.** A new ticket is inserted with `number = 0`; the trigger assigns the board's next number under a row lock, so concurrent inserts never collide. The client inserts new tickets and updates existing ones separately; a mixed upsert would renumber.
 - **`closed_at`** is set when status becomes `Closed` and cleared when reopened.
 - **`created_by`** defaults to the signed-in user.
