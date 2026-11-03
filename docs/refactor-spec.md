@@ -197,6 +197,8 @@ Public share links. Each board has a random `boards.share_token` (24 characters)
 
 Acceptance test: a user in `b-cb-9` cannot select, insert, update or delete a ticket with `board = 'm-cb-3'`, including by changing `board` in an update. This is `supabase/scripts/check_tenant_isolation.sql`, which also checks ticket numbering and feature flag resolution and rolls everything back. It passed in production on 2026-11-02, after 3b: each test user saw only their own board (5 and 24 tickets), a new `b-cb-9` ticket got number 8 (the next `next_ticket_no`; numbers are not reused after a delete), all four cross-board writes were denied or changed 0 rows, a `b-cb-9` override turned `district_map` off for that board only, and the default turned it off and on for all 59 boards. The anonymous `curl` against `/rest/v1/tickets` returned `[]`.
 
+It passed again on 2026-11-03 with the transcript matching checks added (migration `20261103100000_meetings_and_suggestions.sql`). Staff of `b-cb-9` saw 0 of a test staging meeting and suggestion. Their approve and reject were denied (P0002), and a direct update of the suggestion changed 0 rows. Staging staff then approved it, which made ticket 22 with source `transcript` and one meeting. Isolation and flags gave the same results as before (5 and 24 tickets, 60 boards). Afterwards the staging and `b-cb-9` ticket counters, the suggestions table and the flags were unchanged. `match-transcript` answers 401 to the anon key.
+
 ## 6. V1 product scope
 
 ### 6.1 Flow
