@@ -299,6 +299,7 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .place-results li:hover { background: #eef8fb; }
 .place-results li.muted { color: #8a949a; cursor: default; }
 .place-results li.muted:hover { background: none; }
+.place-results li.search-more { color: #176b83; font-weight: 600; }
 .cell-select { max-width: 100%; border: 0; font: inherit; font-size: 8px; font-weight: 600; cursor: pointer; appearance: none; padding-right: 16px; background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%); background-position: right 9px center, right 6px center; background-size: 3px 3px; background-repeat: no-repeat; }
 .cell-select.tag.type { background-color: rgb(var(--hl) / .16); }
 .cell-select:focus-visible { outline: 2px solid #2bb7d5; outline-offset: 1px; }

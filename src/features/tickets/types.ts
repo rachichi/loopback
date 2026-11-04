@@ -18,7 +18,7 @@ export type Place = {
   lat: number;
   lng: number;
   /** "geosearch" = matched by NYC GeoSearch; "manual" = placed by hand (search pick-up, pin drag, or seed data). */
-  source: "geosearch" | "manual";
+  source: "geosearch" | "osm" | "manual";
 };
 
 /** A highlight: a character range in one meeting's transcript. */

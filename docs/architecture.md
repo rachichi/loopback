@@ -20,6 +20,7 @@ flowchart LR
   BS[Better Stack]
   GeoSearch[NYC GeoSearch]
   OSM[OpenStreetMap tiles]
+  Nominatim[OpenStreetMap Nominatim]
 
   Static --> App
   App -- sign in --> Auth
@@ -28,6 +29,7 @@ flowchart LR
   App -- logos, backgrounds --> Storage
   App -- usage events and errors, no personal data --> BS
   App -- place search --> GeoSearch
+  App -- backup place search, on request --> Nominatim
   App -- map tiles --> OSM
 ```
 
@@ -123,8 +125,8 @@ src/
 ├── IntakeForm.tsx           # ticket form: new ticket (manual_intake) and the expanded row
 ├── RowHeightMenu.tsx        # toolbar menu for the table's row height
 ├── MapView.tsx              # Leaflet map, board boundary, ticket pins (district_map)
-├── LocationCell.tsx         # places on a ticket + NYC GeoSearch picker
-├── geosearch.ts             # GeoSearch client, biased to the board's borough
+├── LocationCell.tsx         # places on a ticket + place search (GeoSearch, backup on request)
+├── geosearch.ts             # GeoSearch and Nominatim clients, biased to the board's borough
 ├── db.ts                    # the Supabase client, nothing else
 ├── lib/
 │   ├── board.tsx            # BoardProvider, useBoard, useFeature, useBoardSwitcher, roles
@@ -191,5 +193,6 @@ Netlify's build runs `pnpm install --frozen-lockfile --force` before building so
 | Supabase | Auth, Postgres, Storage | Free plan pauses after about a week of inactivity; the daily keep-alive workflow calls `ping()`. Upgrade before real staff depend on it. Built-in email only reaches the project's team; inviting by email needs custom SMTP. |
 | Netlify | Hosting and previews | |
 | Better Stack | Usage analytics, web vitals, frontend errors | Sets a first-party `_bs` session cookie. Check whether the boards need a consent banner. Replays and autocapture must stay off (see Usage analytics). |
-| NYC GeoSearch | Address and place search | Free, no key. Cannot resolve intersections; staff place those by hand. |
+| NYC GeoSearch | Address and place search | Free, no key. Cannot resolve intersections; staff place those by hand. Misses some addresses (1555 Bedford Avenue, for one). |
+| OpenStreetMap Nominatim | Backup place search | Free, no key, data under ODbL (the map already credits OpenStreetMap). Its usage policy allows about one search a second and no search-as-you-type, so it runs only when someone asks: Enter with no matches, or the list's last row. The list doesn't name either source. |
 | OpenStreetMap | Map tiles | Public tile servers are fine for light use; switch to a keyed provider for heavy traffic. |
