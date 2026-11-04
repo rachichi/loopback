@@ -154,7 +154,10 @@ async function extractOnce(opts: ExtractOptions): Promise<ExtractResult> {
     schema: ticketSchema(types, promptMatches(promptText)),
     system: buildSystemPrompt(promptText, types),
     prompt: `${header}${previous?.length ? previousBlock(previous) : ""}<transcript>\n${transcript}\n</transcript>\n\nExtract the tickets from this transcript.`,
-    maxOutputTokens: 16000,
+    // Thinking counts against this cap. A long hearing (31-37 tickets on CB9's 10/23 statement of needs)
+    // takes 13-16K tokens at medium effort, so 16K cut the JSON off. 32K at ~240 tokens/s still ends
+    // inside the Edge Function's 150 s limit on Supabase's free plan.
+    maxOutputTokens: 32000,
     // Native structured outputs; Sonnet 5.5 rejects the forced tool call the jsonTool mode relies on.
     providerOptions: {
       anthropic: {

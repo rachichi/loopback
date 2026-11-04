@@ -11,6 +11,7 @@
 // Secrets: ANTHROPIC_API_KEY (function secrets). SUPABASE_URL, SUPABASE_ANON_KEY and
 // SUPABASE_SERVICE_ROLE_KEY are provided by Supabase.
 import { createClient } from "@supabase/supabase-js";
+import { NoObjectGeneratedError } from "ai";
 import { extract, type ExtractedTicket, type ModelId, type PreviousTicket } from "../_shared/extract.ts";
 import { buildParagraphs, spansFromParagraphIds } from "../_shared/transcript.ts";
 import { PROMPT, PROMPT_VERSION } from "./prompt.ts";
@@ -145,6 +146,9 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error(error);
+    if (NoObjectGeneratedError.isInstance(error) && error.finishReason === "length") {
+      return json(502, { error: "The model's answer was too long for this meeting and got cut off. Try again; if it keeps happening, the meeting needs to be split." });
+    }
     return json(502, { error: "The model call failed. Try again in a minute." });
   }
 
