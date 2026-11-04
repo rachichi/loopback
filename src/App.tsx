@@ -2,15 +2,17 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import { ChevronDown, ClipboardList, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { statuses, today, type Status, type Ticket } from "./features/tickets/types";
-import TicketTable from "./TicketTable";
+import TicketTable, { loadRowHeight, saveRowHeight, type RowHeight } from "./TicketTable";
+import RowHeightMenu from "./RowHeightMenu";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
-import { deleteTicket, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
+import { deleteTickets, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
 import { BoardProvider, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
+import { useDismiss } from "./lib/useDismiss";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
 
@@ -64,17 +66,8 @@ function Avatar({ account, size }: { account: Account; size: number }) {
 function AccountMenu({ account }: { account: Account }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onPointer = (event: MouseEvent) => { if (!ref.current?.contains(event.target as Node)) setOpen(false); };
-    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(ref, open, close);
   return (
     <div className="nav-profile" ref={ref}>
       <button type="button" className="nav-profile-button" aria-label={`Account: ${account.name}`} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((current) => !current)}>
@@ -233,6 +226,8 @@ function Toolbar({
   setStatus,
   onNew,
   sync,
+  rowHeight,
+  setRowHeight,
 }: {
   count: number;
   query: string;
@@ -241,6 +236,8 @@ function Toolbar({
   setStatus: (value: "All" | Status) => void;
   onNew: () => void;
   sync: Sync;
+  rowHeight: RowHeight;
+  setRowHeight: (value: RowHeight) => void;
 }) {
   const intakeOn = useFeature("manual_intake");
   return (
@@ -257,6 +254,7 @@ function Toolbar({
             <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
           </select>
         </div>
+        <RowHeightMenu value={rowHeight} onChange={setRowHeight} />
         {intakeOn && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
       </div>
     </div>
@@ -356,6 +354,11 @@ function Portal({ account }: { account: Account }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(false);
   const [view, setView] = useState<View>("home");
+  // The ticket open in the expanded form, if any.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const closeExpanded = useCallback(() => setExpandedId(null), []);
+  const [rowHeight, setRowHeight] = useState(loadRowHeight);
+  useEffect(() => saveRowHeight(rowHeight), [rowHeight]);
   // Usage analytics: who by board and role only, and which screen. Fixed page names, never ticket content.
   useEffect(() => setAnalyticsUser({ board_id: board.id, role: board.role ?? "unknown" }), [board.id, board.role]);
   useEffect(() => {
@@ -391,35 +394,47 @@ function Portal({ account }: { account: Account }) {
   };
   const closeIntake = useCallback(() => setIntakeOpen(false), []);
 
-  // Deleting asks first, waits for the database, and only then removes the row, so a failed delete leaves it in place.
-  const removeTicket = async (ticket: Ticket) => {
-    const label = ticket.number ? `#${ticket.number} "${ticket.title}"` : `"${ticket.title}"`;
-    if (inserting.current.has(ticket.id)) {
-      window.alert(`Ticket ${label} is still being saved. Try again in a moment.`);
+  // Deleting asks first, waits for the database, and only then removes the rows, so a failed delete leaves them in place.
+  const removeTickets = async (list: Ticket[]) => {
+    if (!list.length) return;
+    const label = (ticket: Ticket) => ticket.number ? `#${ticket.number} "${ticket.title}"` : `"${ticket.title}"`;
+    if (list.some((ticket) => inserting.current.has(ticket.id))) {
+      window.alert(list.length > 1 ? "Some of these tickets are still being saved. Try again in a moment." : `Ticket ${label(list[0])} is still being saved. Try again in a moment.`);
       return;
     }
-    if (!window.confirm(`Delete ticket ${label}? This can't be undone.`)) return;
-    const remove = () => {
-      persisted.current.delete(ticket.id);
-      setTickets((current) => current.filter((item) => item.id !== ticket.id));
-      if (selectedId === ticket.id) setSelectedId("");
+    const question = list.length > 1 ? `Delete ${list.length} tickets? This can't be undone.` : `Delete ticket ${label(list[0])}? This can't be undone.`;
+    if (!window.confirm(question)) return;
+    const remove = (ids: Set<string>) => {
+      for (const id of ids) persisted.current.delete(id);
+      setTickets((current) => current.filter((item) => !ids.has(item.id)));
+      if (ids.has(selectedId)) setSelectedId("");
+      if (expandedId && ids.has(expandedId)) setExpandedId(null);
     };
     // A ticket that was never saved only exists in this browser.
-    if (!persisted.current.has(ticket.id)) { remove(); return; }
+    const saved = list.filter((ticket) => persisted.current.has(ticket.id));
+    const local = new Set(list.filter((ticket) => !persisted.current.has(ticket.id)).map((ticket) => ticket.id));
+    if (!saved.length) { remove(local); return; }
     setSync("saving");
     try {
-      await deleteTicket(ticket.id);
-      trackEvent("ticket_deleted", { board_id: board.id });
-      remove();
+      const deleted = await deleteTickets(saved.map((ticket) => ticket.id));
+      deleted.forEach(() => trackEvent("ticket_deleted", { board_id: board.id }));
+      remove(new Set([...local, ...deleted]));
       setSync("saved");
+      // RLS hides rows the user may not delete, which shows up as fewer rows deleted rather than an error.
+      const missed = saved.length - deleted.length;
+      if (missed) window.alert(`${missed} of ${saved.length} tickets couldn't be deleted (missing, or you can't delete on this board).`);
     } catch (error) {
       console.error(error);
       setSync("error");
-      window.alert(`Couldn't delete ticket ${label}. ${error instanceof Error ? error.message : ""}`);
+      window.alert(`Couldn't delete ${list.length > 1 ? `${list.length} tickets` : `ticket ${label(list[0])}`}. ${error instanceof Error ? error.message : ""}`);
     }
   };
 
   const selectTicket = (ticket: Ticket) => setSelectedId(ticket.id);
+  // Expanding a row also selects it, so the row stays highlighted and the map follows.
+  const expandTicket = (ticket: Ticket) => { setSelectedId(ticket.id); setExpandedId(ticket.id); };
+  const expanded = tickets.find((ticket) => ticket.id === expandedId);
+  const expandedIndex = expanded ? rows.indexOf(expanded) : -1;
 
   const onMapHover = useCallback((id: string | null) => setHover({ id, from: "map" }), []);
   // The table's Map cell opens the map on the ticket's first place; a place chip opens it on that place.
@@ -463,8 +478,8 @@ function Portal({ account }: { account: Account }) {
       <main className={`workspace ${!mapOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} />
-          <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} />
-          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTicket} />
+          <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
+          <TicketTable rows={rows} selectedId={selected?.id ?? ""} emptyMessage={tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} />
         </section>
         {/* district_map off: no map panel, no rail, and the Map cells don't open one. */}
         {!mapOn ? null : sidebarOpen ? (
@@ -484,6 +499,17 @@ function Portal({ account }: { account: Account }) {
         )}
       </main>
       {intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
+      {expanded && (
+        <IntakeForm
+          ticket={expanded}
+          onChange={updateTicket}
+          onStep={{
+            prev: expandedIndex > 0 ? () => expandTicket(rows[expandedIndex - 1]) : undefined,
+            next: expandedIndex >= 0 && expandedIndex < rows.length - 1 ? () => expandTicket(rows[expandedIndex + 1]) : undefined,
+          }}
+          onClose={closeExpanded}
+        />
+      )}
       <PortalFooter />
     </div>
   );

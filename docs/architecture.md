@@ -98,8 +98,9 @@ src/
 ├── SignIn.tsx               # email + password sign-in (no sign-up: accounts are invite-only)
 ├── PublicBoard.tsx          # /share/<token>: read-only table and map
 ├── ShareLink.tsx            # staff dialog: copy or replace the share link
-├── TicketTable.tsx          # editable, resizable ticket table (spec 6.2 column order)
-├── IntakeForm.tsx           # new ticket form (manual_intake)
+├── TicketTable.tsx          # editable, resizable ticket table: row heights, checkboxes, right-click delete (spec 6.2)
+├── IntakeForm.tsx           # ticket form: new ticket (manual_intake) and the expanded row
+├── RowHeightMenu.tsx        # toolbar menu for the table's row height
 ├── MapView.tsx              # Leaflet map, board boundary, ticket pins (district_map)
 ├── LocationCell.tsx         # places on a ticket + NYC GeoSearch picker
 ├── geosearch.ts             # GeoSearch client, biased to the board's borough
@@ -107,6 +108,7 @@ src/
 ├── lib/
 │   ├── board.tsx            # BoardProvider, useBoard, useFeature, useBoardSwitcher, roles
 │   ├── features.ts          # FeatureKey: the single list of flag keys
+│   ├── useDismiss.ts        # close a menu on outside click or Escape
 │   └── analytics.ts         # Better Stack analytics and errors (off unless VITE_BETTERSTACK_TOKEN is set)
 ├── features/tickets/
 │   ├── types.ts             # Ticket, Status, Source, Place
