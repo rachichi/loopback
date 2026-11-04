@@ -8,7 +8,6 @@ Production project: `enanmsnprjviztiiemtn` ("Loopback"). How the pieces fit toge
 | `scripts/` | Admin SQL to run by hand in the SQL editor. Not migrations. |
 | `seeds/boards/` | Output of `scripts/seed_boards.mjs`: the 59 NYC community boards with boundaries. |
 | `seed.sql` | Sample CB3 tickets for a fresh database (`pnpm db:seed-sql` regenerates it). |
-| `legacy/` | The original hand-pasted `schema.sql` and `002_board.sql`. Superseded by the baseline migration. |
 
 ## Migrations
 
@@ -29,6 +28,7 @@ Every file below is applied in production.
 | `20261102170000_public_board_features.sql` | Additive | `public_board()` also returns the board's flags |
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
 | `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: staff with display names |
+| `20261102200000_submitted_by_from_auth.sql` | Additive | Trigger that sets `submitted_by` on manual tickets to the signed-in user's email |
 | `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
 | `20261103120000_suggestion_stats.sql` | Additive | `board_suggestion_stats`: accepted and rejected AI suggestions and distinct reviewers per board |
 
@@ -55,7 +55,8 @@ supabase link --project-ref enanmsnprjviztiiemtn
 # Record every file as applied under its own version:
 supabase migration repair --status applied \
   20261020000000 20261102120000 20261102120100 20261102120150 20261102120200 20261102120300 \
-  20261102130000 20261102140000 20261102150000 20261102160000 20261102170000 20261102180000
+  20261102130000 20261102140000 20261102150000 20261102160000 20261102170000 20261102180000 \
+  20261102190000 20261102200000 20261103100000 20261103120000
 # Remove the MCP-stamped versions:
 supabase migration repair --status reverted 20261102132812 20261102132842 20261102134215 20261102134248
 supabase migration list    # local and remote should now match with nothing pending

@@ -4,7 +4,7 @@
 
 do $$
 declare
-  admin_email constant text := 'rl996@cornell.edu';
+  admin_email constant text := 'you@example.org';
   uid uuid;
 begin
   select id into uid from auth.users where email = lower(admin_email);

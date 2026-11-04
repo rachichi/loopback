@@ -2,8 +2,9 @@
 -- NOT a migration. Paste into the Supabase SQL editor and run. Safe to re-run.
 --
 -- Plus-addressed accounts get the name of their base address, so the per-board test staff accounts from
--- create_board_test_staff.sql (rl996+b-cb-9@cornell.edu and so on) show the same name as rl996@cornell.edu.
--- Add a row to the list below for each new person.
+-- create_board_test_staff.sql (you+b-cb-9@example.org and so on) show the same name as you@example.org.
+-- Add a row to the list below for each person. Do not commit real names or emails: the repo is public.
+-- Keep the real list in a copy named set_staff_names.local.sql, which is git-ignored.
 
 do $$
 declare
@@ -12,11 +13,8 @@ declare
 begin
   for person in
     select * from (values
-      ('rl996@cornell.edu',   'Rachel Liu'),
-      ('ma2495@cornell.edu',  'Mujtaba Asghar'),
-      ('darnwine@cb.nyc.gov', 'Dante B. Arnwine'),
-      ('djo47@cornell.edu',   'David Opatrny'),
-      ('bwr45@cornell.edu',   'Burke Reimann')
+      ('you@example.org',       'Your Name'),
+      ('colleague@example.org', 'Colleague Name')
     ) as people (email, full_name)
   loop
     update auth.users

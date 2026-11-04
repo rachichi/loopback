@@ -31,7 +31,7 @@ Findings that drive the work:
    - `src/meetings.ts`: bundles two CB3 transcripts into the client, even on the CB9 deployment.
 3. **Ticket numbers are assigned client-side** (`initialTickets` index, `Number(ticket.number)` in `toRow`). Two staff creating tickets at once will collide. There is only a non-unique index on `(board, number)`.
 4. **Schema is applied by pasting SQL** (`schema.sql`, `002_board.sql`). No migration history. `002_board.sql` backfills every existing ticket as `m-cb-3`.
-5. **Eval harness is mixed into the app root**: `lib/`, `scripts/`, `prompts/`, `runs/`, `results.csv`, `data/`. `data/` holds gold tickets and transcripts. The repo was public until 2026-11-02 and is now private.
+5. **Eval harness is mixed into the app root**: `lib/`, `scripts/`, `prompts/`, `runs/`, `results.csv`, `data/`. `data/` holds gold tickets and transcripts. The repo was public until 2026-11-02, private until 2026-11-04, and is now public under the MIT license.
 6. **No CI, no typecheck script, no tests.**
 7. **Sample-data fallback in `db.ts`** means a missing env var silently runs the app on fake data and saves nothing.
 

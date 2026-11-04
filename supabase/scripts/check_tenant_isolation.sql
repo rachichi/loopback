@@ -30,7 +30,7 @@
 
 do $$
 declare
-  base_email constant text := 'rl996@cornell.edu';
+  base_email constant text := 'you@example.org';
   board_a    constant text := 'b-cb-9';
   board_b    constant text := 'm-cb-3';
   ua uuid := (select id from auth.users
