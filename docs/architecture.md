@@ -132,6 +132,13 @@ It never sends ticket content, names, emails, user ids, query strings, hashes or
 
 Most of the tag's features are on by default and can only be switched off in Better Stack (application, Frontend tab). Keep these off, since they would capture ticket content: session replays, console logs, auto-capture of anonymous and identified user events, browser fingerprint. Keep on: frontend errors, web vitals, website analytics. As a backstop, the application's ingestion transformations (VRL) drop autocapture events, console logs and replays and strip the fingerprint, so these are not stored even if a switch is turned back on.
 
+The web events transformation also prepares events for dashboards, which can only filter on fields Better Stack extracts:
+
+- It copies `payload.board_id` to `user.group_id` and `payload.role` to `user.group_name`, Better Stack's built-in group fields. No user id is set, and the browser still never calls `user`. Events received before 2026-11-03 14:00 UTC have neither.
+- It sets `environment` from the page address: `development` for localhost, `production` for anything else (deploy previews have no token). The app's `environment` setting only reaches error reports, not web events. Events received before 2026-11-03 14:16 UTC have none.
+
+Dashboards (Better Stack, Telemetry, Metrics): `Loopback usage` shows the app's events, sessions and frontend errors, with board, role and environment filters that each default to `all`. The board filter is a fixed list of board ids, so add new boards to it by hand. The role list (`platform_admin`, `staff`) is fixed too. `Website analytics` and `Web vitals` are Better Stack's built-in dashboards.
+
 ## Environments and deploys
 
 | Where | What runs | Configuration |
