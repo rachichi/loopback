@@ -7,7 +7,10 @@ import { useBoard } from "./lib/board";
 
 const titleCase = (text: string) => text.toLowerCase().replace(/\b([a-z])/g, (c) => c.toUpperCase());
 
-/** The ticket's mapped places, plus a GeoSearch box to add more. The meeting's wording stays in location.text. */
+/**
+ * The ticket's mapped places, plus a GeoSearch box to add more. The meeting's wording stays in location.text;
+ * it shows while the ticket has no places (tickets drafted from a transcript start that way) and seeds the search.
+ */
 export default function LocationCell({
   location,
   label,
@@ -60,6 +63,9 @@ export default function LocationCell({
   return (
     <div className="location-cell">
       <div className="place-chips">
+        {!location.places.length && location.text.trim() && !adding && (
+          <span className="location-text" title={`From the meeting: ${location.text}\nAdd a place to put it on the map.`}>{location.text}</span>
+        )}
         {location.places.map((place, index) => (
           <span className="place-chip" key={`${place.name}-${index}`}>
             {onShowOnMap ? (
@@ -87,7 +93,7 @@ export default function LocationCell({
             }}
           />
         ) : (
-          <button type="button" className="place-add" onClick={(event) => { event.stopPropagation(); setAdding(true); }}><Plus size={9} /> Place</button>
+          <button type="button" className="place-add" onClick={(event) => { event.stopPropagation(); if (!location.places.length) setQuery(location.text.trim()); setAdding(true); }}><Plus size={9} /> Place</button>
         )}
       </div>
       {adding && anchor && query.trim().length >= 3 && createPortal(

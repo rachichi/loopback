@@ -268,6 +268,9 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .ticket-row > div:nth-child(2) .cell-input { color: #1a2234; font-weight: 500; }
 .location-cell { width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .place-chips { display: flex; flex-wrap: wrap; gap: 3px; padding: 0 2px; }
+/* The meeting's wording, shown on one line beside + Place until the ticket has a mapped place. */
+.location-text { min-width: 0; flex: 0 1 auto; align-self: center; color: #4c5561; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.place-add { flex: none; }
 .place-chip { max-width: 100%; display: inline-flex; align-items: center; border-radius: 3px; background: #e6f4f8; color: #176b83; }
 .place-chip button { min-width: 0; display: inline-flex; align-items: center; gap: 3px; padding: 2px 4px; border: 0; background: none; color: inherit; font: inherit; font-size: 8px; cursor: pointer; }
 .place-chip > button:first-child span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -428,9 +431,16 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 .meeting-picker { min-width: 0; }
 .meeting-picker select { min-width: 0; flex: 0 1 auto; }
 .meeting-picker button.generate { width: auto; height: 32px; margin-left: auto; padding: 0 16px 0 13px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #eef1f4; border-radius: 999px; background: #fbfcfd; box-shadow: 0 2px 8px rgba(17, 24, 44, .08), inset 0 1px 0 white; font-size: 13px; font-weight: 600; cursor: pointer; transition: box-shadow .15s, transform .15s; }
-.meeting-picker button.generate span { background: linear-gradient(90deg, #3fd8b4, #2bb7d5 45%, #8a63b5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.meeting-picker button.generate { position: relative; overflow: hidden; }
+.meeting-picker button.generate > svg, .generate-label { position: relative; }
+.generate-label { background: linear-gradient(90deg, #3fd8b4, #2bb7d5 45%, #8a63b5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* While Generate runs, the button itself is the progress bar. */
+.generate-fill { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(63, 216, 180, .3), rgba(43, 183, 213, .3) 45%, rgba(138, 99, 181, .3)); transition: clip-path .25s linear; }
+/* Already generated: grey, but it still runs again after a confirm. */
+.meeting-picker button.generate.done { background: #f1f3f5; box-shadow: none; }
+.meeting-picker button.generate.done .generate-label { background: none; color: #8b929c; }
 .meeting-picker button.generate:hover:not(:disabled) { background: white; box-shadow: 0 4px 14px rgba(43, 183, 213, .22), inset 0 1px 0 white; transform: translateY(-1px); }
-.meeting-picker button.generate:disabled { opacity: .65; cursor: progress; }
+.meeting-picker button.generate:disabled { cursor: progress; }
 .match-status { padding: 7px 18px; border-bottom: 1px solid #e3e6ea; background: #fafbfc; color: #4c5561; font-size: 9px; }
 .match-status .match-error { color: #b3263e; }
 /* A pending suggestion's paragraphs: underlined in the type color until staff review it. */

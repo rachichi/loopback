@@ -28,6 +28,16 @@ function standIn(suggestion: Suggestion, ticket: Ticket | undefined): Ticket {
   };
 }
 
+/** Expected seconds for a Generate run. On CB9's meetings it took about 10 s plus 1 s per 2,000 characters. */
+function expectedSeconds(paragraphs: Paragraph[]): number {
+  return 10 + paragraphs.reduce((total, paragraph) => total + paragraph.text.length, 0) / 2000;
+}
+
+/** The Generate button's fill: steady to 90% at the expected time, then creeping toward 99% so a slow run never looks done. */
+function progressAt(elapsed: number, expected: number): number {
+  return elapsed < expected ? 0.9 * elapsed / expected : 0.9 + 0.09 * (1 - Math.exp(-(elapsed - expected) / expected));
+}
+
 export default function TranscriptPanel({
   meetings,
   meetingId,
@@ -83,8 +93,18 @@ export default function TranscriptPanel({
     onMeetingChange(id);
   };
 
-  const [matching, setMatching] = useState(false);
+  // While Generate runs, the button fills like a progress bar toward the run's expected length.
+  const [running, setRunning] = useState<{ at: number; seconds: number } | null>(null);
+  const [progress, setProgress] = useState(0);
   const [matchError, setMatchError] = useState<string | null>(null);
+  useEffect(() => {
+    if (!running) return;
+    const tick = () => setProgress(progressAt((Date.now() - running.at) / 1000, running.seconds));
+    tick();
+    const timer = window.setInterval(tick, 250);
+    return () => window.clearInterval(timer);
+  }, [running]);
+  const matching = running !== null;
 
   const byId = useMemo(() => new Map(tickets.map((ticket) => [ticket.id, ticket])), [tickets]);
   const inMeeting = suggestions.filter((suggestion) => suggestion.meetingId === info?.id);
@@ -97,27 +117,39 @@ export default function TranscriptPanel({
   const meeting: TranscriptMeeting = { id: info.id, title: info.title, label: info.label, date: info.heldOn, paragraphs: shown };
 
   const run = async () => {
-    if (inMeeting.length && !window.confirm(`Match this meeting again? This replaces its ${inMeeting.length} suggestion${inMeeting.length === 1 ? "" : "s"} waiting in Review.`)) return;
-    setMatching(true);
+    const replaces = inMeeting.length ? ` This replaces its ${inMeeting.length} suggestion${inMeeting.length === 1 ? "" : "s"} waiting in Review.` : "";
+    if (info.matchedAt && !window.confirm(`This meeting was already generated on ${new Date(info.matchedAt).toLocaleDateString()}. Generate again?${replaces}`)) return;
+    setRunning({ at: Date.now(), seconds: expectedSeconds(shown) });
     setMatchError(null);
     try {
       await onRunMatching(info.id);
+      // Show the bar full for a moment before the button resets.
+      setProgress(1);
+      await new Promise((resolve) => setTimeout(resolve, 400));
     } catch (error) {
       setMatchError(error instanceof Error ? error.message : "Couldn't match this meeting.");
     } finally {
-      setMatching(false);
+      setRunning(null);
+      setProgress(0);
     }
   };
+
+  // A meeting that was already generated keeps a greyed-out button; it still runs again, after a confirm.
+  const done = Boolean(info.matchedAt) && !matching;
 
   // The sparkle takes the same teal-to-blue-to-purple gradient as the label (.generate in index.css).
   const button = canEdit && (
     <button
       type="button"
-      className="generate"
+      className={`generate ${matching ? "running" : ""} ${done ? "done" : ""}`}
       disabled={matching}
+      aria-busy={matching}
       onClick={run}
-      title={`Match this transcript to the board's open tickets and draft tickets for anything new. Results go to the Review tab.${info.matchedAt ? ` Last run ${new Date(info.matchedAt).toLocaleString()}; running again replaces the suggestions still in Review.` : ""}`}
+      title={matching
+        ? "Reading the transcript against the board's open tickets"
+        : `Match this transcript to the board's open tickets and draft tickets for anything new. Results go to the Review tab.${info.matchedAt ? ` Generated ${new Date(info.matchedAt).toLocaleString()}; generating again replaces the suggestions still in Review.` : ""}`}
     >
+      {matching && <span className="generate-fill" style={{ clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }} aria-hidden="true" />}
       <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
         <defs>
           <linearGradient id="generate-ombre" x1="0" y1="0" x2="1" y2="1">
@@ -127,8 +159,8 @@ export default function TranscriptPanel({
           </linearGradient>
         </defs>
       </svg>
-      <Sparkles size={15} color="url(#generate-ombre)" />
-      <span>{matching ? "Generating…" : "Generate"}</span>
+      <Sparkles size={15} color={done ? "#9aa1aa" : "url(#generate-ombre)"} />
+      <span className="generate-label">{matching ? "Generating…" : done ? "Generated" : "Generate"}</span>
     </button>
   );
 
