@@ -117,6 +117,34 @@ function RowMenu({ x, y, targets, onDelete, onClose }: { x: number; y: number; t
   );
 }
 
+/** A summary cell: one clipped line in the table. Clicking it opens the full text in an editor mid-screen. */
+function SummaryCell({ ticket, onChange }: { ticket: Ticket; onChange: (summary: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const close = useCallback(() => setOpen(false), []);
+  useDismiss(dialogRef, open, close);
+  const label = ticket.number || ticket.title;
+  return (
+    <div className="summary-cell">
+      <div className="summary-text" tabIndex={0} title="Click to read and edit" onClick={() => setOpen(true)} onKeyDown={(event) => { if (event.key === "Enter") setOpen(true); }}>
+        {ticket.summary}
+      </div>
+      {open && createPortal(
+        <div className="cell-backdrop" onClick={(event) => event.stopPropagation()}>
+          <div className="cell-dialog" role="dialog" aria-label={`Summary for ${label}`} ref={dialogRef}>
+            <div className="cell-dialog-head">
+              <span>Summary</span>
+              <button type="button" aria-label="Close" onClick={close}><X size={14} /></button>
+            </div>
+            <textarea autoFocus className="cell-dialog-input" value={ticket.summary} onChange={(event) => onChange(event.target.value)} />
+          </div>
+        </div>,
+        document.body,
+      )}
+    </div>
+  );
+}
+
 export default function TicketTable({
   rows,
   selectedId,
@@ -215,7 +243,7 @@ export default function TicketTable({
     "--row-height": `${rowHeights.find((item) => item.key === rowHeight)?.px ?? 32}px`,
   } as CSSProperties;
 
-  const text = (ticket: Ticket, field: "title" | "summary", label: string) => (
+  const text = (ticket: Ticket, field: "title", label: string) => (
     <textarea
       className="cell-input"
       rows={1}
@@ -376,7 +404,7 @@ export default function TicketTable({
           {onShowOnMap
             ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
             : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} /></div>}
-          <div>{text(ticket, "summary", "Summary")}</div>
+          <div><SummaryCell ticket={ticket} onChange={(summary) => onChange(ticket.id, { summary })} /></div>
           {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}
