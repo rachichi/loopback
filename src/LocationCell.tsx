@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Plus, X } from "lucide-react";
-import { searchPlaces } from "./geosearch";
+import { searchMorePlaces, searchPlaces } from "./geosearch";
 import type { Place, TicketLocation } from "./features/tickets/types";
 import { useBoard } from "./lib/board";
 
@@ -29,6 +29,8 @@ export default function LocationCell({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<Place[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  // The backup search, for one query at a time; it runs only when asked (see searchMorePlaces).
+  const [more, setMore] = useState<{ query: string; status: "loading" | "done" | "error"; results: Place[] } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [anchor, setAnchor] = useState<DOMRect | null>(null);
 
@@ -53,7 +55,20 @@ export default function LocationCell({
     if (adding) setAnchor(inputRef.current?.getBoundingClientRect() ?? null);
   }, [adding, query, results]);
 
-  const close = () => { setAdding(false); setQuery(""); setResults([]); };
+  const close = () => { setAdding(false); setQuery(""); setResults([]); setMore(null); };
+  const text = query.trim();
+  const current = more?.query === text ? more : null;
+  const moreResults = current ? current.results.filter((place) => !results.some((result) => result.name.toLowerCase() === place.name.toLowerCase())) : [];
+  const searchMore = async () => {
+    if (text.length < 3 || (current && current.status !== "error")) return;
+    setMore({ query: text, status: "loading", results: [] });
+    try {
+      const found = await searchMorePlaces(text, borough);
+      setMore((latest) => latest?.query === text ? { query: text, status: "done", results: found } : latest);
+    } catch {
+      setMore((latest) => latest?.query === text ? { ...latest, status: "error" } : latest);
+    }
+  };
   const add = (place: Place) => {
     onChange({ ...location, places: [...location.places, { ...place, name: titleCase(place.name) }] });
     close();
@@ -89,7 +104,12 @@ export default function LocationCell({
             onKeyDown={(event) => {
               // Keep Escape and Enter from also closing or submitting a surrounding form.
               if (event.key === "Escape") { event.stopPropagation(); close(); }
-              if (event.key === "Enter") { event.preventDefault(); if (results[0]) add(results[0]); }
+              if (event.key === "Enter") {
+                event.preventDefault();
+                const first = results[0] ?? moreResults[0];
+                if (first) add(first);
+                else if (status !== "loading") void searchMore();
+              }
             }}
           />
         ) : (
@@ -99,14 +119,19 @@ export default function LocationCell({
       {adding && anchor && query.trim().length >= 3 && createPortal(
         <ul className="place-results" style={{ left: anchor.left, top: anchor.bottom + 4, minWidth: Math.max(anchor.width, 220) }}>
           {status === "loading" && !results.length && <li className="muted">Searching…</li>}
-          {status === "error" && <li className="muted">Couldn't reach NYC GeoSearch</li>}
-          {status === "idle" && !results.length && <li className="muted">No matches. Try an address or a named place; intersections aren't supported.</li>}
-          {results.map((place) => (
+          {status === "error" && <li className="muted">Couldn't reach the place search</li>}
+          {[...results, ...moreResults].map((place) => (
             // mousedown, not click, so the input's blur doesn't close the list first
             <li key={`${place.name}-${place.lat}`} onMouseDown={(event) => { event.preventDefault(); add(place); }}>
               {titleCase(place.name)}
             </li>
           ))}
+          {/* The last row runs the backup search, which also finds addresses missing from the first one. */}
+          {status !== "loading" && (!current || current.status === "error"
+            ? <li className="search-more" onMouseDown={(event) => { event.preventDefault(); void searchMore(); }}>{current ? "Couldn't search more places. Try again" : results.length ? "Search more places" : "No matches. Search more places (Enter)"}</li>
+            : current.status === "loading" ? <li className="muted">Searching more places…</li>
+            : !results.length && !moreResults.length ? <li className="muted">No matches. Try an address or a named place; intersections aren't supported.</li>
+            : null)}
         </ul>,
         document.body,
       )}
