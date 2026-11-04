@@ -47,8 +47,9 @@ Read from the hand-drawn journey. Dot colors: purple = V1, blue = V2, green = V3
 | Ticket table | V1 | none | Exists. Critical columns and metrics defined in section 6. |
 | District map | V1 | `district_map` | Exists (`MapView.tsx`). Boundary becomes per board. |
 | Admin panel + features on/off | V2 | none | V1 ships the `boards.features` column and `useFeature()`. The admin UI is V2. |
-| Transcript matching (Block Party) | V2 | `transcript_matching` | `TranscriptView`, extraction, evidence spans. Dark in V1. |
-| Human approve / edit of every AI output | V2 | with `transcript_matching` | The sketch shows these nodes green. Placed in V2 because transcript matching creates AI drafts that need review. Confirm. |
+| Transcript matching (Block Party) | V2 | `transcript_matching` | In progress on the `staging` board (2026-11-03). Staff log tickets during the meeting; the transcript arrives about 24 hours later and `match-transcript` suggests updates to those tickets (evidence paragraphs, changed fields) and new tickets for issues staff missed. Transcripts are loaded by hand into `meetings` until the Block Party connection exists. See `docs/architecture.md`. |
+| Human approve / edit of every AI output | V2 | with `transcript_matching` | Confirmed V2 (2026-11-03): every suggestion is approved, edited then approved, or rejected by staff in the Transcript tab. Decisions are kept in `ticket_suggestions`. |
+| Meeting minutes | V3 | `meeting_minutes` | Requested 2026-11-03. Boards must post minutes within two weeks of a meeting. A "Generate meeting minutes" button on a processed transcript, prompted with the board's past minutes. Not built yet. |
 | Email intake | V3 | `email_intake` | |
 | Asset generation: social posts, resolutions, meeting minutes (docx/pdf) | V3 | `asset_generation` | |
 | Aggregate to borough presidents and mayors | V3 | `data_aggregation` | Cross-board. Conflicts with tenant isolation, see section 8. |
@@ -196,6 +197,8 @@ Public share links. Each board has a random `boards.share_token` (24 characters)
 
 Acceptance test: a user in `b-cb-9` cannot select, insert, update or delete a ticket with `board = 'm-cb-3'`, including by changing `board` in an update. This is `supabase/scripts/check_tenant_isolation.sql`, which also checks ticket numbering and feature flag resolution and rolls everything back. It passed in production on 2026-11-02, after 3b: each test user saw only their own board (5 and 24 tickets), a new `b-cb-9` ticket got number 8 (the next `next_ticket_no`; numbers are not reused after a delete), all four cross-board writes were denied or changed 0 rows, a `b-cb-9` override turned `district_map` off for that board only, and the default turned it off and on for all 59 boards. The anonymous `curl` against `/rest/v1/tickets` returned `[]`.
 
+It passed again on 2026-11-03 with the transcript matching checks added (migration `20261103100000_meetings_and_suggestions.sql`). Staff of `b-cb-9` saw 0 of a test staging meeting and suggestion. Their approve and reject were denied (P0002), and a direct update of the suggestion changed 0 rows. Staging staff then approved it, which made ticket 22 with source `transcript` and one meeting. Isolation and flags gave the same results as before (5 and 24 tickets, 60 boards). Afterwards the staging and `b-cb-9` ticket counters, the suggestions table and the flags were unchanged. `match-transcript` answers 401 to the anon key.
+
 ## 6. V1 product scope
 
 ### 6.1 Flow
@@ -294,7 +297,7 @@ Resolved on 2026-11-02:
 
 Still open:
 1. Who toggles features: platform admins only (assumed) or board admins too.
-2. Approve/reject placement in V2 (assumed) versus V3.
+2. ~~Approve/reject placement in V2 (assumed) versus V3.~~ Resolved 2026-11-03: V2, with transcript matching.
 3. Supabase staging project: a second free project (assumed). Free projects are paused after about a week of low activity (Supabase docs give no exact threshold). The keep-alive Action is a workaround, not a guarantee. Upgrade production to a paid plan before real board staff depend on it.
 4. The user downloads the Community Districts GeoJSON from NYC Open Data (dataset `5crt-au7u`) and confirms the terms of use on the dataset's About page. The license text could not be read when this spec was written. Do not invent boundaries.
 

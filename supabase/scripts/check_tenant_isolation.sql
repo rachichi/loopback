@@ -4,9 +4,11 @@
 -- Needs the plus-addressed test staff from create_board_test_staff.sql. Do not use a platform admin
 -- account: platform admins see every board, so the isolation lines would look like failures.
 --
--- Signs in as staff of board_a, then board_b, then runs the flag checks as postgres. It always ends
+-- Signs in as staff of board_a, then board_b, then checks meetings and suggestions (a staging meeting and
+-- suggestion that board_a's staff must not see or decide, and that the staging staff can approve), then
+-- runs the flag checks as postgres. It always ends
 -- with an exception, so nothing is kept: the test ticket, the ticket counter and the flag changes all
--- roll back. The results are in the error message after "ROLLBACK REPORT:".
+-- roll back, as do the test meeting, suggestion and ticket. The results are in the error message after "ROLLBACK REPORT:".
 --
 -- A pass looks like this (counts and numbers depend on the data):
 --   A sees: <board_a>=<n>                      only board_a
@@ -16,6 +18,12 @@
 --   A delete B rows deleted: 0
 --   A move own ticket to B: denied (42501)
 --   B sees: <board_b>=<n>                      only board_b
+--   A sees staging meetings: 0, suggestions: 0
+--   A approve staging suggestion: denied (P0002)
+--   A reject staging suggestion: denied (P0002)
+--   A update staging suggestion rows changed: 0
+--   Staging suggestion after A: pending
+--   C approve staging suggestion: ticket <n>, source transcript, meetings 1
 --   After A override off: ... (boards with map off: 1)
 --   Default off, boards with map on: 0
 --   Default on, boards with map on: <all> of <all>
@@ -29,12 +37,18 @@ declare
               where email = lower(split_part(base_email, '@', 1) || '+' || board_a || '@' || split_part(base_email, '@', 2)));
   ub uuid := (select id from auth.users
               where email = lower(split_part(base_email, '@', 1) || '+' || board_b || '@' || split_part(base_email, '@', 2)));
+  -- Staff of the staging board, for the meeting and suggestion checks.
+  uc uuid := (select id from auth.users
+              where email = lower(split_part(base_email, '@', 1) || '+staging@' || split_part(base_email, '@', 2)));
+  mid uuid;
+  sid uuid;
+  t public.tickets;
   r text := '';
   n int;
   s text;
 begin
-  if ua is null or ub is null then
-    raise exception 'Test staff for % or % not found. Run create_board_test_staff.sql first.', board_a, board_b;
+  if ua is null or ub is null or uc is null then
+    raise exception 'Test staff for %, % or staging not found. Run create_board_test_staff.sql first.', board_a, board_b;
   end if;
 
   -- Isolation, as staff of board_a
@@ -71,6 +85,44 @@ begin
   perform set_config('request.jwt.claims', json_build_object('sub', ub, 'role', 'authenticated')::text, true);
   select string_agg(board || '=' || c, ',') into s from (select board, count(*) c from public.tickets group by board) x;
   r := r || E'\nB sees: ' || coalesce(s, 'nothing');
+
+  -- Meetings and suggestions: a staging meeting with one pending suggestion, made as postgres
+  perform set_config('role', 'postgres', true);
+  insert into public.meetings (board, title, held_on, transcript, source, external_id)
+  values ('staging', 'Rollback test meeting', current_date, 'First paragraph.' || E'\n' || 'Second paragraph.', 'upload', 'rollback-test')
+  returning id into mid;
+  insert into public.ticket_suggestions (board, meeting_id, kind, evidence, spans, changes)
+  values ('staging', mid, 'new', '{P2}', jsonb_build_array(jsonb_build_object('meetingId', mid, 'start', 17, 'end', 34)),
+          '{"title": "Rollback test suggestion", "type": "Other", "status": "Open"}')
+  returning id into sid;
+
+  -- As staff of board_a: none of it is visible or decidable
+  perform set_config('request.jwt.claims', json_build_object('sub', ua, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+  r := r || E'\nA sees staging meetings: ' || (select count(*) from public.meetings where board = 'staging')
+         || ', suggestions: ' || (select count(*) from public.ticket_suggestions where board = 'staging');
+  begin
+    perform public.apply_ticket_suggestion(sid);
+    r := r || E'\nA approve staging suggestion: ALLOWED (bad)';
+  exception when others then r := r || E'\nA approve staging suggestion: denied (' || sqlstate || ')';
+  end;
+  begin
+    perform public.reject_ticket_suggestion(sid);
+    r := r || E'\nA reject staging suggestion: ALLOWED (bad)';
+  exception when others then r := r || E'\nA reject staging suggestion: denied (' || sqlstate || ')';
+  end;
+  update public.ticket_suggestions set status = 'approved' where id = sid;
+  get diagnostics n = row_count;
+  r := r || E'\nA update staging suggestion rows changed: ' || n;
+  perform set_config('role', 'postgres', true);
+  r := r || E'\nStaging suggestion after A: ' || (select status from public.ticket_suggestions where id = sid);
+
+  -- As staging staff: approving creates a numbered transcript ticket linked to the meeting
+  perform set_config('request.jwt.claims', json_build_object('sub', uc, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+  t := public.apply_ticket_suggestion(sid);
+  r := r || E'\nC approve staging suggestion: ticket ' || t.number || ', source ' || t.source
+         || ', meetings ' || cardinality(t.meeting_ids);
 
   -- Flag off for board_a only
   perform set_config('role', 'postgres', true);

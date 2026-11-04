@@ -18,4 +18,5 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm build
-      - run: pnpm check:bundle   # no transcript code in V1 (spec step 7)
+      - run: pnpm check:bundle   # transcript UI only in its lazy chunk, no demo data anywhere
+      - run: node scripts/build_match_prompt.mjs --check   # match-transcript ships the current evals prompt

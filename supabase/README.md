@@ -27,8 +27,10 @@ Every file below is applied in production.
 | `20261102160000_public_share_links.sql` | Mixed | `boards.share_token`, `public_board()`, `public_board_tickets()`, `rotate_share_token()`; removes the volunteer role |
 | `20261102170000_public_board_features.sql` | Additive | `public_board()` also returns the board's flags |
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
-| `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: `board_staff()` plus each person's display name |
+| `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: staff with display names |
 | `20261102200000_submitted_by_from_auth.sql` | Additive | Trigger that sets `submitted_by` on manual tickets to the signed-in user's email |
+| `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
+| `20261103120000_suggestion_stats.sql` | Additive | `board_suggestion_stats`: accepted and rejected AI suggestions and distinct reviewers per board |
 
 ### Writing a migration
 
@@ -54,7 +56,7 @@ supabase link --project-ref enanmsnprjviztiiemtn
 supabase migration repair --status applied \
   20261020000000 20261102120000 20261102120100 20261102120150 20261102120200 20261102120300 \
   20261102130000 20261102140000 20261102150000 20261102160000 20261102170000 20261102180000 \
-  20261102190000 20261102200000
+  20261102190000 20261102200000 20261103100000 20261103120000
 # Remove the MCP-stamped versions:
 supabase migration repair --status reverted 20261102132812 20261102132842 20261102134215 20261102134248
 supabase migration list    # local and remote should now match with nothing pending
@@ -68,8 +70,9 @@ Re-running the baseline would re-create the demo policies and reopen anonymous a
 | --- | --- |
 | `add_platform_admin.sql` | Makes an existing account a platform admin. Set the email, run. |
 | `create_board_test_staff.sql` | One plus-addressed staff account per board (`you+<board id>@domain`) for testing what each board's staff see. Writes to `auth.users` directly; never commit the password you set. |
-| `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering and feature flags. Always rolls back; results are in the error message. |
-| `create_staging_board.sql` | Creates or refreshes the `staging` board: a copy of `m-cb-3`'s boundary and ticket types with every feature flag on, for trying V2 and V3 features. No share link, no staff. |
+| `check_tenant_isolation.sql` | Signs in as two boards' test staff and checks isolation, cross-board denial, ticket numbering, meeting and suggestion access, and feature flags. Always rolls back; results are in the error message. |
+| `create_staging_board.sql` | Creates or refreshes the `staging` board: a copy of `b-cb-9`'s borough, boundary and ticket types with every feature flag on, for trying V2 and V3 features. No share link, no staff. |
+| `seed_staging_tickets.sql` | About two hand-logged tickets per meeting in `evals/data/b-cb-9/` on the `staging` board, for transcript matching to enhance. Load the meetings first: `node scripts/load_meetings.mjs staging evals/data/b-cb-9/raw_*.txt`. |
 
 Common one-liners (staff, flags, logos, ticket types) are in the root [`README.md`](../README.md#as-a-platform-admin-supabase-sql-editor).
 
@@ -80,9 +83,21 @@ Common one-liners (staff, flags, logos, ticket types) are in the root [`README.m
 | `is_board_member(b)`, `is_platform_admin()`, `can_edit_board(b)` | Used inside policies | Booleans for the signed-in user |
 | `board_staff(b)` | Signed-in | The board's staff and emails, if the caller is its staff or a platform admin |
 | `rotate_share_token(b)` | Signed-in | A new share token, if the caller can edit the board |
+| `apply_ticket_suggestion(s, edited)` | Signed-in, `security invoker` | Approves a pending suggestion (staff's edited fields, or as proposed) and returns the ticket |
+| `reject_ticket_suggestion(s)` | Signed-in, `security invoker` | Rejects a pending suggestion |
 | `public_board(token)` | Anyone | The board's name, borough, logo, background, boundary, ticket types and flags |
 | `public_board_tickets(token)` | Anyone | Number, title, type, status, urgent, deadline, location, submitted date |
 | `ping()` | Anyone | `true`; called daily by the keep-alive workflow |
+
+## Edge Functions (`functions/`)
+
+| Function | What it does | Secrets |
+| --- | --- | --- |
+| `match-transcript` | Matches one meeting's transcript to the board's open tickets and stores `ticket_suggestions`. Checks `can_edit_board` and `transcript_matching` as the caller. See [`docs/architecture.md`](../docs/architecture.md#transcript-matching-v2-transcript_matching). | `ANTHROPIC_API_KEY` |
+
+`_shared/` holds code used by the functions and elsewhere: `extract.ts` (also the eval harness's extractor) and `transcript.ts` (also the app's paragraph splitter). Each function's `deno.json` maps the bare imports (`ai`, `@ai-sdk/anthropic`, `zod`, `@supabase/supabase-js`) to `npm:` specifiers.
+
+Deploy `match-transcript` with its own files and the shared ones: `index.ts`, `deno.json`, `prompt.ts`, `../_shared/extract.ts`, `../_shared/transcript.ts`. With the CLI: `supabase functions deploy match-transcript --project-ref enanmsnprjviztiiemtn`. Keep JWT verification on. Set the key once in the dashboard (Edge Functions, Secrets) or with `supabase secrets set ANTHROPIC_API_KEY=...`. After editing the prompt (`evals/prompts/v6.md`), run `node scripts/build_match_prompt.mjs` before deploying.
 
 ## Seeding all 59 boards
 
