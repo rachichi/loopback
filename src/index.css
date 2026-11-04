@@ -396,6 +396,47 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .hl-handle::before { content: ""; position: absolute; top: 0; bottom: 0; left: 4.5px; width: 3px; border-radius: 1px; background: rgb(var(--hl)); }
 body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select: none; }
 
+/* Transcript matching: the Transcript column, the Review tab's rows, the auto-match button and pending highlights. */
+.transcript-cell { flex-wrap: wrap; align-content: center; gap: 4px; }
+.meeting-tag.suggested { background: #ece4f5; color: #5b3a7a; box-shadow: inset 0 0 0 1px #c9b4e0; }
+.urgency-tabs button.review.active { border-bottom-color: #8a63b5; color: #5b3a7a; }
+.urgency-tabs button.review span { background: #ece4f5; color: #5b3a7a; }
+/* A suggestion waiting for review: greyed out and read only until Reviewed. */
+.review-row { background: #f6f7f8; }
+/* Review rows grow past the chosen row height to fit the Reviewed and Reject buttons, and keep their row number on hover. */
+.ticket-row.review-row { height: auto; min-height: var(--row-height, 32px); }
+.ticket-row.review-row > div { padding: 5px 8px; }
+.ticket-row.review-row .row-index { display: inline; }
+.review-row:hover, .review-row.hovered { background: #f1edf6; }
+.review-row .dim { opacity: .55; }
+.review-row .read-only { color: #4c5561; font-size: 10px; line-height: 1.4; }
+.review-row .review-summary { align-items: flex-start; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; }
+.review-title { flex-direction: column; align-items: flex-start !important; justify-content: center; gap: 6px; }
+.review-title > span { color: #1a2234; font-size: 11px; font-weight: 500; line-height: 1.35; }
+.ai-changed { border-bottom: 1.5px dotted #8a63b5; cursor: help; }
+.tag.ai-new { padding: 2px 7px; background: #ece4f5; color: #5b3a7a; font-size: 8px; font-weight: 700; }
+.review-actions { display: flex; gap: 5px; }
+.review-actions button { padding: 3px 8px; display: inline-flex; align-items: center; gap: 3px; border: 1px solid #cbd0d6; border-radius: 4px; background: white; color: #2c3742; font-size: 9px; font-weight: 600; cursor: pointer; }
+.review-actions button.reviewed { border-color: #237348; background: #237348; color: white; }
+.review-actions button.reviewed:hover:not(:disabled) { background: #1b5c39; }
+.review-actions button.reject:hover:not(:disabled) { border-color: #b3263e; color: #b3263e; }
+.review-actions button:disabled { opacity: .5; cursor: progress; }
+.tab-count { min-width: 16px; padding: 1px 5px; border-radius: 999px; background: #8a63b5; color: white; font-size: 8px; }
+.transcript-empty { padding: 32px 18px; color: #7d858f; font-size: 11px; text-align: center; background: white; flex: 1; }
+/* The meeting title and Generate share one line: the title shortens with an ellipsis, the button keeps its size. */
+.transcript-heading > div:first-child { min-width: 0; flex: 1 1 auto; }
+.meeting-picker { min-width: 0; }
+.meeting-picker select { min-width: 0; flex: 0 1 auto; }
+.meeting-picker button.generate { width: auto; height: 32px; margin-left: auto; padding: 0 16px 0 13px; flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px; border: 1px solid #eef1f4; border-radius: 999px; background: #fbfcfd; box-shadow: 0 2px 8px rgba(17, 24, 44, .08), inset 0 1px 0 white; font-size: 13px; font-weight: 600; cursor: pointer; transition: box-shadow .15s, transform .15s; }
+.meeting-picker button.generate span { background: linear-gradient(90deg, #3fd8b4, #2bb7d5 45%, #8a63b5); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.meeting-picker button.generate:hover:not(:disabled) { background: white; box-shadow: 0 4px 14px rgba(43, 183, 213, .22), inset 0 1px 0 white; transform: translateY(-1px); }
+.meeting-picker button.generate:disabled { opacity: .65; cursor: progress; }
+.match-status { padding: 7px 18px; border-bottom: 1px solid #e3e6ea; background: #fafbfc; color: #4c5561; font-size: 9px; }
+.match-status .match-error { color: #b3263e; }
+/* A pending suggestion's paragraphs: underlined in the type color until staff review it. */
+.transcript-body mark.hl.pending { background: transparent; box-shadow: inset 0 -2px 0 rgb(var(--hl) / .55); }
+.transcript-body mark.hl.pending.active { background: rgb(var(--hl) / .14); box-shadow: inset 0 -2px 0 rgb(var(--hl)); }
+
 @media (max-width: 1100px) {
   .workspace { grid-template-columns: minmax(620px, 58%) minmax(390px, 42%); }
 }

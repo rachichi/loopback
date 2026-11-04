@@ -13,6 +13,7 @@ export const featureFlags = {
   email_intake: { version: "V3", defaultEnabled: false, description: "Tickets created from email" },
   asset_generation: { version: "V3", defaultEnabled: false, description: "Social posts, resolutions, meeting minutes" },
   data_aggregation: { version: "V3", defaultEnabled: false, description: "Roll-up for borough presidents and mayors" },
+  meeting_minutes: { version: "V3", defaultEnabled: false, description: "Draft meeting minutes from a processed transcript" },
 } as const satisfies Record<string, { version: "V1" | "V2" | "V3"; defaultEnabled: boolean; description: string }>;
 
 export type FeatureKey = keyof typeof featureFlags;

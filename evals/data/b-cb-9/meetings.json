@@ -1,0 +1,52 @@
+[
+  {
+    "file": "raw_2026-10-07_land-use-part-1.txt",
+    "title": "ULURP/Land Use Committee Meeting Part 1",
+    "held_on": "2026-10-07"
+  },
+  {
+    "file": "raw_2026-10-07_land-use-part-2.txt",
+    "title": "ULURP/Land Use Committee Meeting Part 2",
+    "held_on": "2026-10-07"
+  },
+  {
+    "file": "raw_2026-10-07_youth-education.txt",
+    "title": "Youth and Education Committee Meeting",
+    "held_on": "2026-10-07"
+  },
+  {
+    "file": "raw_2026-10-08_environmental-protection.txt",
+    "title": "Environmental Protection Committee Meeting",
+    "held_on": "2026-10-08"
+  },
+  {
+    "file": "raw_2026-10-08_transportation.txt",
+    "title": "Transportation Committee Meeting",
+    "held_on": "2026-10-08"
+  },
+  {
+    "file": "raw_2026-10-14_public-safety.txt",
+    "title": "Public Safety Committee Meeting",
+    "held_on": "2026-10-14"
+  },
+  {
+    "file": "raw_2026-10-14_executive.txt",
+    "title": "Executive Committee Meeting",
+    "held_on": "2026-10-14"
+  },
+  {
+    "file": "raw_2026-10-16_land-use-bedford-utica-vote.txt",
+    "title": "ULURP/Land Use Committee Bedford Ave Utica Ave Vote",
+    "held_on": "2026-10-16"
+  },
+  {
+    "file": "raw_2026-10-21_general-board.txt",
+    "title": "General Board Meeting",
+    "held_on": "2026-10-21"
+  },
+  {
+    "file": "raw_2026-10-23_statement-of-needs-hearing.txt",
+    "title": "FY 28/29 Statement of Needs Public Hearing",
+    "held_on": "2026-10-23"
+  }
+]
