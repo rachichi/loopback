@@ -119,8 +119,9 @@ src/
 ├── SignIn.tsx               # email + password sign-in (no sign-up: accounts are invite-only)
 ├── PublicBoard.tsx          # /share/<token>: read-only table and map
 ├── ShareLink.tsx            # staff dialog: copy or replace the share link
-├── TicketTable.tsx          # editable, resizable ticket table (spec 6.2 column order)
-├── IntakeForm.tsx           # new ticket form (manual_intake)
+├── TicketTable.tsx          # editable, resizable ticket table: row heights, checkboxes, right-click delete (spec 6.2)
+├── IntakeForm.tsx           # ticket form: new ticket (manual_intake) and the expanded row
+├── RowHeightMenu.tsx        # toolbar menu for the table's row height
 ├── MapView.tsx              # Leaflet map, board boundary, ticket pins (district_map)
 ├── LocationCell.tsx         # places on a ticket + NYC GeoSearch picker
 ├── geosearch.ts             # GeoSearch client, biased to the board's borough
@@ -128,6 +129,7 @@ src/
 ├── lib/
 │   ├── board.tsx            # BoardProvider, useBoard, useFeature, useBoardSwitcher, roles
 │   ├── features.ts          # FeatureKey: the single list of flag keys
+│   ├── useDismiss.ts        # close a menu on outside click or Escape
 │   └── analytics.ts         # Better Stack analytics and errors (off unless VITE_BETTERSTACK_TOKEN is set)
 ├── features/tickets/
 │   ├── types.ts             # Ticket, Status, Source, Place
@@ -159,6 +161,13 @@ Flow after sign-in: `App` waits for the Supabase session, then `BoardProvider` l
 It never sends ticket content, names, emails, user ids, query strings, hashes or share tokens.
 
 Most of the tag's features are on by default and can only be switched off in Better Stack (application, Frontend tab). Keep these off, since they would capture ticket content: session replays, console logs, auto-capture of anonymous and identified user events, browser fingerprint. Keep on: frontend errors, web vitals, website analytics. As a backstop, the application's ingestion transformations (VRL) drop autocapture events, console logs and replays and strip the fingerprint, so these are not stored even if a switch is turned back on.
+
+The web events transformation also prepares events for dashboards, which can only filter on fields Better Stack extracts:
+
+- It copies `payload.board_id` to `user.group_id` and `payload.role` to `user.group_name`, Better Stack's built-in group fields. No user id is set, and the browser still never calls `user`. Events received before 2026-11-03 14:00 UTC have neither.
+- It sets `environment` from the page address: `development` for localhost, `production` for anything else (deploy previews have no token). The app's `environment` setting only reaches error reports, not web events. Events received before 2026-11-03 14:16 UTC have none.
+
+Dashboards (Better Stack, Telemetry, Metrics): `Loopback usage` shows the app's events, sessions and frontend errors, with board, role and environment filters that each default to `all`. The board filter is a fixed list of board ids, so add new boards to it by hand. The role list (`platform_admin`, `staff`) is fixed too. `Website analytics` and `Web vitals` are Better Stack's built-in dashboards.
 
 ## Environments and deploys
 

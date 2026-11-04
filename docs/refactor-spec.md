@@ -211,8 +211,13 @@ It passed again on 2026-11-03 with the transcript matching checks added (migrati
 
 ### 6.2 Critical columns (answers the open question on the sketch)
 
-Table columns, in order: `#`, Title, Type, Status, Urgent, Deadline, Location, Summary, Source. The checkbox column has no row position number; `#` is the ticket's number.
-Stored but not shown in the table: `requester`, `owner_id`, `submitted_by`, `submitted_at`, `created_by`, `closed_at`, `meeting_ids`, evidence spans.
+~~Table columns, in order: `#`, Title, Type, Status, Urgent, Deadline, Location, Summary, Source. The checkbox column has no row position number; `#` is the ticket's number.~~
+~~Stored but not shown in the table: `requester`, `owner_id`, `submitted_by`, `submitted_at`, `created_by`, `closed_at`, `meeting_ids`, evidence spans.~~
+
+**Changed 2026-11-03:** the table works like Airtable. Columns, in order: Title, Type, Status, Urgent, Deadline, Location, Summary.
+Stored but not shown in the table: `number`, `source`, `requester`, `owner_id`, `submitted_by`, `submitted_at`, `created_by`, `closed_at`, `meeting_ids`, evidence spans. `source` still records where a ticket came from: `manual` for the form, `transcript` for AI proposals.
+The left column shows the row's position in the current view. On hover it becomes a checkbox and an Expand button. Right-click deletes the row, or every checked row. Expand opens the ticket in the form layout and edits it in place.
+Row height (Short, Medium, Tall, Extra tall) and column widths are per-viewer settings kept in browser storage.
 The intake form does not ask for requester, submitted by or the date. `submitted_at` is the local date the ticket is logged, and for a manual ticket the `tickets_submitted_by` trigger sets `submitted_by` to the signed-in user's email.
 
 ### 6.3 Metrics (answers the open question on the sketch)

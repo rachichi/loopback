@@ -63,7 +63,6 @@ export type Ticket = {
 /** Where a ticket came from. V1 creates manual tickets only; transcript (V2) and email (V3) come later. */
 export const sources = ["manual", "transcript", "email"] as const;
 export type Source = (typeof sources)[number];
-export const sourceLabel: Record<Source, string> = { manual: "Manual", transcript: "Transcript", email: "Email" };
 
 /** Today's local date as YYYY-MM-DD, the default for a new intake ticket. */
 export function today(): string {
