@@ -133,13 +133,15 @@ export default function TranscriptPanel({
   );
 
   const updates = inMeeting.filter((suggestion) => suggestion.kind === "update").length;
-  const status = matchError
-    ? <span className="match-error" role="alert">{matchError}</span>
-    : inMeeting.length
-      ? <span>{updates} updated and {inMeeting.length - updates} new ticket{inMeeting.length - updates === 1 ? "" : "s"} from this meeting are waiting in the Review tab. Their paragraphs are underlined below.</span>
-      : info.matchedAt
-        ? <span>Matched {new Date(info.matchedAt).toLocaleDateString()}. Nothing left to review from this meeting.</span>
-        : <span>Not matched yet.</span>;
+  const status = matching
+    ? <span>Reading the transcript against the board's open tickets. This takes up to a minute.</span>
+    : matchError
+      ? <span className="match-error" role="alert">{matchError}</span>
+      : inMeeting.length
+        ? <span>{updates} updated and {inMeeting.length - updates} new ticket{inMeeting.length - updates === 1 ? "" : "s"} from this meeting are waiting in the Review tab. Their paragraphs are underlined below.</span>
+        : info.matchedAt
+          ? <span>Matched {new Date(info.matchedAt).toLocaleDateString()}. Nothing left to review from this meeting.</span>
+          : <span>Not matched yet.</span>;
 
   return (
     <TranscriptView
