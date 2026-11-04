@@ -268,6 +268,9 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .ticket-row > div:nth-child(2) .cell-input { color: #1a2234; font-weight: 500; }
 .location-cell { width: 100%; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .place-chips { display: flex; flex-wrap: wrap; gap: 3px; padding: 0 2px; }
+/* The meeting's wording, shown on one line beside + Place until the ticket has a mapped place. */
+.location-text { min-width: 0; flex: 0 1 auto; align-self: center; color: #4c5561; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.place-add { flex: none; }
 .place-chip { max-width: 100%; display: inline-flex; align-items: center; border-radius: 3px; background: #e6f4f8; color: #176b83; }
 .place-chip button { min-width: 0; display: inline-flex; align-items: center; gap: 3px; padding: 2px 4px; border: 0; background: none; color: inherit; font: inherit; font-size: 8px; cursor: pointer; }
 .place-chip > button:first-child span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
