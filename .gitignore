@@ -3,3 +3,9 @@ dist
 .env*
 !.env.example
 .DS_Store
+*.local
+*.local.*
+supabase/.temp
+supabase/.branches
+*.pem
+*.key

@@ -8,7 +8,6 @@ Production project: `enanmsnprjviztiiemtn` ("Loopback"). How the pieces fit toge
 | `scripts/` | Admin SQL to run by hand in the SQL editor. Not migrations. |
 | `seeds/boards/` | Output of `scripts/seed_boards.mjs`: the 59 NYC community boards with boundaries. |
 | `seed.sql` | Sample CB3 tickets for a fresh database (`pnpm db:seed-sql` regenerates it). |
-| `legacy/` | The original hand-pasted `schema.sql` and `002_board.sql`. Superseded by the baseline migration. |
 
 ## Migrations
 
@@ -28,6 +27,8 @@ Every file below is applied in production.
 | `20261102160000_public_share_links.sql` | Mixed | `boards.share_token`, `public_board()`, `public_board_tickets()`, `rotate_share_token()`; removes the volunteer role |
 | `20261102170000_public_board_features.sql` | Additive | `public_board()` also returns the board's flags |
 | `20261102180000_board_staff.sql` | Additive | `board_staff()` for the Owner column |
+| `20261102190000_board_staff_names.sql` | Additive | `board_staff_named()`: `board_staff()` plus each person's display name |
+| `20261102200000_submitted_by_from_auth.sql` | Additive | Trigger that sets `submitted_by` on manual tickets to the signed-in user's email |
 
 ### Writing a migration
 
@@ -52,7 +53,8 @@ supabase link --project-ref enanmsnprjviztiiemtn
 # Record every file as applied under its own version:
 supabase migration repair --status applied \
   20261020000000 20261102120000 20261102120100 20261102120150 20261102120200 20261102120300 \
-  20261102130000 20261102140000 20261102150000 20261102160000 20261102170000 20261102180000
+  20261102130000 20261102140000 20261102150000 20261102160000 20261102170000 20261102180000 \
+  20261102190000 20261102200000
 # Remove the MCP-stamped versions:
 supabase migration repair --status reverted 20261102132812 20261102132842 20261102134215 20261102134248
 supabase migration list    # local and remote should now match with nothing pending

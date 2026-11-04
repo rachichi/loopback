@@ -3,7 +3,7 @@
 -- accounts keep their password, and their membership is set to staff (this also fixes accounts made
 -- by the earlier version of this script, which made them admin). The password is only needed for new accounts.
 --
--- Addresses are the base email plus-addressed with the board id: rl996@cornell.edu -> rl996+b-cb-9@cornell.edu.
+-- Addresses are the base email plus-addressed with the board id: you@example.org -> you+b-cb-9@example.org.
 -- Accounts are created confirmed, so no email is sent.
 --
 -- This writes to auth.users and auth.identities directly, shaped like the rows Supabase Auth creates
@@ -14,7 +14,7 @@
 
 do $$
 declare
-  base_email constant text := 'rl996@cornell.edu';
+  base_email constant text := 'you@example.org';
   password   constant text := 'CHANGE_ME';
   board      record;
   address    text;
