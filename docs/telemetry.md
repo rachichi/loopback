@@ -4,6 +4,8 @@ Everything the app sends to Better Stack, and nothing else. The code is `src/lib
 
 When you add or change an event, update this file in the same pull request.
 
+A major feature must have its telemetry in place before it is turned on for any board other than `staging`. Staging is exempt, so a feature can be tried there first. Check this when changing a feature flag for a real board.
+
 ## When it runs
 
 - Only when `VITE_BETTERSTACK_TOKEN` is set (production on Netlify). Local development and deploy previews send nothing unless given a token.
