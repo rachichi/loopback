@@ -2,7 +2,7 @@
 // is set (the public application token from Better Stack's Frontend tab), so local development and
 // deploy previews send nothing unless they are given one.
 //
-// What is sent: page views of the app's screens, a few named events (sign in, ticket created or deleted,
+// What is sent: page views of the app's screens, a few named events (sign in, ticket created (with form and save timings) or deleted, matching started, finished or failed,
 // share link copied or replaced, board switched), board id and role on each of those, web vitals, and
 // frontend errors. What is never sent: ticket content, names, emails, user ids, or the secret part of a
 // share link. Page addresses are rewritten before they leave the browser (see safeLocation and safeUrl).
@@ -122,7 +122,7 @@ export function trackPage(path: string, title: string, boardId?: string): void {
 type EventName =
   | "login" | "ticket_created" | "ticket_deleted" | "share_link_copied" | "share_link_replaced" | "board_switched"
   // Transcript matching: board_id and suggestion kind or counts only, never quotes, titles or ids.
-  | "transcript_opened" | "matching_run" | "suggestion_reviewed";
+  | "transcript_opened" | "matching_started" | "matching_run" | "matching_failed" | "suggestion_reviewed";
 
 /** A named usage event. Parameters must never contain ticket content or personal details. */
 export function trackEvent(name: EventName, params: Record<string, string | number | boolean> = {}): void {

@@ -322,6 +322,9 @@ function Portal({ account }: { account: Account }) {
   const persisted = useRef(new Map<string, Ticket>());
   // New tickets whose insert is in flight. Edits made meanwhile are saved as an update once it returns.
   const inserting = useRef(new Set<string>());
+  // When the intake form opened, and when each new ticket was submitted, for the ticket_created timings.
+  const intakeOpenedAt = useRef(0);
+  const submittedAt = useRef(new Map<string, { at: number; formMs: number }>());
   useEffect(() => {
     loadTickets(board.id)
       .then((loaded) => {
@@ -345,10 +348,18 @@ function Portal({ account }: { account: Account }) {
         insertTicket(sent, board.id)
           .then((saved) => {
             persisted.current.set(saved.id, saved);
-            trackEvent("ticket_created", { board_id: board.id, source: saved.source });
+            const timing = submittedAt.current.get(sent.id);
+            submittedAt.current.delete(sent.id);
+            trackEvent("ticket_created", {
+              board_id: board.id,
+              source: saved.source,
+              // form_ms: form open to submit. save_ms: submit to saved in the database.
+              ...(timing ? { form_ms: timing.formMs, save_ms: Date.now() - timing.at } : {}),
+            });
             // Keep any edits made while the insert was in flight; they differ from `saved`, so they get updated next.
             setTickets((current) => current.map((ticket) => ticket.id !== saved.id ? ticket : ticket === sent ? saved : { ...ticket, number: saved.number }));
           })
+          .catch((error) => { submittedAt.current.delete(sent.id); throw error; })
           .finally(() => inserting.current.delete(sent.id)),
       );
       Promise.all([...inserts, updateTickets(changed, board.id)])
@@ -370,6 +381,7 @@ function Portal({ account }: { account: Account }) {
   const intakeOn = useFeature("manual_intake");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(false);
+  useEffect(() => { if (intakeOpen) intakeOpenedAt.current = Date.now(); }, [intakeOpen]);
   const transcriptOn = useFeature("transcript_matching");
   // The right panel has a Map tab (district_map) and a Transcript tab (transcript_matching).
   const panelOn = mapOn || transcriptOn;
@@ -415,6 +427,8 @@ function Portal({ account }: { account: Account }) {
     // submitted_by to the signed-in user's email. Requester is no longer collected.
     // Every board shares one table, so ids must be unique across boards, not just within this one.
     const ticket: Ticket = { ...fields, requester: "", submittedBy: "", submittedAt: today(), id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {}, ownerId: null, source: "manual", closedAt: null, createdBy: null };
+    const now = Date.now();
+    submittedAt.current.set(ticket.id, { at: now, formMs: intakeOpenedAt.current ? now - intakeOpenedAt.current : 0 });
     setTickets((current) => [ticket, ...current]);
     setSelectedId(ticket.id);
     setQuery("");
@@ -485,9 +499,21 @@ function Portal({ account }: { account: Account }) {
   } : undefined;
 
   // After a run, the table switches to the Review tab, where the new suggestions are waiting.
+  // Runs started per meeting in this tab, so repeat clicks show up without sending a meeting id.
+  const matchRuns = useRef(new Map<string, number>());
   const matchMeeting = async (id: string) => {
-    const result = await runMatching(id);
-    trackEvent("matching_run", { board_id: board.id, updates: result.updates, new: result.new });
+    const run = (matchRuns.current.get(id) ?? 0) + 1;
+    matchRuns.current.set(id, run);
+    const startedAt = Date.now();
+    trackEvent("matching_started", { board_id: board.id, run_in_session: run, already_generated: Boolean(meetings.find((meeting) => meeting.id === id)?.matchedAt) });
+    let result: Awaited<ReturnType<typeof runMatching>>;
+    try {
+      result = await runMatching(id);
+    } catch (error) {
+      trackEvent("matching_failed", { board_id: board.id, run_in_session: run, duration_ms: Date.now() - startedAt });
+      throw error;
+    }
+    trackEvent("matching_run", { board_id: board.id, updates: result.updates, new: result.new, run_in_session: run, duration_ms: Date.now() - startedAt });
     const [loadedMeetings, loadedSuggestions] = await Promise.all([loadMeetings(board.id), loadSuggestions(board.id)]);
     setMeetings(loadedMeetings);
     setSuggestions(loadedSuggestions);
