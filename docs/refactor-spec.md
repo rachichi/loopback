@@ -41,7 +41,7 @@ Read from the hand-drawn journey. Dot colors: purple = V1, blue = V2, green = V3
 
 | Node | Version | Flag key | Notes |
 | --- | --- | --- | --- |
-| Government authentication | V1 | none (always on) | See section 5. Staff accounts tied to a board. Not real .gov SSO. |
+| Government authentication | V1 | none (always on) | See section 5. Invite-only staff accounts tied to a board. Self sign-up and .gov SSO are V3. |
 | Board identification, ticket table filtered to the board | V1 | none | Required for the refactor goal. Resolved from `board_members`. |
 | Manual intake form | V1 | `manual_intake` | Exists (`IntakeForm.tsx`). |
 | Ticket table | V1 | none | Exists. Critical columns and metrics defined in section 6. |
@@ -53,6 +53,7 @@ Read from the hand-drawn journey. Dot colors: purple = V1, blue = V2, green = V3
 | Email intake | V3 | `email_intake` | |
 | Asset generation: social posts, resolutions, meeting minutes (docx/pdf) | V3 | `asset_generation` | |
 | Aggregate to borough presidents and mayors | V3 | `data_aggregation` | Cross-board. Conflicts with tenant isolation, see section 8. |
+| Self sign-up: @cb.nyc.gov email or NYC employee SSO | V3 | none (project auth setting, not a board flag) | Decided 2026-11-05. Every kind of self sign-up is V3; V1 and V2 stay invite-only. See section 8 and WA-195. |
 
 ## 3. Target architecture
 
@@ -158,7 +159,7 @@ Do not edit applied migrations. Add new files.
 
 ## 5. Auth and RLS (V1)
 
-Auth: Supabase Auth, email + password or magic link, **invite-only** (disable open signup). A platform admin creates the user and inserts a `board_members` row. "Government authentication" in V1 means board staff accounts. Real government SSO is out of scope and unverified.
+Auth: Supabase Auth, email + password or magic link, **invite-only** (disable open signup). A platform admin creates the user and inserts a `board_members` row. "Government authentication" in V1 means board staff accounts. Self sign-up of any kind (domain-restricted email or city SSO) is V3, see section 8.
 
 RLS. Migration 3a adds these policies next to the existing `demo` ones; migration 3b drops the three `demo` policies. 3a also defines `is_board_admin(b)`.
 
@@ -266,6 +267,7 @@ Known limitation to leave as a TODO, not fix in V1: `saveTickets` upserts whole 
 - Admin panel (V2): writes `boards.features`, platform admins only. Board admins see their flags read-only. Confirm.
 - Transcript matching (V2): extraction runs in a Supabase Edge Function that checks `features.transcript_matching` server-side, since a client flag is not enforcement. Anthropic key lives in function secrets. Reuse `lib/extract.ts` and `prompts/` from `evals/`. Whether Block Party exposes the API the sketch assumes is unverified, so keep the `TranscriptSource` seam.
 - Aggregation (V3): RLS isolation means no cross-board reads. Use a `security definer` function or materialized view that returns counts only, with no ticket rows, no names, and a minimum cell size before a board's numbers are shown to a borough president or mayor. Needs board consent. Decide before building.
+- Self sign-up (V3, WA-195): a verified email or SSO login does not say which board someone is on, so `board_members` stays the gate. New users wait for approval and see no board data. Domain sign-up needs custom SMTP, 6-digit email codes instead of magic links (city mail scanners open links first and use up one-time tokens), a Supabase "Before User Created" hook that only allows `@cb.nyc.gov`, and periodic membership review for people who leave. City SSO needs a city sponsor (district managers, the Mayor's Community Affairs Unit), OTI to register the app, a NYC Cyber Command security review and a privacy review. SAML needs Supabase Pro or above; Supabase's Microsoft ("Azure") OIDC provider does not.
 
 ## 9. Execution order (one PR each)
 
@@ -294,6 +296,9 @@ git push origin 'refs/tags/archive/*'
 Resolved on 2026-11-02:
 - Repo is private.
 - V1 authentication is invite-only email accounts, with open signup disabled.
+
+Resolved on 2026-11-05:
+- Every kind of self sign-up (@cb.nyc.gov email or NYC employee SSO) is V3.
 
 Still open:
 1. Who toggles features: platform admins only (assumed) or board admins too.
