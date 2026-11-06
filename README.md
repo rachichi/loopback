@@ -36,8 +36,34 @@ Sign in with an account that a platform admin has added to a board (see below). 
 | `pnpm check:bundle` | Fails if transcript code reaches the bundle (run after `build`) |
 | `pnpm format` | Format with oxfmt |
 | `pnpm evals:run`, `evals:score`, `evals:log` | Extraction evals in `evals/` (needs `ANTHROPIC_API_KEY`) |
+| `pnpm evals:minutes` | Draft meeting minutes from a transcript into `evals/runs/minutes/` (needs `ANTHROPIC_API_KEY`) |
 
 CI runs `typecheck`, `build` and `check:bundle` on every pull request.
+
+## Evals
+
+`evals/` holds the prompts and the harness that tests them. It is not bundled into the app.
+
+```
+evals/
+  prompts/
+    tickets/        tickets-v1.md ... tickets-v6.md   ticket extraction and matching
+    minutes/        minutes-v1.md                     meeting minutes
+    resolutions/    resolutions-v1.md                 resolutions and the letters that send them
+  data/
+    b-cb-9/         Brooklyn CB9 transcripts (raw_*, psplit_*), meetings.json, staging tickets
+      minutes/
+        2026-09-29_general-board/   one minutes test case: transcript, agenda, roster,
+                                    example minutes, and the official minutes for comparison
+  runs/             ticket runs (.json), scored with evals:score and logged to results.csv
+    minutes/        minutes drafts, git-ignored: <prompt>-<model>-<meeting>-<n>.md (with [P12] source
+                    markers and Staff review) and .published.md (markers and Staff review removed)
+  lib/, scripts/    harness code; scripts/vtt_to_paragraphs.py turns YouTube captions into a transcript
+```
+
+Prompts are versioned by kind as `prompts/<kind>/<kind>-vN.md`. Add a new version as a new file rather than editing one that runs have used. Ticket prompts keep their short labels (`v6`) in run files, `results.csv` and `suggestions.prompt_version`. The `match-transcript` Edge Function ships a copy of `tickets-v6.md`: after changing it, run `node scripts/build_match_prompt.mjs` (CI checks the copy is current).
+
+The ticket prompts used to live at `evals/prompts/v1.md` to `v6.md`. They moved into `prompts/tickets/` when the minutes and resolutions prompts were added.
 
 ## Roles
 

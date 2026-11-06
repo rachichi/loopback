@@ -1,7 +1,7 @@
 /**
  * Run the extractor and save each run to runs/<prompt>-<model>-<i>.json.
  *
- *   tsx scripts/run.ts --model claude-haiku-5-5 --prompt prompts/v2.md --n 3
+ *   tsx scripts/run.ts --model claude-haiku-5-5 --prompt prompts/tickets/tickets-v2.md --n 3
  *
  * Flags: --previous <csv> (previous meeting's gold tickets, or a board's numbered tickets for a matching prompt) --transcript data/psplit_train1.txt --model <id> --prompt <md> --n 1
  */
@@ -17,7 +17,7 @@ const { values: args } = parseArgs({
   options: {
     transcript: { type: "string", default: DATA_FILES.transcript },
     model: { type: "string", default: "claude-haiku-5-5" },
-    prompt: { type: "string", default: "prompts/v2.md" },
+    prompt: { type: "string", default: "prompts/tickets/tickets-v2.md" },
     n: { type: "string", default: "1" },
     previous: { type: "string" },
   },
@@ -25,7 +25,8 @@ const { values: args } = parseArgs({
 
 const model = args.model as ModelId;
 if (!MODELS.includes(model)) throw new Error(`--model must be one of ${MODELS.join(", ")}`);
-const promptVersion = basename(args.prompt, ".md");
+// "prompts/tickets/tickets-v6.md" -> "v6", the label in results.csv, older runs and suggestions.prompt_version.
+const promptVersion = basename(args.prompt, ".md").replace(/^tickets-/, "");
 const n = Number(args.n);
 
 const paragraphs = loadParagraphs(args.transcript);

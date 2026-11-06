@@ -14,6 +14,7 @@ Ticket tracker for NYC community boards. Staff review tickets from board meeting
 | `pnpm check:bundle` | After `build`: fails if transcript UI code is in the entry chunk, or CB3 demo data is in any chunk |
 | `pnpm format` | oxfmt |
 | `pnpm evals:run`, `evals:score`, `evals:log` | Extraction evals in `evals/`. Needs `ANTHROPIC_API_KEY` in `.env.local` |
+| `pnpm evals:minutes` | Draft minutes for a meeting folder in `evals/data/<board>/minutes/` into `evals/runs/minutes/`. Needs `ANTHROPIC_API_KEY` |
 
 CI runs `typecheck`, `build` and `check:bundle` on every pull request. All must pass before merging.
 
@@ -22,7 +23,7 @@ CI runs `typecheck`, `build` and `check:bundle` on every pull request. All must 
 - `src/` is the web app. `src/lib/` holds `board.tsx` (BoardProvider, useBoard, useFeature, roles), `features.ts` (FeatureKey) and `analytics.ts`. `src/features/tickets/` holds ticket types, row mapping and queries. `src/index.css` holds Tailwind v4 (`@import 'tailwindcss';`) and global styles. No Tailwind or PostCSS config file.
 - `src/features/transcript/` is transcript matching (V2, `transcript_matching`). `TranscriptPanel.tsx` is loaded with `React.lazy`, and it is the only importer of `TranscriptView.tsx` and the paragraph code, so they stay out of the entry chunk (`check:bundle` enforces it). Keep it that way: never import them statically from the main bundle.
 - `src/meetings.ts` and `goldTickets.ts` are CB3 demo data. The app must not import them; only `scripts/make_supabase_seed.mjs` does.
-- `evals/` is the extraction and scoring harness (`lib/`, `scripts/`, `prompts/`, `runs/`, `data/`). It is not bundled into the app.
+- `evals/` is the extraction and scoring harness (`lib/`, `scripts/`, `prompts/`, `runs/`, `data/`). It is not bundled into the app. Prompts are versioned by kind: `prompts/tickets/tickets-vN.md`, `prompts/minutes/minutes-vN.md` and `prompts/resolutions/resolutions-vN.md`.
 - `supabase/` holds `migrations/`, admin SQL in `scripts/` (run by hand, not migrations) and seeds. `scripts/` holds app-side tooling.
 - `docs/` holds `architecture.md` (how it works today), `refactor-spec.md` (scope and decisions) and `ideal-state.md` (V2/V3 vision).
 - The page title (`Loopback`) and language are set directly in `index.html`. `.figma/make/site.json` is gone. `vite.config.ts` still carries the Figma Make dev-only plugins; leave them until the spec says otherwise.

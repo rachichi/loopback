@@ -125,14 +125,14 @@ The extraction and scoring pieces already exist as scripts and run against the C
 
 ```bash
 npx tsx scripts/score.ts --all-annotators          # score the three model annotators vs gold
-npx tsx scripts/run.ts --model claude-haiku-5-5 --n 3   # draft tickets with prompts/v1.md
+npx tsx scripts/run.ts --model claude-haiku-5-5 --n 3   # draft tickets with prompts/tickets/tickets-v2.md
 npx tsx scripts/score.ts --run runs/v1-claude-haiku-5-5-1.json
 npx tsx scripts/log.ts runs/*.json                 # append scores and cost to results.csv
 ```
 
 - `lib/extract.ts`: AI SDK `generateObject` call, zod schema, validator, cost per run.
 - `lib/score.ts`: greedy one-to-one matching by Jaccard overlap of evidence paragraphs (threshold 0.3), over-split detection, precision/recall/F1, type and status accuracy, and paragraph-level evidence P/R/F1.
-- `prompts/v1.md`: the extraction prompt, versioned so prompt changes can be diffed and scored.
+- `prompts/tickets/tickets-v1.md`: the extraction prompt, versioned so prompt changes can be diffed and scored. Minutes and resolution prompts live in `prompts/minutes/` and `prompts/resolutions/`.
 - `data/`: transcripts, gold tickets, rejected tickets, annotator tickets, and ticket type definitions.
 
 `run.ts` reads `ANTHROPIC_API_KEY` from `.env.local`, which is git-ignored. On the 9/29 meeting, Haiku 5.5 reaches about 88% ticket F1 for about $0.01 per meeting; status is the weakest field. Status accuracy improves in the ideal state because the extractor sees each issue's history from earlier meetings instead of guessing whether it was "raised before".

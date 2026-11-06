@@ -9,3 +9,7 @@ supabase/.temp
 supabase/.branches
 *.pem
 *.key
+.context/
+__pycache__/
+# Minutes drafts are model output and aren't scored; regenerate with pnpm evals:minutes.
+evals/runs/minutes/
