@@ -122,7 +122,9 @@ export function trackPage(path: string, title: string, boardId?: string): void {
 type EventName =
   | "login" | "ticket_created" | "ticket_deleted" | "share_link_copied" | "share_link_replaced" | "board_switched"
   // Transcript matching: board_id and suggestion kind or counts only, never quotes, titles or ids.
-  | "transcript_opened" | "matching_started" | "matching_run" | "matching_failed" | "suggestion_reviewed";
+  | "transcript_opened" | "matching_started" | "matching_run" | "matching_failed" | "suggestion_reviewed"
+  // Meetings tab: board_id and durations only, never meeting ids, titles or minutes text.
+  | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited";
 
 /** A named usage event. Parameters must never contain ticket content or personal details. */
 export function trackEvent(name: EventName, params: Record<string, string | number | boolean> = {}): void {

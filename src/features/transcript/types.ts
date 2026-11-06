@@ -13,6 +13,12 @@ export type MeetingInfo = {
   heldOn: string;
   /** When match-transcript last ran on this meeting, or null if it never has. */
   matchedAt: string | null;
+  /** Committee name ("Full Board" for general meetings), or null when unknown. */
+  committee: string | null;
+  /** When generate-minutes drafted the minutes, or null if it never has. */
+  minutesAt: string | null;
+  /** When staff last saved edits to the minutes, or null if never. */
+  minutesEditedAt: string | null;
 };
 
 /** A meeting with its transcript split into paragraphs, as TranscriptView shows it. */

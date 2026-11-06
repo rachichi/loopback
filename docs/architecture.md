@@ -109,6 +109,7 @@ A flag's value for a board is the board's override in `boards.features` if prese
 | `asset_generation` | off | V3 |
 | `data_aggregation` | off | V3 |
 | `meeting_minutes` | off | V3. Draft meeting minutes from a processed transcript |
+| `meetings_tab` | off (on for `staging`) | V2. Meetings tab: a table of meetings, and per meeting the transcript, its tickets and AI-drafted minutes (`generate-minutes` Edge Function, stored on `meetings`, edited in a Tiptap editor) |
 
 Keys are typed in `src/lib/features.ts`; read them with `useFeature("district_map")`. Flags only hide UI. Anything that costs money or touches secrets must also be checked server-side.
 

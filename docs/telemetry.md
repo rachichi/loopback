@@ -74,6 +74,21 @@ Screens: `/` (Home), `/tickets` (Tickets), `/sign-in` (Sign in).
 
 `run_in_session` stands in for a meeting id, so repeat Generate clicks show up without sending which meeting.
 
+### Meetings tab (`meetings_tab` flag)
+
+Page views are sent as `/meetings`.
+
+| Event | Fired when | Fields |
+| --- | --- | --- |
+| `meetings_opened` | A meeting's view opens (the default newest meeting counts) | `board_id` |
+| `meeting_generate_started` | Generate Tickets and Minutes is pressed | `board_id` |
+| `meeting_generate_done` | Both the tickets and the minutes finish | `board_id`, `duration_ms` |
+| `meeting_generate_failed` | Either one errors | `board_id`, `duration_ms` |
+| `minutes_copied` | The Copy button is pressed on the minutes | `board_id` |
+| `minutes_edited` | An edit to the minutes is saved | `board_id` |
+
+No meeting id, title or minutes text is sent.
+
 ## What the data can and cannot tell you
 
 - Counts are per browser session (the first-party `_bs` cookie), not per person, because no user id is sent. Per-person counts, and suggestion acceptance by board, come from the database (`board_suggestion_stats`).

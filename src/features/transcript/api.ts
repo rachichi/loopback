@@ -19,17 +19,20 @@ export function meetingLabel(title: string, heldOn: string): string {
 export async function loadMeetings(board: string): Promise<MeetingInfo[]> {
   const { data, error } = await db
     .from("meetings")
-    .select("id, title, held_on, matched_at")
+    .select("id, title, held_on, matched_at, committee, minutes_generated_at, minutes_edited_at")
     .eq("board", board)
     .order("held_on", { ascending: false })
     .order("title");
   if (error) throw error;
-  return ((data ?? []) as { id: string; title: string; held_on: string; matched_at: string | null }[]).map((row) => ({
+  return ((data ?? []) as { id: string; title: string; held_on: string; matched_at: string | null; committee: string | null; minutes_generated_at: string | null; minutes_edited_at: string | null }[]).map((row) => ({
     id: row.id,
     title: row.title,
     label: meetingLabel(row.title, row.held_on),
     heldOn: row.held_on,
     matchedAt: row.matched_at,
+    committee: row.committee,
+    minutesAt: row.minutes_generated_at,
+    minutesEditedAt: row.minutes_edited_at,
   }));
 }
 
@@ -72,11 +75,33 @@ export async function loadSuggestions(board: string): Promise<Suggestion[]> {
   }));
 }
 
+/** One meeting's minutes as HTML, or null before they are drafted. Loaded when the Minutes section opens. */
+export async function loadMinutes(meetingId: string): Promise<string | null> {
+  const { data, error } = await db.from("meetings").select("minutes_html").eq("id", meetingId).single();
+  if (error) throw error;
+  return (data as { minutes_html: string | null }).minutes_html;
+}
+
+/** Saves staff's edits to the minutes. Only the minutes text changes. */
+export async function saveMinutes(meetingId: string, html: string): Promise<void> {
+  const { error } = await db.rpc("save_meeting_minutes", { m: meetingId, html });
+  if (error) throw error;
+}
+
 export type MatchResult = { matched_at: string; updates: number; new: number; dropped: string[] };
 
 /** Runs match-transcript on one meeting. It replaces the meeting's pending suggestions. */
 export async function runMatching(meetingId: string): Promise<MatchResult> {
-  const { data, error } = await db.functions.invoke<MatchResult>("match-transcript", { body: { meeting_id: meetingId } });
+  return invokeMeetingFunction<MatchResult>("match-transcript", meetingId);
+}
+
+/** Runs generate-minutes on one meeting. Minutes are drafted once; a second call is refused. */
+export async function runMinutes(meetingId: string): Promise<{ minutes_generated_at: string }> {
+  return invokeMeetingFunction<{ minutes_generated_at: string }>("generate-minutes", meetingId);
+}
+
+async function invokeMeetingFunction<T>(name: string, meetingId: string): Promise<T> {
+  const { data, error } = await db.functions.invoke<T>(name, { body: { meeting_id: meetingId } });
   if (error) {
     // The function answers errors as { error: "..." }; show that instead of a generic status message.
     if (error instanceof FunctionsHttpError) {
