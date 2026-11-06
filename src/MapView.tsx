@@ -25,6 +25,7 @@ export default function MapView({
   focus,
   onHover,
   onSelect,
+  half,
 }: {
   tickets: Ticket[];
   selected: Ticket | undefined;
@@ -32,6 +33,8 @@ export default function MapView({
   focus: MapFocus | null;
   onHover: (id: string | null) => void;
   onSelect: (ticket: Ticket) => void;
+  /** Frame only the west half of the board's boundary (the landing page uses this on phones). */
+  half?: "west";
 }) {
   const { boundary } = useBoard();
   const typeClass = useTypeClass();
@@ -57,7 +60,8 @@ export default function MapView({
       ? L.geoJSON(boundary, { style: { color: "#1fa2c2", weight: 2.5, opacity: 0.9, fill: false }, interactive: false }).addTo(map)
       : null;
     const bounds = district?.getBounds();
-    map.fitBounds(bounds?.isValid() ? bounds : NYC_BOUNDS, { padding: [16, 16] });
+    const framed = bounds?.isValid() && half === "west" ? L.latLngBounds(bounds.getSouthWest(), [bounds.getNorth(), bounds.getCenter().lng]) : bounds;
+    map.fitBounds(framed?.isValid() ? framed : NYC_BOUNDS, { padding: [16, 16] });
     layerRef.current = L.layerGroup().addTo(map);
     mapRef.current = map;
     // The pane can change size when tabs switch; keep tiles in sync.
@@ -70,7 +74,7 @@ export default function MapView({
       markersRef.current.clear();
     };
     // The board is fixed for the life of the portal (BoardProvider is keyed by user), so this runs once.
-  }, [boundary]);
+  }, [boundary, half]);
 
   // Keep one marker per place and update it in place when tickets, selection or hover change.
   // Rebinding a tooltip or swapping an icon would close an open tooltip under the cursor, so
