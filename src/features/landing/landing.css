@@ -41,9 +41,9 @@
 .lp-hero-backdrop::before, .lp-hero-backdrop::after { display: none; }
 
 /* Ticket pins on the resident map: much bigger, with a ring on the one in focus. */
-.lp-share .leaflet-marker-icon.map-place span { transform: scale(1.6); border-width: 2px; box-shadow: 0 0 0 3px rgb(var(--hl) / .22), 0 3px 8px rgba(17, 24, 44, .35); }
-.lp-share .leaflet-marker-icon.map-place.selected span { transform: scale(2.2); box-shadow: 0 0 0 5px rgb(var(--hl) / .35), 0 3px 10px rgba(17, 24, 44, .4); }
-.lp-share .leaflet-marker-icon.map-place.hovered span { transform: scale(2.4); box-shadow: 0 0 0 5px rgb(var(--hl) / .4), 0 3px 10px rgba(17, 24, 44, .4); }
+.lp-share .leaflet-marker-icon.map-place span { transform: scale(1.2); border-width: 2px; box-shadow: 0 0 0 2px rgb(var(--hl) / .22), 0 2px 6px rgba(17, 24, 44, .35); }
+.lp-share .leaflet-marker-icon.map-place.selected span { transform: scale(1.5); box-shadow: 0 0 0 5px rgb(var(--hl) / .35), 0 3px 10px rgba(17, 24, 44, .4); }
+.lp-share .leaflet-marker-icon.map-place.hovered span { transform: scale(1.7); box-shadow: 0 0 0 5px rgb(var(--hl) / .4), 0 3px 10px rgba(17, 24, 44, .4); }
 
 /* Pin tooltips on the resident map: the same text size as the meeting minutes, wrapped so they stay on screen, lifted clear of the bigger pins. */
 .lp-share .leaflet-tooltip { width: max-content; max-width: 220px; padding: 7px 11px; border-radius: 8px; white-space: normal; overflow-wrap: anywhere; font-size: 13px; font-weight: 500; line-height: 1.4; box-shadow: 0 4px 14px rgba(17, 24, 44, .3); }
