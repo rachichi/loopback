@@ -147,6 +147,17 @@ export default function TranscriptView({
     />
   );
 
+  // Arrow keys step through the paragraphs; Home and End jump to the first and last.
+  const moveBetweenParagraphs = (event: React.KeyboardEvent<HTMLLIElement>) => {
+    if (event.target !== event.currentTarget) return;
+    const items = [...(bodyRef.current?.children ?? [])] as HTMLElement[];
+    const at = items.indexOf(event.currentTarget);
+    const to = { ArrowDown: at + 1, ArrowUp: at - 1, Home: 0, End: items.length - 1 }[event.key];
+    if (to === undefined) return;
+    event.preventDefault();
+    items[Math.max(0, Math.min(items.length - 1, to))]?.focus();
+  };
+
   return (
     <div className="transcript-view">
       {!bare && <header className="transcript-heading">
@@ -202,7 +213,7 @@ export default function TranscriptView({
             }
           }
           return (
-            <li key={paragraph.id} data-para={paragraph.id}>
+            <li key={paragraph.id} data-para={paragraph.id} tabIndex={0} onKeyDown={moveBetweenParagraphs}>
               {!bare && <span className="para-id">{paragraph.id}</span>}<p>{pieces}</p>
             </li>
           );

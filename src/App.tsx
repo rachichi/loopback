@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
+import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, Menu, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
@@ -9,10 +9,11 @@ import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTickets, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
-import { BoardProvider, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
+import { BoardProvider, takeBoardLanding, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 import { useDismiss } from "./lib/useDismiss";
+import { useMediaQuery } from "./lib/useMediaQuery";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
 import { approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes } from "./features/transcript/api";
@@ -45,6 +46,9 @@ function Logo() {
 }
 
 type View = "home" | "tickets" | "meetings";
+
+/** Phones get Home and the intake form only; the table, map and transcript need a wider screen. */
+const MOBILE_QUERY = "(max-width: 850px)";
 
 /** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
 type Account = { name: string; email: string; avatarUrl: string | null };
@@ -114,9 +118,13 @@ function AccountControls({ account }: { account: Account }) {
   );
 }
 
-function PortalHeader({ view, setView, account }: { view: View; setView: (view: View) => void; account: Account }) {
+function PortalHeader({ view, setView, account, mobile }: { view: View; setView: (view: View) => void; account: Account; mobile: boolean }) {
   const mapOn = useFeature("district_map");
   const meetingsOn = useFeature("meetings_tab");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLElement>(null);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useDismiss(menuRef, menuOpen, closeMenu);
   return (
     <>
       <header className="portal-header">
@@ -124,13 +132,14 @@ function PortalHeader({ view, setView, account }: { view: View; setView: (view: 
           <Logo />
         </div>
       </header>
-      <nav className={`portal-nav ${meetingsOn ? "has-meetings" : ""}`}>
+      <nav className={`portal-nav ${meetingsOn ? "has-meetings" : ""} ${mobile ? "mobile" : ""} ${menuOpen ? "menu-open" : ""}`} ref={menuRef}>
+        {mobile && <button type="button" className="nav-hamburger" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={18} /> : <Menu size={18} />}</button>}
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
         {meetingsOn && <button className={view === "meetings" ? "active" : ""} aria-current={view === "meetings" ? "page" : undefined} onClick={() => setView("meetings")}><CalendarDays size={15} /> Meetings</button>}
         <AccountControls account={account} />
       </nav>
-      {view === "tickets" && (
+      {view === "tickets" && !mobile && (
         <div className="title-band">
           <div>
             <h1>Tickets</h1>
@@ -142,7 +151,8 @@ function PortalHeader({ view, setView, account }: { view: View; setView: (view: 
   );
 }
 
-function HomeView({ onShowMap, onLookUp, onNewTicket }: {
+function HomeView({ mobile, onShowMap, onLookUp, onNewTicket }: {
+  mobile: boolean;
   onShowMap: () => void;
   onLookUp: () => void;
   onNewTicket: () => void;
@@ -150,7 +160,7 @@ function HomeView({ onShowMap, onLookUp, onNewTicket }: {
   const { name, backgroundUrl } = useBoard();
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
-  const actions = [
+  const actions = mobile ? (intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []) : [
     ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
@@ -319,7 +329,9 @@ function Portal({ account }: { account: Account }) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meetingId, setMeetingId] = useState("");
   const [jump, setJump] = useState<{ id: string | null; meetingId: string | null; n: number }>({ id: null, meetingId: null, n: 0 });
-  const [view, setView] = useState<View>("home");
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  // After picking a board in the switcher, land on its tickets (phones only have Home and the intake form).
+  const [view, setView] = useState<View>(() => (takeBoardLanding() && !window.matchMedia(MOBILE_QUERY).matches ? "tickets" : "home"));
   // The ticket open in the expanded form, if any.
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const closeExpanded = useCallback(() => setExpandedId(null), []);
@@ -365,6 +377,18 @@ function Portal({ account }: { account: Account }) {
     setIntakeOpen(false);
   };
   const closeIntake = useCallback(() => setIntakeOpen(false), []);
+  // Cmd+N (Ctrl+N elsewhere) opens New ticket. Some browsers keep it for a new window; there it needs Ctrl+Alt+N as well.
+  useEffect(() => {
+    if (!intakeOn || mobile) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "n" || !(event.metaKey || event.ctrlKey) || event.shiftKey) return;
+      event.preventDefault();
+      setView("tickets");
+      setIntakeOpen(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [intakeOn, mobile]);
 
   // Deleting asks first, waits for the database, and only then removes the rows, so a failed delete leaves them in place.
   const removeTickets = async (list: Ticket[]) => {
@@ -549,15 +573,17 @@ function Portal({ account }: { account: Account }) {
     setMapFocus((current) => ({ ticketId: id, place, n: (current?.n ?? 0) + 1 }));
   };
 
-  if (view === "home") {
+  if (view === "home" || mobile) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} account={account} />
+        <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
         <HomeView
+          mobile={mobile}
           onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
           onLookUp={() => setView("tickets")}
-          onNewTicket={() => { setView("tickets"); setIntakeOpen(true); }}
+          onNewTicket={() => { if (!mobile) setView("tickets"); setIntakeOpen(true); }}
         />
+        {mobile && intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
         <PortalFooter />
       </div>
     );
@@ -567,7 +593,7 @@ function Portal({ account }: { account: Account }) {
   if (sync === "loading" || (sync === "error" && !tickets.length)) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} account={account} />
+        <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
         <main className="workspace-message">
           {sync === "loading" && "Loading tickets…"}
           {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
@@ -580,7 +606,7 @@ function Portal({ account }: { account: Account }) {
   const meetingsShown = view === "meetings" && meetingsOn;
   return (
     <div className="portal">
-      <PortalHeader view={view} setView={setView} account={account} />
+      <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
       {meetingsShown ? (
         <Suspense fallback={<main className="workspace-message">Loading meetings…</main>}>
           <MeetingsPage

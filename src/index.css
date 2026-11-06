@@ -19,7 +19,7 @@ button, input, select { font: inherit; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(42, 183, 214, .28); outline-offset: 1px; }
 
-.portal { min-height: 100vh; display: flex; flex-direction: column; background: #ffffff; }
+.portal { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; background: #ffffff; }
 .portal-footer {
   min-height: 116px;
   flex: 0 0 auto;
@@ -160,7 +160,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .tag { width: fit-content; display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; white-space: nowrap; }
 
 .workspace {
-  height: calc(100vh - 316px);
+  height: calc(100dvh - 316px);
   min-height: 610px;
   display: grid;
   grid-template-columns: minmax(710px, 60%) minmax(430px, 40%);
@@ -372,6 +372,7 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .intake-form footer .primary { border: 0; background: #2bb7d5; color: white; }
 .intake-form footer .primary:hover { background: #1fa2c2; }
 .map-view { min-height: 0; flex: 1; display: flex; flex-direction: column; }
+.map-canvas:focus { outline: none; }
 .map-canvas { min-height: 0; flex: 1; position: relative; overflow: hidden; background: #edf1ed; z-index: 0; }
 /* Lightly soften OSM's colors so the type-colored pins stand out. */
 .map-tiles { filter: saturate(.8) brightness(1.03) contrast(.96); }
@@ -395,6 +396,7 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .transcript-body { position: relative; min-height: 0; flex: 1; margin: 0; padding: 6px 0 12px; overflow: auto; list-style: none; }
 .transcript-body li { padding: 6px 18px; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 8px; }
 .transcript-body li:hover { background: #fafbfc; }
+.transcript-body li:focus-visible { outline: 2px solid #2bb7d5; outline-offset: -2px; background: #f1fafc; }
 .transcript-body .para-id { padding-top: 2px; color: #9aa1aa; font-size: 8px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .transcript-body p { margin: 0; color: #2c3742; font-size: 11px; line-height: 1.55; }
 /* Evidence highlights: faint by default, darker for the hovered ticket. */
@@ -478,6 +480,22 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
   .hero-actions { width: 100%; min-height: 225px; grid-template-rows: repeat(3, minmax(58px, 1fr)); }.insights-rail { flex-direction: row; justify-content: flex-end; padding: 6px 10px; border-top: 5px solid #11182c; }.insights-rail button:first-child { margin: 0 auto 0 0; }.insights-pane { min-height: 620px; border-top: 5px solid #11182c; }.map-canvas { min-height: 510px; }
 }
 
+.nav-hamburger { display: none; }
+@media (max-width: 850px) {
+  .portal-nav.mobile { display: flex; justify-content: flex-end; }
+  .portal-nav.mobile > button:not(.nav-hamburger) { display: none; }
+  .portal-nav.mobile .nav-hamburger { display: flex; width: 48px; border-left: 1px solid var(--nav-rule); }
+  /* The share link, board switcher and account sit in a panel under the bar instead of squeezing into it. */
+  .portal-nav.mobile .nav-account { display: none; position: absolute; top: 100%; left: 0; right: 0; height: auto; flex-direction: column; background: #fff; border-bottom: 1px solid var(--nav-rule); box-shadow: 0 10px 20px rgba(17, 24, 44, .12); }
+  .portal-nav.mobile.menu-open .nav-account { display: flex; }
+  .portal-nav.mobile .nav-account > * { min-height: 46px; border-left: 0; border-right: 0; border-top: 1px solid var(--nav-rule); }
+  .portal-nav.mobile .nav-account > :first-child { border-top: 0; }
+  .portal-nav.mobile .nav-account .nav-share, .portal-nav.mobile .nav-profile-button { justify-content: flex-start; padding: 0 18px; }
+  .portal-nav.mobile .nav-account .board-switcher { max-width: none; }
+  .account-menu { right: auto; left: 0; max-width: calc(100vw - 32px); }
+  .hero-content, .hero-banner { min-height: 0; }
+  .hero-actions { min-height: 0; grid-template-rows: none; }
+}
 @media (max-width: 560px) {.nav-account .board-switcher { max-width: 130px; }.nav-share { padding: 0 10px; }.title-band div span { font-size: 11px; line-height: 1.35; }
   .table-toolbar { align-items: flex-start; flex-direction: column; padding: 7px 8px; gap: 6px; }.toolbar-actions { width: 100%; }.table-search { flex: 1; }.table-search input { width: 100%; }
   .records-pane { min-height: 720px; }
