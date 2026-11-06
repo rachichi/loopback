@@ -31,7 +31,6 @@ Every file below is applied in production.
 | `20261102200000_submitted_by_from_auth.sql` | Additive | Trigger that sets `submitted_by` on manual tickets to the signed-in user's email |
 | `20261103100000_meetings_and_suggestions.sql` | Additive | `meetings`, `ticket_suggestions`, `apply_ticket_suggestion()`, `reject_ticket_suggestion()`, the `meeting_minutes` flag |
 | `20261103120000_suggestion_stats.sql` | Additive | `board_suggestion_stats`: accepted and rejected AI suggestions and distinct reviewers per board |
-| `20261106120000_board_leads.sql` | Additive | `board_leads`: landing page requests, written only by the `submit-lead` Edge Function. **Not applied yet.** |
 
 ### Writing a migration
 

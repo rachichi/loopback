@@ -5,7 +5,6 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { CalendarDays, ChevronDown, ChevronRight, ClipboardList, FileText, House, Link2, ListChecks, MapPin, NotebookText, Plus, Search, Sparkles, X } from "lucide-react";
 import loopbackLogo from "../../assets/logo.png";
-import { db } from "../../db";
 import Logo from "../../Logo";
 import MapView from "../../MapView";
 import TicketTable from "../../TicketTable";
@@ -340,15 +339,15 @@ function PhoneForm({ onSubmit }: { onSubmit: (ticket: Ticket) => void }) {
   );
 }
 
-/** The "Contact our team" popup. Submit sends the request to the submit-lead Edge Function, which saves it in
- *  Supabase and emails the team. Nothing the visitor types goes to analytics. */
+/** The "Contact our team" popup. Submit posts the form to Netlify Forms (the form named "contact" in index.html),
+ *  and Netlify emails the team; the recipients are set in the Netlify dashboard, not in the code. Nothing the
+ *  visitor types goes to analytics. */
 function IntakeModal({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState("");
   const [details, setDetails] = useState("");
-  // A honeypot: hidden from people, filled in by bots. The function drops any request that has it.
+  // A honeypot: hidden from people, filled in by bots. Netlify drops any submission that has it.
   const [website, setWebsite] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const [message, setMessage] = useState("");
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
@@ -358,14 +357,16 @@ function IntakeModal({ onClose }: { onClose: () => void }) {
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     setStatus("sending");
-    const { error, response } = await db.functions.invoke("submit-lead", { body: { email, details, website } }).then(
-      (result) => ({ error: result.error, response: result.error && "context" in result.error ? (result.error.context as Response) : null }),
-    );
-    if (!error) { setStatus("sent"); return; }
-    // The function's own message (for example an invalid email) when it sent one.
-    const reason = await response?.json().then((body: { error?: string }) => body.error).catch(() => undefined);
-    setMessage(reason ?? "Couldn't send your request. Please try again.");
-    setStatus("error");
+    try {
+      const response = await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ "form-name": "contact", email, details, website }).toString(),
+      });
+      setStatus(response.ok ? "sent" : "error");
+    } catch {
+      setStatus("error");
+    }
   };
 
   return (
@@ -388,7 +389,7 @@ function IntakeModal({ onClose }: { onClose: () => void }) {
               <textarea required rows={5} value={details} onChange={(event) => setDetails(event.target.value)} placeholder="What community board and city are you a part of? How are you looking to use Loopback?" />
             </label>
             <input className="lp-hp" tabIndex={-1} autoComplete="off" aria-hidden="true" value={website} onChange={(event) => setWebsite(event.target.value)} />
-            {status === "error" && <p className="lp-modal-error" role="alert">{message}</p>}
+            {status === "error" && <p className="lp-modal-error" role="alert">Couldn't send your request. Please try again.</p>}
             <div className="lp-modal-actions">
               <button type="button" className="lp-secondary" onClick={onClose}>Back</button>
               <button type="submit" className="lp-primary" disabled={status === "sending"}>{status === "sending" ? "Sending…" : "Submit →"}</button>
