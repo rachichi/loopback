@@ -35,6 +35,8 @@ export default function IntakeForm({
   onSubmit,
   onChange,
   onStep,
+  page,
+  banner,
   onClose,
 }: {
   ticket?: Ticket;
@@ -44,6 +46,10 @@ export default function IntakeForm({
   onChange?: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
   /** Expanded ticket only: move to the previous or next row, or undefined at either end. */
   onStep?: { prev?: () => void; next?: () => void };
+  /** New ticket only: fill the screen instead of floating over the portal. */
+  page?: boolean;
+  /** Page mode: shown above the header, e.g. the board's name and logo. */
+  banner?: ReactNode;
   onClose: () => void;
 }) {
   const { ticketTypes } = useBoard();
@@ -57,10 +63,11 @@ export default function IntakeForm({
 
   useEffect(() => { titleRef.current?.focus(); }, [ticket?.id]);
   useEffect(() => {
+    if (page) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, page]);
 
   const submit = (event: React.FormEvent) => {
     event.preventDefault();
@@ -76,14 +83,15 @@ export default function IntakeForm({
   };
 
   return (
-    <div className="intake-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
+    <div className={`intake-backdrop ${page ? "page" : ""}`} onMouseDown={(event) => { if (!page && event.target === event.currentTarget) onClose(); }}>
       <form
-        className={`intake-form ${ticket ? "expanded" : ""}`}
-        role="dialog"
-        aria-modal="true"
+        className={`intake-form ${ticket ? "expanded" : ""} ${page ? "page" : ""}`}
+        role={page ? undefined : "dialog"}
+        aria-modal={page ? undefined : "true"}
         {...(ticket ? { "aria-label": ticket.title || "Ticket" } : { "aria-labelledby": "intake-title" })}
         onSubmit={submit}
       >
+        {page && banner}
         {ticket ? (
           <header className="intake-bar">
             <div className="intake-step">
@@ -94,7 +102,7 @@ export default function IntakeForm({
           </header>
         ) : (
           <header>
-            <h2 id="intake-title">New ticket</h2>
+            <h2 id="intake-title">{page ? "Submit a ticket" : "New ticket"}</h2>
             <button type="button" aria-label="Close" onClick={onClose}><X size={16} /></button>
           </header>
         )}
@@ -153,7 +161,7 @@ export default function IntakeForm({
         {!ticket && (
           <footer>
             <button type="button" className="secondary" onClick={onClose}>Cancel</button>
-            <button type="submit" className="primary">Add ticket</button>
+            <button type="submit" className="primary">{page ? "Submit" : "Add ticket"}</button>
           </footer>
         )}
       </form>
