@@ -110,7 +110,9 @@ Deno.serve(async (req) => {
   ]);
   for (const result of [canEdit, flags, boardRow, open]) if (result.error) return json(500, { error: result.error.message });
   if (canEdit.data !== true) return json(403, { error: "Only staff of this board can run transcript matching." });
-  if ((flags.data?.features as Record<string, unknown> | undefined)?.transcript_matching !== true) {
+  // The Meetings tab generates tickets through this function too.
+  const on = flags.data?.features as Record<string, unknown> | undefined;
+  if (on?.transcript_matching !== true && on?.meetings_tab !== true) {
     return json(403, { error: "Transcript matching is not turned on for this board." });
   }
 

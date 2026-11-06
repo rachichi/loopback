@@ -10,6 +10,7 @@ export const featureFlags = {
   manual_intake: { version: "V1", defaultEnabled: true, description: "Staff intake form" },
   district_map: { version: "V1", defaultEnabled: true, description: "Ticket map over the board boundary" },
   transcript_matching: { version: "V2", defaultEnabled: false, description: "Transcript view and AI-drafted tickets" },
+  meetings_tab: { version: "V2", defaultEnabled: false, description: "Meetings tab: transcript, meeting tickets and AI-drafted minutes" },
   email_intake: { version: "V3", defaultEnabled: false, description: "Tickets created from email" },
   asset_generation: { version: "V3", defaultEnabled: false, description: "Social posts, resolutions, meeting minutes" },
   data_aggregation: { version: "V3", defaultEnabled: false, description: "Roll-up for borough presidents and mayors" },

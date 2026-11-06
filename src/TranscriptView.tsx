@@ -39,6 +39,8 @@ export default function TranscriptView({
   pendingIds,
   pickerAction,
   aside,
+  bare,
+  onHighlightClick,
 }: {
   /** Every meeting in the picker, newest first. Only the shown one needs its paragraphs. */
   meetings: { id: string; title: string }[];
@@ -58,6 +60,10 @@ export default function TranscriptView({
   pickerAction?: ReactNode;
   /** Shown between the heading and the transcript, e.g. the suggestions to review. */
   aside?: ReactNode;
+  /** The Meetings tab: no meeting picker heading and no paragraph numbers. Paragraphs are still split, for highlights. */
+  bare?: boolean;
+  /** A click on a highlight, with the id of the ticket (or review row) it belongs to. Not fired by the drag handles. */
+  onHighlightClick?: (ticketId: string) => void;
 }) {
   const { paragraphs } = meeting;
   const tickets = allTickets.filter((ticket) => ticket.meetingIds.includes(meeting.id));
@@ -143,7 +149,7 @@ export default function TranscriptView({
 
   return (
     <div className="transcript-view">
-      <header className="transcript-heading">
+      {!bare && <header className="transcript-heading">
         <div>
           <div className="meeting-picker">
             <button type="button" aria-label="Newer meeting" title="Newer meeting" disabled={position <= 0} onClick={() => onMeetingChange(meetings[position - 1].id)}><ChevronLeft size={16} /></button>
@@ -155,9 +161,9 @@ export default function TranscriptView({
           </div>
           <p>Meeting {position + 1} of {meetings.length} · {tickets.filter((ticket) => !pendingIds?.has(ticket.id)).length} tickets · hover a highlight and drag its ends to edit</p>
         </div>
-      </header>
+      </header>}
       {aside}
-      <ol className="transcript-body" ref={bodyRef} onMouseLeave={() => hover(null)}>
+      <ol className={`transcript-body ${bare ? "bare" : ""}`} ref={bodyRef} onMouseLeave={() => hover(null)}>
         {paragraphs.map((paragraph) => {
           const inside = placed.filter(({ span }) => span.start < paragraph.end && span.end > paragraph.start);
           // Cut the paragraph wherever a highlight starts or ends.
@@ -184,6 +190,7 @@ export default function TranscriptView({
                   className={`hl ${typeClass(owner.ticket.type)} ${owner.ticket.id === activeId ? "active" : ""} ${pendingIds?.has(owner.ticket.id) ? "pending" : ""}`}
                   title={covering.map(({ ticket }) => `${ticket.number} · ${ticket.title}`).join("\n")}
                   onMouseEnter={() => hover(owner.ticket.id)}
+                  onClick={onHighlightClick ? (event) => { if (!(event.target as HTMLElement).closest(".hl-handle")) onHighlightClick(owner.ticket.id); } : undefined}
                 >
                   {ends.filter(({ span }) => span.start === a).map((item) => handle(item, "start"))}
                   {text}
@@ -196,7 +203,7 @@ export default function TranscriptView({
           }
           return (
             <li key={paragraph.id} data-para={paragraph.id}>
-              <span className="para-id">{paragraph.id}</span><p>{pieces}</p>
+              {!bare && <span className="para-id">{paragraph.id}</span>}<p>{pieces}</p>
             </li>
           );
         })}
