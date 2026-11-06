@@ -121,7 +121,7 @@
 
 /* Closing */
 .lp-closing { padding: 120px 20px 100px; display: flex; flex-direction: column; align-items: center; gap: 32px; text-align: center; }
-.lp-closing h2 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: clamp(48px, 9vw, 120px); line-height: 1; font-weight: 600; letter-spacing: -3px; }
+.lp-closing h2 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: clamp(40px, 7vw, 88px); line-height: 1; font-weight: 600; letter-spacing: -2.5px; }
 
 /* Contact popup */
 .lp-modal-backdrop { position: fixed; inset: 0; z-index: 1000; padding: 16px; display: grid; place-items: center; overflow-y: auto; background: rgba(17, 24, 44, .45); }
@@ -203,7 +203,7 @@
   .lp-feature-text h2 { margin-bottom: 4px; font-size: 22px; line-height: 1.1; font-weight: 600; letter-spacing: -.6px; }
   .lp-feature-text p { font-size: 14px; line-height: 1.35; }
   .lp-closing { padding: 48px 20px 48px; gap: 20px; }
-  .lp-closing h2 { font-size: 36px; letter-spacing: -1.5px; }
+  .lp-closing h2 { font-size: 30px; letter-spacing: -1.2px; }
 }
 
 /* Share table: tighter columns so Urgent and Location fit beside the map. */
