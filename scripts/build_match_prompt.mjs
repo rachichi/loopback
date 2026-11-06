@@ -7,7 +7,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 
 const prompts = [
-  { version: "v6", source: "evals/prompts/tickets/tickets-v6.md", target: "supabase/functions/match-transcript/prompt.ts" },
+  { version: "v7", source: "evals/prompts/tickets/tickets-v7.md", target: "supabase/functions/match-transcript/prompt.ts" },
   { version: "v1", source: "evals/prompts/minutes/minutes-v1.md", target: "supabase/functions/generate-minutes/prompt.ts" },
 ];
 const check = process.argv.includes("--check");

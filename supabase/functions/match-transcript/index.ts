@@ -35,6 +35,7 @@ type OpenTicket = {
   summary: string;
   location_text: string;
   requester: string;
+  deadline: string | null;
   submitted_at: string;
 };
 
@@ -51,6 +52,12 @@ type SuggestionRow = {
   prompt_version: string;
 };
 
+/** The model's deadline if it is a real YYYY-MM-DD date; anything else is dropped rather than failing the approval. */
+function validDeadline(value: string | undefined): string {
+  const d = value?.trim() ?? "";
+  return /^\d{4}-\d{2}-\d{2}$/.test(d) && !Number.isNaN(Date.parse(d)) ? d : "";
+}
+
 /** Fields of an update suggestion: only what the transcript adds or changes. Title and type stay staff's. */
 function changesFor(result: ExtractedTicket, ticket: OpenTicket): Record<string, string> {
   const changes: Record<string, string> = {};
@@ -58,6 +65,8 @@ function changesFor(result: ExtractedTicket, ticket: OpenTicket): Record<string,
   if (result.summary?.trim() && result.summary.trim() !== ticket.summary.trim()) changes.summary = result.summary.trim();
   if (result.location_raw?.trim() && result.location_raw.trim() !== ticket.location_text.trim()) changes.location_text = result.location_raw.trim();
   if (result.requester?.trim() && result.requester.trim() !== ticket.requester.trim()) changes.requester = result.requester.trim();
+  const deadline = validDeadline(result.deadline);
+  if (deadline && deadline !== ticket.deadline) changes.deadline = deadline;
   return changes;
 }
 
@@ -103,7 +112,7 @@ Deno.serve(async (req) => {
     asUser.from("boards").select("ticket_types").eq("id", board).single(),
     asUser
       .from("tickets")
-      .select("id, number, title, type, status, summary, location_text, requester, submitted_at")
+      .select("id, number, title, type, status, summary, location_text, requester, deadline, submitted_at")
       .eq("board", board)
       .neq("status", "Closed")
       .order("number"),
@@ -185,6 +194,7 @@ Deno.serve(async (req) => {
           summary: t.summary?.trim() ?? "",
           location_text: t.location_raw?.trim() ?? "",
           requester: t.requester?.trim() ?? "",
+          deadline: validDeadline(t.deadline),
         },
         reason: number ? `The model linked this to #${number}, which is not an open ticket on this board.` : "",
       });

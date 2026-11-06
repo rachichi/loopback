@@ -22,6 +22,10 @@ export type ExtractedTicket = {
   summary?: string;
   /** Number of the existing ticket this issue is about, or "" (prompts from v5 on). */
   matches_ticket?: string;
+  /** A possible risk to people's safety that needs quick action (prompts from v7 on). */
+  urgent?: boolean;
+  /** YYYY-MM-DD, or "" when the transcript gives none (prompts from v7 on). */
+  deadline?: string;
 };
 
 /** A ticket given to the model as history: the previous meeting's tickets, or the board's open tickets. */
@@ -51,8 +55,9 @@ export function costUsd(model: ModelId, inputTokens: number, outputTokens: numbe
   return (inputTokens * p.input + outputTokens * p.output) / 1_000_000;
 }
 
-/** `matching` adds matches_ticket, for prompts that link issues to the board's existing tickets. */
-export function ticketSchema(types: TicketType[], matching = false) {
+/** `matching` adds matches_ticket, for prompts that link issues to the board's existing tickets.
+ *  `urgency` adds urgent and deadline. */
+export function ticketSchema(types: TicketType[], matching = false, urgency = false) {
   const typeNames = types.map((t) => t.name) as [string, ...string[]];
   const ticket = z.object({
     title: z.string().describe("3-10 words naming the issue"),
@@ -63,6 +68,12 @@ export function ticketSchema(types: TicketType[], matching = false) {
     type: z.enum(typeNames),
     location_raw: z.string().describe("Location copied verbatim from the transcript, or empty string"),
     requester: z.string().describe('Who raised the issue, with role in parentheses, e.g. "Jane Doe (public speaker)"'),
+    ...(urgency
+      ? {
+          urgent: z.boolean().describe("True only if the transcript describes a real risk to people's safety or calls the issue urgent"),
+          deadline: z.string().describe("YYYY-MM-DD if the transcript gives a deadline for the follow-up, or empty string"),
+        }
+      : {}),
     // Status comes before summary so the "Action: " sentence doesn't anchor it toward Open.
     status: z.enum(STATUSES),
     summary: z.string().describe('2-4 sentences, ending with a sentence starting "Action: "'),
@@ -78,6 +89,9 @@ export function buildSystemPrompt(promptText: string, types: TicketType[]): stri
 
 /** Prompts that ask for matches_ticket mention it; older prompts get the original schema. */
 export const promptMatches = (promptText: string) => promptText.includes("matches_ticket");
+
+/** Prompts that ask for urgent and deadline mention both; older prompts get the schema without them. */
+export const promptUrgency = (promptText: string) => promptText.includes("`urgent`") && promptText.includes("`deadline`");
 
 export function previousBlock(previous: PreviousTicket[]): string {
   const lines = previous.map((t) => {
@@ -151,7 +165,7 @@ async function extractOnce(opts: ExtractOptions): Promise<ExtractResult> {
 
   const { object, usage, finishReason } = await generateObject({
     model: provider(model),
-    schema: ticketSchema(types, promptMatches(promptText)),
+    schema: ticketSchema(types, promptMatches(promptText), promptUrgency(promptText)),
     system: buildSystemPrompt(promptText, types),
     prompt: `${header}${previous?.length ? previousBlock(previous) : ""}<transcript>\n${transcript}\n</transcript>\n\nExtract the tickets from this transcript.`,
     // Thinking counts against this cap. A long hearing (31-37 tickets on CB9's 10/23 statement of needs)
