@@ -1,36 +1,30 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { ChevronDown, ClipboardList, FileText, Filter, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
+import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, Menu, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
-import { statuses, today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
-import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type RowHeight, type TranscriptColumn } from "./TicketTable";
-import RowHeightMenu from "./RowHeightMenu";
+import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
+import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
+import { inTab, Toolbar, UrgencyTabs, type Sync, type UrgencyTab } from "./TicketFilters";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTickets, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
-import { BoardProvider, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
+import { BoardProvider, takeBoardLanding, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
 import { setAnalyticsUser, trackEvent, trackPage } from "./lib/analytics";
 import { useDismiss } from "./lib/useDismiss";
+import { useMediaQuery } from "./lib/useMediaQuery";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
-import { approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching } from "./features/transcript/api";
+import { approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes } from "./features/transcript/api";
 import type { MeetingInfo, Suggestion } from "./features/transcript/types";
 import { withReviewRows } from "./features/transcript/review";
 
 // The transcript panel, TranscriptView and the paragraph code load only for boards with transcript_matching,
 // in their own chunk (scripts/check_bundle.mjs keeps them out of the entry chunk).
 const TranscriptPanel = lazy(() => import("./features/transcript/TranscriptPanel"));
-
-/** The state of the tickets in Supabase. */
-type Sync = "loading" | "saving" | "saved" | "error";
-const syncLabel: Record<Sync, string> = {
-  loading: "Loading…",
-  saving: "Saving…",
-  saved: "Saved",
-  error: "Couldn't reach the database",
-};
+// The Meetings tab (meetings_tab) loads the same way, in its own chunk.
+const MeetingsPage = lazy(() => import("./features/meetings/MeetingsPage"));
 
 function Logo() {
   const { name, logoUrl } = useBoard();
@@ -51,7 +45,10 @@ function Logo() {
   );
 }
 
-type View = "home" | "tickets";
+type View = "home" | "tickets" | "meetings";
+
+/** Phones get Home and the intake form only; the table, map and transcript need a wider screen. */
+const MOBILE_QUERY = "(max-width: 850px)";
 
 /** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
 type Account = { name: string; email: string; avatarUrl: string | null };
@@ -121,8 +118,13 @@ function AccountControls({ account }: { account: Account }) {
   );
 }
 
-function PortalHeader({ view, setView, account }: { view: View; setView: (view: View) => void; account: Account }) {
+function PortalHeader({ view, setView, account, mobile }: { view: View; setView: (view: View) => void; account: Account; mobile: boolean }) {
   const mapOn = useFeature("district_map");
+  const meetingsOn = useFeature("meetings_tab");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLElement>(null);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  useDismiss(menuRef, menuOpen, closeMenu);
   return (
     <>
       <header className="portal-header">
@@ -130,12 +132,14 @@ function PortalHeader({ view, setView, account }: { view: View; setView: (view: 
           <Logo />
         </div>
       </header>
-      <nav className="portal-nav">
+      <nav className={`portal-nav ${meetingsOn ? "has-meetings" : ""} ${mobile ? "mobile" : ""} ${menuOpen ? "menu-open" : ""}`} ref={menuRef}>
+        {mobile && <button type="button" className="nav-hamburger" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={18} /> : <Menu size={18} />}</button>}
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
+        {meetingsOn && <button className={view === "meetings" ? "active" : ""} aria-current={view === "meetings" ? "page" : undefined} onClick={() => setView("meetings")}><CalendarDays size={15} /> Meetings</button>}
         <AccountControls account={account} />
       </nav>
-      {view === "tickets" && (
+      {view === "tickets" && !mobile && (
         <div className="title-band">
           <div>
             <h1>Tickets</h1>
@@ -147,7 +151,8 @@ function PortalHeader({ view, setView, account }: { view: View; setView: (view: 
   );
 }
 
-function HomeView({ onShowMap, onLookUp, onNewTicket }: {
+function HomeView({ mobile, onShowMap, onLookUp, onNewTicket }: {
+  mobile: boolean;
   onShowMap: () => void;
   onLookUp: () => void;
   onNewTicket: () => void;
@@ -155,7 +160,7 @@ function HomeView({ onShowMap, onLookUp, onNewTicket }: {
   const { name, backgroundUrl } = useBoard();
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
-  const actions = [
+  const actions = mobile ? (intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []) : [
     ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
@@ -202,79 +207,6 @@ function PortalFooter() {
         </div>
       </div>
     </footer>
-  );
-}
-
-// Review (transcript_matching) is not a third urgency: a row waiting for review is also urgent or not.
-const urgencyTabs = [
-  { key: "all", label: "All" },
-  { key: "urgent", label: "Urgent" },
-  { key: "non-urgent", label: "Non-urgent" },
-  { key: "review", label: "Review" },
-] as const;
-type UrgencyTab = (typeof urgencyTabs)[number]["key"];
-const inTab = (ticket: Ticket, tab: UrgencyTab, inReview: (id: string) => boolean) =>
-  tab === "all" || (tab === "review" ? inReview(ticket.id) : ticket.urgent === (tab === "urgent"));
-
-function UrgencyTabs({ tab, setTab, tickets, inReview, showReview }: {
-  tab: UrgencyTab;
-  setTab: (tab: UrgencyTab) => void;
-  tickets: Ticket[];
-  inReview: (id: string) => boolean;
-  /** Only boards with transcript_matching have a Review tab. */
-  showReview: boolean;
-}) {
-  return (
-    <div className="urgency-tabs" role="tablist" aria-label="Filter by urgency or review">
-      {urgencyTabs.filter((item) => showReview || item.key !== "review").map((item) => (
-        <button key={item.key} role="tab" aria-selected={tab === item.key} className={`${item.key} ${tab === item.key ? "active" : ""}`} onClick={() => setTab(item.key)}>
-          {item.label} <span>{tickets.filter((ticket) => inTab(ticket, item.key, inReview)).length}</span>
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function Toolbar({
-  count,
-  query,
-  setQuery,
-  status,
-  setStatus,
-  onNew,
-  sync,
-  rowHeight,
-  setRowHeight,
-}: {
-  count: number;
-  query: string;
-  setQuery: (value: string) => void;
-  status: "All" | Status;
-  setStatus: (value: "All" | Status) => void;
-  onNew: () => void;
-  sync: Sync;
-  rowHeight: RowHeight;
-  setRowHeight: (value: RowHeight) => void;
-}) {
-  const intakeOn = useFeature("manual_intake");
-  return (
-    <div className="table-toolbar">
-      <div className="table-meta">
-        <strong className="table-count">{count} tickets</strong>
-        <span className={`sync-state ${sync}`} role="status">{syncLabel[sync]}</span>
-      </div>
-      <div className="toolbar-actions">
-        <label className="table-search"><Search size={14} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Find a ticket" /></label>
-        <div className="filter-wrap">
-          <Filter size={14} />
-          <select aria-label="Filter by status" value={status} onChange={(event) => setStatus(event.target.value as "All" | Status)}>
-            <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
-          </select>
-        </div>
-        <RowHeightMenu value={rowHeight} onChange={setRowHeight} />
-        {intakeOn && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
-      </div>
-    </div>
   );
 }
 
@@ -383,6 +315,11 @@ function Portal({ account }: { account: Account }) {
   const [intakeOpen, setIntakeOpen] = useState(false);
   useEffect(() => { if (intakeOpen) intakeOpenedAt.current = Date.now(); }, [intakeOpen]);
   const transcriptOn = useFeature("transcript_matching");
+  const meetingsOn = useFeature("meetings_tab");
+  // Meetings and suggestions load, and review rows exist, for either flag.
+  const matchingOn = transcriptOn || meetingsOn;
+  // The meeting open in the Meetings tab: "list" for the table, null until first opened (then the newest meeting).
+  const [meetingView, setMeetingView] = useState<string | null>(null);
   // The right panel has a Map tab (district_map) and a Transcript tab (transcript_matching).
   const panelOn = mapOn || transcriptOn;
   const [panelTab, setPanelTab] = useState<"map" | "transcript">(mapOn ? "map" : "transcript");
@@ -392,7 +329,9 @@ function Portal({ account }: { account: Account }) {
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meetingId, setMeetingId] = useState("");
   const [jump, setJump] = useState<{ id: string | null; meetingId: string | null; n: number }>({ id: null, meetingId: null, n: 0 });
-  const [view, setView] = useState<View>("home");
+  const mobile = useMediaQuery(MOBILE_QUERY);
+  // After picking a board in the switcher, land on its tickets (phones only have Home and the intake form).
+  const [view, setView] = useState<View>(() => (takeBoardLanding() && !window.matchMedia(MOBILE_QUERY).matches ? "tickets" : "home"));
   // The ticket open in the expanded form, if any.
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const closeExpanded = useCallback(() => setExpandedId(null), []);
@@ -402,11 +341,12 @@ function Portal({ account }: { account: Account }) {
   useEffect(() => setAnalyticsUser({ board_id: board.id, role: board.role ?? "unknown" }), [board.id, board.role]);
   useEffect(() => {
     if (view === "home") trackPage("/", "Home", board.id);
+    else if (view === "meetings") trackPage("/meetings", "Meetings", board.id);
     else trackPage("/tickets", "Tickets", board.id);
   }, [view, board.id]);
 
   // Pending suggestions become greyed-out rows: a new ticket at the top, an update in place of its ticket.
-  const { rows: withReview, review } = useMemo(() => withReviewRows(tickets, transcriptOn ? suggestions : []), [tickets, suggestions, transcriptOn]);
+  const { rows: withReview, review } = useMemo(() => withReviewRows(tickets, matchingOn ? suggestions : []), [tickets, suggestions, matchingOn]);
   const inReview = useCallback((id: string) => review.has(id), [review]);
   // Search and status filters apply first, so each tab's count matches what it shows.
   const filtered = useMemo(() => withReview.filter((ticket) => {
@@ -437,6 +377,18 @@ function Portal({ account }: { account: Account }) {
     setIntakeOpen(false);
   };
   const closeIntake = useCallback(() => setIntakeOpen(false), []);
+  // Cmd+N (Ctrl+N elsewhere) opens New ticket. Some browsers keep it for a new window; there it needs Ctrl+Alt+N as well.
+  useEffect(() => {
+    if (!intakeOn || mobile) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key.toLowerCase() !== "n" || !(event.metaKey || event.ctrlKey) || event.shiftKey) return;
+      event.preventDefault();
+      setView("tickets");
+      setIntakeOpen(true);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [intakeOn, mobile]);
 
   // Deleting asks first, waits for the database, and only then removes the rows, so a failed delete leaves them in place.
   const removeTickets = async (list: Ticket[]) => {
@@ -475,7 +427,7 @@ function Portal({ account }: { account: Account }) {
   };
 
   useEffect(() => {
-    if (!transcriptOn) return;
+    if (!matchingOn) return;
     Promise.all([loadMeetings(board.id), loadSuggestions(board.id)])
       .then(([loadedMeetings, loadedSuggestions]) => {
         setMeetings(loadedMeetings);
@@ -483,7 +435,7 @@ function Portal({ account }: { account: Account }) {
         setMeetingId((current) => current || loadedMeetings[0]?.id || "");
       })
       .catch((error) => console.error("Couldn't load meetings and suggestions", error));
-  }, [board.id, transcriptOn]);
+  }, [board.id, matchingOn]);
   const meetingLabels = useMemo(() => new Map(meetings.map((meeting) => [meeting.id, meeting.label])), [meetings]);
 
   const openTranscript = (nextMeetingId: string, ticketId: string | null) => {
@@ -519,11 +471,36 @@ function Portal({ account }: { account: Account }) {
     setSuggestions(loadedSuggestions);
     setUrgency("review");
   };
-  // Reviewed approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
+  // The Meetings tab's button: drafts whichever of tickets and minutes the meeting doesn't have yet, in parallel.
+  const generateMeeting = async (id: string) => {
+    const meeting = meetings.find((item) => item.id === id);
+    if (!meeting) return;
+    const startedAt = Date.now();
+    trackEvent("meeting_generate_started", { board_id: board.id });
+    const jobs: Promise<unknown>[] = [];
+    if (!meeting.matchedAt) jobs.push(runMatching(id));
+    if (!meeting.minutesAt) jobs.push(runMinutes(id));
+    const results = await Promise.allSettled(jobs);
+    // Reload either way: one half may have finished even if the other failed.
+    const [loadedMeetings, loadedSuggestions] = await Promise.all([loadMeetings(board.id), loadSuggestions(board.id)]);
+    setMeetings(loadedMeetings);
+    setSuggestions(loadedSuggestions);
+    const failed = results.find((result): result is PromiseRejectedResult => result.status === "rejected");
+    if (failed) {
+      trackEvent("meeting_generate_failed", { board_id: board.id, duration_ms: Date.now() - startedAt });
+      throw failed.reason;
+    }
+    trackEvent("meeting_generate_done", { board_id: board.id, duration_ms: Date.now() - startedAt });
+  };
+  const minutesEvent = (event: "edited" | "copied") => {
+    trackEvent(event === "copied" ? "minutes_copied" : "minutes_edited", { board_id: board.id });
+    if (event === "edited") loadMeetings(board.id).then(setMeetings).catch((error) => console.error(error));
+  };
+  // Accept approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
   // is sent, with the kind, the outcome and how many fields the suggestion changed. Never its content.
   const reviewed = (outcome: "accepted" | "rejected", suggestion: Suggestion) =>
     trackEvent("suggestion_reviewed", { board_id: board.id, kind: suggestion.kind, outcome, fields_changed: Object.keys(suggestion.changes).length });
-  const reviewRows: ReviewRows | undefined = transcriptOn ? {
+  const reviewRows: ReviewRows | undefined = matchingOn ? {
     rows: review,
     onReviewed: async (rowId) => {
       const info = review.get(rowId);
@@ -596,15 +573,17 @@ function Portal({ account }: { account: Account }) {
     setMapFocus((current) => ({ ticketId: id, place, n: (current?.n ?? 0) + 1 }));
   };
 
-  if (view === "home") {
+  if (view === "home" || mobile) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} account={account} />
+        <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
         <HomeView
+          mobile={mobile}
           onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
           onLookUp={() => setView("tickets")}
-          onNewTicket={() => { setView("tickets"); setIntakeOpen(true); }}
+          onNewTicket={() => { if (!mobile) setView("tickets"); setIntakeOpen(true); }}
         />
+        {mobile && intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
         <PortalFooter />
       </div>
     );
@@ -614,7 +593,7 @@ function Portal({ account }: { account: Account }) {
   if (sync === "loading" || (sync === "error" && !tickets.length)) {
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} account={account} />
+        <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
         <main className="workspace-message">
           {sync === "loading" && "Loading tickets…"}
           {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
@@ -624,12 +603,40 @@ function Portal({ account }: { account: Account }) {
     );
   }
 
+  const meetingsShown = view === "meetings" && meetingsOn;
   return (
     <div className="portal">
-      <PortalHeader view={view} setView={setView} account={account} />
+      <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
+      {meetingsShown ? (
+        <Suspense fallback={<main className="workspace-message">Loading meetings…</main>}>
+          <MeetingsPage
+            meetings={meetings}
+            meetingId={meetingView === "list" ? null : meetingView ?? meetings[0]?.id ?? null}
+            onOpenMeeting={(id) => setMeetingView(id ?? "list")}
+            tickets={tickets}
+            rows={withReview}
+            suggestions={suggestions}
+            review={reviewRows}
+            selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""}
+            hoveredId={hover.id}
+            followHover={hover.from !== "table"}
+            rowHeight={rowHeight}
+            onHover={(id) => setHover({ id, from: "table" })}
+            onSelect={(ticket) => setSelectedId(ticket.id)}
+            onExpand={expandTicket}
+            onChange={updateTicket}
+            onDelete={removeTickets}
+            onSpanChange={updateSpan}
+            canEdit={board.role !== null}
+            onGenerate={generateMeeting}
+            onMinutesEvent={minutesEvent}
+            onViewed={() => trackEvent("meetings_opened", { board_id: board.id })}
+          />
+        </Suspense>
+      ) : (
       <main className={`workspace ${!panelOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
-          <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={transcriptOn} />
+          <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
           <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review. Open a meeting in the Transcript tab and press Generate." : tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
         </section>
@@ -669,6 +676,7 @@ function Portal({ account }: { account: Account }) {
           </aside>
         )}
       </main>
+      )}
       {intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
       {expanded && (
         <IntakeForm

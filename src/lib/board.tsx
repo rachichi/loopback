@@ -50,6 +50,15 @@ const STORAGE_KEY = "loopback.boardId";
 const readStoredBoard = () => { try { return localStorage.getItem(STORAGE_KEY); } catch { return null; } };
 const storeBoard = (id: string) => { try { localStorage.setItem(STORAGE_KEY, id); } catch { /* storage unavailable */ } };
 
+// Set when someone picks a board in the switcher, so the fresh portal opens on the ticket board, not Home.
+let landOnTickets = false;
+/** True once after a board switch; App reads it when the new board's portal mounts. */
+export function takeBoardLanding() {
+  const land = landOnTickets;
+  landOnTickets = false;
+  return land;
+}
+
 async function loadAccess(userId: string): Promise<Access> {
   const [members, admin] = await Promise.all([
     db.from("board_members").select("board_id, role").eq("user_id", userId),
@@ -162,6 +171,7 @@ export function BoardProvider({ userId, children }: { userId: string; children: 
   }, [access, boardId]);
 
   const switchBoard = useCallback((id: string) => {
+    landOnTickets = true;
     storeBoard(id);
     setBoardId(id);
   }, []);

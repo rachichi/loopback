@@ -274,7 +274,7 @@ export default function TicketTable({
     }
   };
 
-  // A pending suggestion: read only and greyed out until Reviewed. Changed fields are marked, with the old value on hover.
+  // A pending suggestion: read only and greyed out until Accept. Changed fields are marked, with the old value on hover.
   const reviewRow = (ticket: Ticket, info: ReviewRow, rowIndex: number) => {
     const mark = (field: ReviewField, value: string) => field in info.changed
       ? <span className="ai-changed" title={`Suggested from the transcript. Was: ${info.changed[field] || "(empty)"}`}>{value || "(empty)"}</span>
@@ -293,7 +293,7 @@ export default function TicketTable({
         <div className="review-title">
           <span className="dim">{!info.ticketId && <span className="tag ai-new">New</span>} {mark("title", ticket.title)}</span>
           <div className="review-actions">
-            <button type="button" className="reviewed" disabled={busy} onClick={decide(ticket.id, review!.onReviewed)} title={info.ticketId ? "Apply these changes to the ticket" : "Add this ticket"}><Check size={12} /> Reviewed</button>
+            <button type="button" className="reviewed" disabled={busy} onClick={decide(ticket.id, review!.onReviewed)} title={info.ticketId ? "Apply these changes to the ticket" : "Add this ticket"}><Check size={12} /> Accept</button>
             <button type="button" className="reject" disabled={busy} onClick={decide(ticket.id, review!.onReject)} title="Dismiss this suggestion"><X size={12} /> Reject</button>
           </div>
         </div>

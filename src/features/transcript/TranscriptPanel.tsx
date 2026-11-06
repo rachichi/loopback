@@ -11,6 +11,7 @@ import { buildParagraphs, type Paragraph } from "../../transcript";
 import { useTypeClass } from "../../lib/board";
 import type { EvidenceSpan, Ticket } from "../tickets/types";
 import { loadTranscript } from "./api";
+import { expectedSeconds, progressAt } from "./progress";
 import { reviewId } from "./review";
 import type { MeetingInfo, Suggestion, TranscriptMeeting } from "./types";
 
@@ -26,16 +27,6 @@ function standIn(suggestion: Suggestion, ticket: Ticket | undefined): Ticket {
     meetingIds: [suggestion.meetingId],
     spans: suggestion.spans,
   };
-}
-
-/** Expected seconds for a Generate run. On CB9's meetings it took about 10 s plus 1 s per 2,000 characters. */
-function expectedSeconds(paragraphs: Paragraph[]): number {
-  return 10 + paragraphs.reduce((total, paragraph) => total + paragraph.text.length, 0) / 2000;
-}
-
-/** The Generate button's fill: steady to 90% at the expected time, then creeping toward 99% so a slow run never looks done. */
-function progressAt(elapsed: number, expected: number): number {
-  return elapsed < expected ? 0.9 * elapsed / expected : 0.9 + 0.09 * (1 - Math.exp(-(elapsed - expected) / expected));
 }
 
 export default function TranscriptPanel({
@@ -119,7 +110,7 @@ export default function TranscriptPanel({
   const run = async () => {
     const replaces = inMeeting.length ? ` This replaces its ${inMeeting.length} suggestion${inMeeting.length === 1 ? "" : "s"} waiting in Review.` : "";
     if (info.matchedAt && !window.confirm(`This meeting was already generated on ${new Date(info.matchedAt).toLocaleDateString()}. Generate again?${replaces}`)) return;
-    setRunning({ at: Date.now(), seconds: expectedSeconds(shown) });
+    setRunning({ at: Date.now(), seconds: expectedSeconds(shown.reduce((total, paragraph) => total + paragraph.text.length, 0)) });
     setMatchError(null);
     try {
       await onRunMatching(info.id);

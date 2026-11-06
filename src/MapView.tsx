@@ -121,6 +121,19 @@ export default function MapView({
     }
   }, [tickets, selected?.id, hoveredId]);
 
+  // Escape closes any open popup or tooltip and puts focus back on the map itself.
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      mapRef.current?.closePopup();
+      for (const { marker } of markersRef.current.values()) marker.closeTooltip();
+      handlers.current.onHover(null);
+      containerRef.current?.focus();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
   // Pan to a place requested from the table.
   useEffect(() => {
     const map = mapRef.current;
@@ -131,7 +144,7 @@ export default function MapView({
 
   return (
     <div className="map-view">
-      <div className="map-canvas" ref={containerRef} />
+      <div className="map-canvas" ref={containerRef} tabIndex={-1} />
     </div>
   );
 }
