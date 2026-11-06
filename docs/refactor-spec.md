@@ -53,6 +53,7 @@ Read from the hand-drawn journey. Dot colors: purple = V1, blue = V2, green = V3
 | Email intake | V3 | `email_intake` | |
 | Asset generation: social posts, resolutions, meeting minutes (docx/pdf) | V3 | `asset_generation` | |
 | Aggregate to borough presidents and mayors | V3 | `data_aggregation` | Cross-board. Conflicts with tenant isolation, see section 8. |
+| Land on the ticket board after switching boards (WA-196) | V2 | none | Picking a board in the switcher opens its Tickets view instead of Home. To test with staff before V1 sign-off. |
 | Self sign-up: @cb.nyc.gov email or NYC employee SSO | V3 | none (project auth setting, not a board flag) | Decided 2026-11-05. Every kind of self sign-up is V3; V1 and V2 stay invite-only. See section 8 and WA-195. |
 
 ## 3. Target architecture
