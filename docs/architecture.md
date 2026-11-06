@@ -124,7 +124,6 @@ src/
 ├── ShareLink.tsx            # staff dialog: copy or replace the share link
 ├── TicketTable.tsx          # editable, resizable ticket table: row heights, checkboxes, right-click delete (spec 6.2)
 ├── IntakeForm.tsx           # ticket form: new ticket (manual_intake) and the expanded row
-├── MobileTickets.tsx        # phones: the ticket list as cards
 ├── SubmitFlow.tsx           # full-screen intake form, then a thank-you screen (phones, ?submit)
 ├── RowHeightMenu.tsx        # toolbar menu for the table's row height
 ├── MapView.tsx              # Leaflet map, board boundary, ticket pins (district_map)
