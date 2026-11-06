@@ -91,7 +91,7 @@ export default function Landing() {
 
         <section className="lp-feature">
           <div className="lp-feature-text">
-            <h2>Share link for residents</h2>
+            <h2>View link for residents</h2>
             <p>Share progress on requests to residents.</p>
           </div>
           <Backdrop image={timesSquare} className="lp-feature-visual lp-share-backdrop"><FitWidth natural={1280} show={860} anchor="left"><SharePage tickets={tickets} /></FitWidth></Backdrop>
