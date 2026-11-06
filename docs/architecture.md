@@ -188,6 +188,10 @@ To try flagged features before a real board gets them, use the `staging` board (
 
 Netlify's build runs `pnpm install --frozen-lockfile --force` before building so a stale dependency cache can't break it, and serves `index.html` for unknown paths so `/share/...` links work.
 
+### Landing page
+
+The public landing page is `src/features/landing/`, served at `/landing` on the same Netlify site as the app (one site, one build). It is lazy-loaded, uses fake demo data only, and makes no database calls except the intake popup, which posts to the `submit-lead` Edge Function (saves to `board_leads` and emails the team). Its Sign in link goes to `VITE_APP_URL`, or the site's own root when that is unset. Once the domains exist, both point at this one site and `App.tsx` shows the landing page on the landing hostname; until then `/landing` is the address to share.
+
 ## External services
 
 | Service | Used for | Notes |
