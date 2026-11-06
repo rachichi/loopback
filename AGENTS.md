@@ -38,6 +38,7 @@ CI runs `typecheck`, `build` and `check:bundle` on every pull request. All must 
 - Feature flags resolve through `board_effective_features`. Add keys to `src/lib/features.ts` and read them with `useFeature`. Anything that costs money or touches secrets must also be checked server-side.
 - Roles: platform admin (`platform_admins`) and staff (`board_members`). Writes are gated by `can_edit_board()`. Public read access is only through the share-link functions, never `anon` table grants.
 - Analytics (`src/lib/analytics.ts`) must never carry ticket content, names, emails, user ids or share tokens.
+- Before a major feature is turned on for any board other than `staging`, update telemetry: add events for it in `src/lib/analytics.ts`, and list them in `docs/telemetry.md` in the same pull request. Staging is exempt, so features can be tried there first.
 - Use double quotes for strings containing apostrophes. Export components as default exports.
 - No em dashes in code comments, docs or commit messages.
 - Secrets live in `.env.local` (git-ignored), Netlify and GitHub secrets.
