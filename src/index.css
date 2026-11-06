@@ -480,25 +480,23 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
   .hero-actions { width: 100%; min-height: 225px; grid-template-rows: repeat(3, minmax(58px, 1fr)); }.insights-rail { flex-direction: row; justify-content: flex-end; padding: 6px 10px; border-top: 5px solid #11182c; }.insights-rail button:first-child { margin: 0 auto 0 0; }.insights-pane { min-height: 620px; border-top: 5px solid #11182c; }.map-canvas { min-height: 510px; }
 }
 
-.nav-hamburger { display: none; }
 @media (max-width: 850px) {
-  .portal-nav.mobile { display: flex; justify-content: flex-end; }
-  /* Home and Tickets stay in the bar; Meetings needs a wider screen. */
-  .portal-nav.mobile { justify-content: flex-start; }
+  /* Home and Tickets stay in the bar; Meetings needs a wider screen. The profile circle is the only control on the right. */
+  .portal-nav.mobile { display: flex; justify-content: flex-start; }
   .portal-nav.mobile > button { flex: 0 0 auto; padding: 0 16px; }
   .portal-nav.mobile > button.nav-home { width: 48px; padding: 0; }
   .portal-nav.mobile > button.nav-meetings { display: none; }
-  .portal-nav.mobile .nav-hamburger { display: flex; width: 48px; margin-left: auto; order: 9; border-left: 1px solid var(--nav-rule); }
-  /* The share link, board switcher and account sit in a panel under the bar instead of squeezing into it. */
-  .portal-nav.mobile .nav-account { display: none; position: absolute; top: 100%; left: 0; right: 0; height: auto; flex-direction: column; background: #fff; border-bottom: 1px solid var(--nav-rule); box-shadow: 0 10px 20px rgba(17, 24, 44, .12); }
-  .portal-nav.mobile.menu-open .nav-account { display: flex; }
-  .portal-nav.mobile .nav-account > * { min-height: 46px; border-left: 0; border-right: 0; border-top: 1px solid var(--nav-rule); }
-  .portal-nav.mobile .nav-account > :first-child { border-top: 0; }
-  .portal-nav.mobile .nav-account .nav-share, .portal-nav.mobile .nav-profile-button { justify-content: flex-start; padding: 0 18px; }
-  .portal-nav.mobile .nav-account .board-switcher { max-width: none; }
-  .account-menu { right: auto; left: 0; max-width: calc(100vw - 32px); }
+  .portal-nav.mobile .nav-account { margin-left: auto; }
+  .portal-nav.mobile .nav-profile-button { padding: 0 14px; }
+  .account-menu { max-width: calc(100vw - 32px); }
+  .account-menu .account-menu-boards .board-switcher { width: 100%; max-width: none; min-height: 46px; border-radius: 4px; background: #fff; font-size: 15px; }
+  .account-menu-boards .board-switcher-sizer, .account-menu-boards .board-switcher select { padding: 0 40px 0 16px; }
+  .account-menu-boards .board-switcher-sizer { display: none; }
+  .account-menu-boards .board-switcher-chevron { right: 16px; }
+  .account-menu-boards { margin-top: 3px; }
   .hero-content, .hero-banner { min-height: 0; }
-  .hero-actions { min-height: 0; grid-template-rows: none; }
+  .hero-actions { width: 100%; min-height: 0; grid-template-rows: none; }
+  .hero-actions button { padding: 20px 18px; font-size: 16px; }
 }
 @media (max-width: 560px) {.nav-account .board-switcher { max-width: 130px; }.nav-share { padding: 0 10px; }.title-band div span { font-size: 11px; line-height: 1.35; }
   .table-toolbar { align-items: flex-start; flex-direction: column; padding: 7px 8px; gap: 6px; }.toolbar-actions { width: 100%; }.table-search { flex: 1; }.table-search input { width: 100%; }
@@ -507,8 +505,8 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
   .hero-content { width: calc(100% - 32px); gap: 22px; padding: 24px 0 30px; }
   .hero-primary { gap: 14px; }
   .hero-copy h1 { font-size: 36px; line-height: 1.05; }
-  .hero-actions { min-height: 210px; gap: 10px; }
-  .hero-actions button { padding: 13px 16px; font-size: 15px; }
+  .hero-actions { min-height: 0; gap: 10px; }
+  .hero-actions button { padding: 20px 18px; font-size: 16px; }
         .urgency-tabs { padding: 0 4px; gap: 0; }.urgency-tabs button { padding: 0 9px; font-size: 11px; letter-spacing: .2px; }
   .form-field { grid-template-columns: minmax(0, 1fr); gap: 4px; }.intake-body { padding: 16px 18px 6px; }
   .portal-footer,.portal-footer-inner { min-height: 116px; }
@@ -519,6 +517,8 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 }
 
 /* Share dialog (staff) */
+.share-dialog .intake-fields { padding: 16px 28px; gap: 12px; }
+@media (max-width: 560px) { .share-dialog .intake-fields { padding: 14px 18px; } }
 .share-note { margin: 0; color: #4c5561; font-size: 13px; line-height: 1.45; }
 .share-row { display: flex; gap: 8px; }
 .share-row input { flex: 1; min-width: 0; height: 34px; padding: 0 9px; border: 1px solid #cfd5db; border-radius: 5px; color: #11182c; font-size: 12px; background: #f7f9fa; }
@@ -642,6 +642,10 @@ button.meeting-generate.done:disabled { cursor: not-allowed; }
 
 /* Tickets on a phone: the desktop table, drawn 1.5x larger and scrolled sideways. */
 .mobile-table .ticket-grid { zoom: 1.5; }
+.mobile-table .urgency-tabs { padding: 0 4px; gap: 0; }
+.mobile-table .urgency-tabs button:not(.tabs-new) { padding: 0 6px; gap: 4px; font-size: 10px; letter-spacing: 0; }
+.mobile-table .urgency-tabs button span { min-width: 16px; padding: 1px 4px; font-size: 9px; }
+.mobile-table .urgency-tabs .tabs-new { height: 30px; margin: 0 4px 0 auto; padding: 0 9px; flex: 0 0 auto; align-self: center; gap: 4px; justify-content: center; border: 0; border-radius: 5px; background: #2bb7d5; color: white; font-size: 11px; white-space: nowrap; }
 .mobile-table .records-pane { min-height: calc(100vh - 230px); }
 
 /* The intake form as a whole page, and its thank-you screen. */

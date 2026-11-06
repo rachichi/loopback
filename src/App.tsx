@@ -1,5 +1,5 @@
-import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, Menu, PanelRightClose, PanelRightOpen, Plus, Search, X } from "lucide-react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
@@ -53,7 +53,7 @@ function Avatar({ account, size }: { account: Account; size: number }) {
 }
 
 /** The avatar at the right end of the nav. Clicking it opens a menu with the account and sign-out. */
-function AccountMenu({ account }: { account: Account }) {
+function AccountMenu({ account, children }: { account: Account; children?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -72,6 +72,7 @@ function AccountMenu({ account }: { account: Account }) {
               {account.name !== account.email && <span>{account.email}</span>}
             </div>
           </div>
+          {children}
           <button type="button" role="menuitem" onClick={() => void db.auth.signOut()}><LogOut size={18} /> Sign out</button>
         </div>
       )}
@@ -80,25 +81,38 @@ function AccountMenu({ account }: { account: Account }) {
 }
 
 /** Right end of the nav: share link, a board switcher when the user has more than one board, and the account menu. */
-function AccountControls({ account }: { account: Account }) {
+function AccountControls({ account, mobile }: { account: Account; mobile: boolean }) {
   const { id, name } = useBoard();
   const { boards, switchBoard } = useBoardSwitcher();
   const [sharing, setSharing] = useState(false);
   const closeShare = useCallback(() => setSharing(false), []);
+  const switcher = boards.length > 1 && (
+    // A native select is as wide as its longest option; the hidden copy of the current name sizes it to that name instead.
+    <div className="board-switcher">
+      <span className="board-switcher-sizer" aria-hidden="true">{name}</span>
+      <select aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
+        {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
+      </select>
+      <ChevronDown className="board-switcher-chevron" size={14} aria-hidden="true" />
+    </div>
+  );
+  // Phones show only the profile circle; Share and the board switcher move into its menu.
+  if (mobile) {
+    return (
+      <div className="nav-account">
+        <AccountMenu account={account}>
+          <button type="button" role="menuitem" onClick={() => setSharing(true)}><Link2 size={18} /> Share read-only link</button>
+          {boards.length > 1 && <div className="account-menu-boards">{switcher}</div>}
+        </AccountMenu>
+        {sharing && <ShareLink onClose={closeShare} />}
+      </div>
+    );
+  }
   return (
     <div className="nav-account">
       <button type="button" className="nav-share" onClick={() => setSharing(true)}><Link2 size={15} /> Share</button>
       {sharing && <ShareLink onClose={closeShare} />}
-      {boards.length > 1 && (
-        // A native select is as wide as its longest option; the hidden copy of the current name sizes it to that name instead.
-        <div className="board-switcher">
-          <span className="board-switcher-sizer" aria-hidden="true">{name}</span>
-          <select aria-label="Switch board" value={id} onChange={(event) => { trackEvent("board_switched", { board_id: event.target.value }); switchBoard(event.target.value); }}>
-            {boards.map((board) => <option key={board.id} value={board.id}>{board.name}</option>)}
-          </select>
-          <ChevronDown className="board-switcher-chevron" size={14} aria-hidden="true" />
-        </div>
-      )}
+      {switcher}
       <AccountMenu account={account} />
     </div>
   );
@@ -107,10 +121,6 @@ function AccountControls({ account }: { account: Account }) {
 function PortalHeader({ view, setView, account, mobile }: { view: View; setView: (view: View) => void; account: Account; mobile: boolean }) {
   const mapOn = useFeature("district_map");
   const meetingsOn = useFeature("meetings_tab");
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLElement>(null);
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
-  useDismiss(menuRef, menuOpen, closeMenu);
   return (
     <>
       <header className="portal-header">
@@ -118,12 +128,11 @@ function PortalHeader({ view, setView, account, mobile }: { view: View; setView:
           <Logo />
         </div>
       </header>
-      <nav className={`portal-nav ${meetingsOn ? "has-meetings" : ""} ${mobile ? "mobile" : ""} ${menuOpen ? "menu-open" : ""}`} ref={menuRef}>
-        {mobile && <button type="button" className="nav-hamburger" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={18} /> : <Menu size={18} />}</button>}
+      <nav className={`portal-nav ${meetingsOn ? "has-meetings" : ""} ${mobile ? "mobile" : ""}`}>
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
         {meetingsOn && <button className={`nav-meetings ${view === "meetings" ? "active" : ""}`} aria-current={view === "meetings" ? "page" : undefined} onClick={() => setView("meetings")}><CalendarDays size={15} /> Meetings</button>}
-        <AccountControls account={account} />
+        <AccountControls account={account} mobile={mobile} />
       </nav>
       {view === "tickets" && !mobile && (
         <div className="title-band">
@@ -320,6 +329,8 @@ function Portal({ account }: { account: Account }) {
   const [jump, setJump] = useState<{ id: string | null; meetingId: string | null; n: number }>({ id: null, meetingId: null, n: 0 });
   const mobile = useMediaQuery(MOBILE_QUERY);
   // After picking a board in the switcher, land on its tickets (phones only have Home and the intake form).
+  // Phones have no Non-urgent tab, so a window resized from desktop can't be left on it.
+  useEffect(() => { if (mobile && urgency === "non-urgent") setUrgency("all"); }, [mobile, urgency]);
   const [view, setView] = useState<View>(() => (submitLink ? "submit" : takeBoardLanding() && !window.matchMedia(MOBILE_QUERY).matches ? "tickets" : "home"));
   // The ticket open in the expanded form, if any.
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -580,11 +591,12 @@ function Portal({ account }: { account: Account }) {
               {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
             </main>
           ) : (
-            // The desktop table, scrolled sideways and drawn larger (.mobile-table in index.css).
+            // The desktop table, scrolled sideways and drawn larger (.mobile-table in index.css). No toolbar on phones: the + in the tab row starts a new ticket.
             <main className="workspace no-map mobile-table">
               <section className="records-pane">
-                <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} />
-                <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setView("submit")} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
+                <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} hideNonUrgent>
+                  {intakeOn && <button type="button" className="tabs-new" aria-label="New ticket" title="New ticket" onClick={() => setView("submit")}><Plus size={14} /> New Ticket</button>}
+                </UrgencyTabs>
                 <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? undefined : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
               </section>
             </main>
