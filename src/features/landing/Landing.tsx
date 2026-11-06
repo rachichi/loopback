@@ -2,8 +2,8 @@
 // clickable demo of the Meetings tab built from the app's own components, the resident share page, the phone
 // intake form and a closing call to action. Everything is fake and lives in this page's state: no database
 // calls, no sign-in, nothing saved. Loaded with React.lazy from App.tsx so none of it reaches the entry chunk.
-import { useEffect, useState, type FormEvent } from "react";
-import { CalendarDays, ChevronDown, ChevronRight, ClipboardList, FileText, House, Link2, ListChecks, MapPin, NotebookText, Plus, Search, Sparkles, X } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { BatteryFull, CalendarDays, ChevronDown, ChevronRight, ClipboardList, FileText, House, Link2, ListChecks, MapPin, NotebookText, Plus, Search, Signal, Sparkles, Wifi, X } from "lucide-react";
 import loopbackLogo from "../../assets/logo.png";
 import Logo from "../../Logo";
 import MapView from "../../MapView";
@@ -15,6 +15,7 @@ import { statusClass, today, type Ticket } from "../tickets/types";
 import timesSquare from "./assets/bg-times-square.jpg";
 import bridge from "./assets/bg-bridge.jpg";
 import mural from "./assets/bg-mural.jpg";
+import watercolor from "./assets/bg-watercolor.png";
 import { demoBoard } from "./demoBoard";
 import { DEMO_MEETING_ID, demoMeeting, demoMinutes, demoTickets } from "./demoData";
 import "./landing.css";
@@ -30,6 +31,31 @@ function Backdrop({ image, className = "", children }: { image: string; classNam
       <div className="lp-backdrop-scroll">{children}</div>
     </div>
   );
+}
+
+/** On a phone the demo is laid out at laptop width, then shrunk with CSS zoom to fit the page. With `cropLeft`, it is
+ *  zoomed in further and the left side is cut off, so the right of the window (the Generate button, tickets and minutes)
+ *  fills the screen. Small is fine. */
+function FitWidth({ natural, show, maxHeight, anchor = "right", children }: { natural: number; show?: number; maxHeight?: number; anchor?: "left" | "right"; children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [fit, setFit] = useState({ zoom: 1, shift: 0 });
+  useEffect(() => {
+    const el = ref.current?.parentElement;
+    if (!el) return;
+    const pad = parseFloat(getComputedStyle(el).paddingLeft) + parseFloat(getComputedStyle(el).paddingRight);
+    const update = () => {
+      if (window.innerWidth > 900) return setFit({ zoom: 1, shift: 0 });
+      const width = el.clientWidth - pad;
+      const zoom = Math.min(1, width / (show ?? natural));
+      setFit({ zoom, shift: show && anchor === "right" ? Math.max(0, natural - width / zoom) : 0 });
+    };
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [natural, show, anchor]);
+  const style = fit.zoom < 1 ? ({ zoom: fit.zoom, marginLeft: -fit.shift } as React.CSSProperties) : undefined;
+  return <div ref={ref} className="lp-fit-crop" style={fit.zoom < 1 && maxHeight ? { maxHeight } : undefined}><div className="lp-fit" style={style}>{children}</div></div>;
 }
 
 const meetingList = [{ id: DEMO_MEETING_ID, title: demoMeeting.title }];
@@ -60,7 +86,7 @@ export default function Landing() {
 
       <StaticBoardProvider board={demoBoard}>
         <div className="lp-stage">
-          <DemoApp tickets={tickets} setTickets={setTickets} />
+          <Backdrop image={watercolor} className="lp-hero-backdrop"><FitWidth natural={1280} show={760}><DemoApp tickets={tickets} setTickets={setTickets} /></FitWidth></Backdrop>
         </div>
 
         <section className="lp-feature">
@@ -68,7 +94,7 @@ export default function Landing() {
             <h2>Share link for residents</h2>
             <p>Share progress on requests to residents.</p>
           </div>
-          <Backdrop image={timesSquare} className="lp-feature-visual"><SharePage tickets={tickets} /></Backdrop>
+          <Backdrop image={timesSquare} className="lp-feature-visual lp-share-backdrop"><FitWidth natural={1280} show={860} anchor="left"><SharePage tickets={tickets} /></FitWidth></Backdrop>
         </section>
 
         <section id="lp-mobile" className="lp-feature lp-feature-phone">
@@ -103,9 +129,9 @@ export default function Landing() {
 }
 
 /** A window frame like the Cursor page's: three dots and a title over whatever it holds. */
-function Window({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
+function Window({ title, className = "", onPointerDown, children }: { title: string; className?: string; onPointerDown?: () => void; children: React.ReactNode }) {
   return (
-    <div className={`lp-window ${className}`}>
+    <div className={`lp-window ${className}`} onPointerDown={onPointerDown}>
       <div className="lp-window-bar" aria-hidden="true"><i /><i /><i /><span>{title}</span></div>
       {children}
     </div>
@@ -121,7 +147,32 @@ function DemoApp({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React
   const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
   const [urgency, setUrgency] = useState<UrgencyTab>("all");
 
-  const inMeeting = tickets.filter((ticket) => ticket.meetingIds.includes(DEMO_MEETING_ID));
+  // On load the Meetings tab plays as if Generate was just pressed: the button fills for a couple of seconds, then the
+  // tickets, their highlights in the transcript and the minutes appear.
+  const [progress, setProgress] = useState(0);
+  const [revealed, setRevealed] = useState(0);
+  const total = useRef(tickets.filter((ticket) => ticket.meetingIds.includes(DEMO_MEETING_ID)).length).current;
+  const generating = progress < 1;
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setProgress(1); setRevealed(total); return; }
+    const started = Date.now();
+    const fill = window.setInterval(() => {
+      const next = Math.min(1, (Date.now() - started) / 2200);
+      setProgress(next);
+      if (next >= 1) window.clearInterval(fill);
+    }, 80);
+    return () => window.clearInterval(fill);
+  }, [total]);
+  useEffect(() => {
+    if (generating) return;
+    const reveal = window.setInterval(() => setRevealed((count) => { if (count + 1 >= total) window.clearInterval(reveal); return Math.min(total, count + 1); }), 380);
+    return () => window.clearInterval(reveal);
+  }, [generating, total]);
+
+  const allInMeeting = tickets.filter((ticket) => ticket.meetingIds.includes(DEMO_MEETING_ID));
+  const inMeeting = allInMeeting.slice(0, revealed);
+  const hidden = new Set(allInMeeting.slice(revealed).map((ticket) => ticket.id));
+  const transcriptTickets = tickets.filter((ticket) => !hidden.has(ticket.id));
   const shown = tab === "meetings" ? inMeeting.filter((ticket) => inTab(ticket, urgency, () => false)) : tickets;
   const selected = tickets.find((ticket) => ticket.id === selectedId);
   const select = (ticket: Ticket) => { setSelectedId(ticket.id); setJump((current) => ({ id: ticket.id, n: current.n + 1 })); };
@@ -175,9 +226,10 @@ function DemoApp({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React
               </h1>
               <span>Friday, October 23, 2026 · ~1h</span>
             </div>
-            <button type="button" className="generate meeting-generate done" disabled title="Tickets and minutes were already generated for this meeting">
-              <Sparkles size={16} color="#9aa1aa" aria-hidden="true" />
-              <span className="generate-label">Generated</span>
+            <button type="button" className={`generate meeting-generate ${generating ? "running" : "done"}`} disabled aria-busy={generating} title="Tickets and minutes are generated from the transcript">
+              {generating && <span className="generate-fill" style={{ clipPath: `inset(0 ${100 - progress * 100}% 0 0)` }} aria-hidden="true" />}
+              <Sparkles size={16} color={generating ? "#2bb7d5" : "#9aa1aa"} aria-hidden="true" />
+              <span className="generate-label">{generating ? "Generating…" : "Generated"}</span>
             </button>
           </div>
           <div className="lp-columns">
@@ -189,7 +241,7 @@ function DemoApp({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React
                   meetings={meetingList}
                   meeting={demoMeeting}
                   onMeetingChange={noop}
-                  tickets={tickets}
+                  tickets={transcriptTickets}
                   hoveredId={hoveredId}
                   onHover={setHoveredId}
                   onSpanChange={noop}
@@ -199,17 +251,19 @@ function DemoApp({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React
                 />
               </div>
             </section>
-            <section className="meeting-section" aria-label="Tickets">
+            <section className={`meeting-section lp-col ${generating ? "lp-collapsed" : ""}`} aria-label="Tickets">
+              <div className="lp-rail" aria-hidden="true"><ListChecks size={15} /><span>Tickets</span></div>
               <header className="section-head"><span><ListChecks size={15} /> Tickets<span className="tab-count">{inMeeting.length}</span></span></header>
               <div className="section-body">
                 <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={inMeeting} inReview={() => false} showReview={false} />
                 {table(shown)}
               </div>
             </section>
-            <section className="meeting-section" aria-label="Minutes">
+            <section className={`meeting-section lp-col ${generating ? "lp-collapsed" : ""}`} aria-label="Minutes">
+              <div className="lp-rail" aria-hidden="true"><NotebookText size={15} /><span>Minutes</span></div>
               <header className="section-head"><span><NotebookText size={15} /> Minutes</span></header>
               <div className="section-body">
-                <div className="minutes-body"><div className="ProseMirror" dangerouslySetInnerHTML={{ __html: demoMinutes }} /></div>
+                {generating ? null : <div className="minutes-body lp-minutes-in"><div className="ProseMirror" dangerouslySetInnerHTML={{ __html: demoMinutes }} /></div>}
               </div>
             </section>
           </div>
@@ -236,10 +290,20 @@ function SharePage({ tickets }: { tickets: Ticket[] }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [query, setQuery] = useState("");
+  // The map moves on its own, stepping through the tickets, until the visitor touches the page.
+  const [touched, setTouched] = useState(false);
+  useEffect(() => {
+    if (touched || window.matchMedia("(prefers-reduced-motion: reduce)").matches || !tickets.length) return;
+    let index = 0;
+    const step = () => { setSelectedId(tickets[index % tickets.length].id); index += 1; };
+    const first = window.setTimeout(step, 1200);
+    const timer = window.setInterval(step, 3000);
+    return () => { window.clearTimeout(first); window.clearInterval(timer); };
+  }, [touched, tickets]);
   const search = query.trim().toLowerCase();
   const rows = search ? tickets.filter((ticket) => `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.status} ${ticket.location.text}`.toLowerCase().includes(search)) : tickets;
   return (
-    <Window title="Read-only view" className="lp-share">
+    <Window title="Read-only view" className="lp-share" onPointerDown={() => setTouched(true)}>
       <div className="public-header">
         <Logo />
         <div className="public-heading"><h1>{name} tickets</h1><span className="role-badge">Read-only view</span></div>
@@ -270,7 +334,7 @@ function SharePage({ tickets }: { tickets: Ticket[] }) {
             </table>
           </div>
           <aside className="public-map">
-            <MapView tickets={tickets} selected={tickets.find((ticket) => ticket.id === selectedId)} hoveredId={hoveredId} focus={null} onHover={setHoveredId} onSelect={(ticket) => setSelectedId(ticket.id)} />
+            <MapView tickets={tickets} selected={tickets.find((ticket) => ticket.id === selectedId)} hoveredId={hoveredId} focus={null} onHover={setHoveredId} onSelect={(ticket) => setSelectedId(ticket.id)} half={window.innerWidth <= 900 ? "west" : undefined} />
           </aside>
         </div>
       </div>
@@ -282,6 +346,13 @@ function SharePage({ tickets }: { tickets: Ticket[] }) {
  *  grabs focus on mount; a submitted ticket joins the demo's list. */
 function PhoneForm({ onSubmit }: { onSubmit: (ticket: Ticket) => void }) {
   const { ticketTypes } = useBoard();
+  // The status bar clock shows the visitor's own local time, like a real phone.
+  const [time, setTime] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setTime(new Date()), 15000);
+    return () => window.clearInterval(timer);
+  }, []);
+  const clock = time.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }).replace(/\s?[AP]M$/i, "");
   const [title, setTitle] = useState("");
   const [type, setType] = useState("");
   const [urgent, setUrgent] = useState(false);
@@ -303,6 +374,7 @@ function PhoneForm({ onSubmit }: { onSubmit: (ticket: Ticket) => void }) {
   return (
     <div className="lp-phone">
       <div className="lp-phone-screen">
+        <div className="lp-phone-status" aria-hidden="true"><span>{clock}</span><span className="lp-phone-icons"><Signal size={14} strokeWidth={2.6} /><Wifi size={14} strokeWidth={2.6} /><BatteryFull size={17} strokeWidth={2.2} /></span></div>
         <div className="lp-phone-brand"><Logo /></div>
         {sent ? (
           <div className="lp-phone-done">

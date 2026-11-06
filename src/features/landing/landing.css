@@ -21,8 +21,39 @@
 .lp-backdrop::after { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(255, 255, 255, .4); }
 .lp-backdrop::before { content: ""; position: absolute; inset: -12px; z-index: -2; background: var(--lp-bg) center / cover; filter: blur(4px) saturate(1.1); }
 
+/* Phone crop for the hero demo (see FitWidth). */
+.lp-minutes-in { animation: lp-in .5s ease-out both; }
+@keyframes lp-in { from { opacity: 0; transform: translateY(8px); } }
+@media (prefers-reduced-motion: reduce) { .lp-minutes-in { animation: none; } }
+
+/* Tickets and Minutes start as the app's collapsed rails, then open when generating finishes. */
+.lp-col { position: relative; overflow: hidden; transition: flex-grow .7s ease, flex-basis .7s ease; }
+.lp-col > .section-head, .lp-col > .section-body { min-width: 380px; transition: opacity .4s ease .25s; }
+.lp-rail { position: absolute; inset: 0 auto 0 0; width: 44px; padding: 14px 0; display: flex; flex-direction: column; align-items: center; gap: 12px; background: #fafbfc; color: #4c5561; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
+.lp-rail span { writing-mode: vertical-rl; font-size: 12px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.lp-collapsed { flex: 0 0 44px; }
+.lp-collapsed > .section-head, .lp-collapsed > .section-body { opacity: 0; transition: none; }
+.lp-collapsed .lp-rail { opacity: 1; transition: none; }
+@media (prefers-reduced-motion: reduce) { .lp-col, .lp-col > * { transition: none; } }
+
+/* The hero demo sits on a photo panel only on phones (see the media query); on desktop the panel is invisible. */
+.lp-hero-backdrop { overflow: visible; border-radius: 0; }
+.lp-hero-backdrop::before, .lp-hero-backdrop::after { display: none; }
+
+/* Ticket pins on the resident map: much bigger, with a ring on the one in focus. */
+.lp-share .leaflet-marker-icon.map-place span { transform: scale(1.6); border-width: 2px; box-shadow: 0 0 0 3px rgb(var(--hl) / .22), 0 3px 8px rgba(17, 24, 44, .35); }
+.lp-share .leaflet-marker-icon.map-place.selected span { transform: scale(2.2); box-shadow: 0 0 0 5px rgb(var(--hl) / .35), 0 3px 10px rgba(17, 24, 44, .4); }
+.lp-share .leaflet-marker-icon.map-place.hovered span { transform: scale(2.4); box-shadow: 0 0 0 5px rgb(var(--hl) / .4), 0 3px 10px rgba(17, 24, 44, .4); }
+
+/* Pin tooltips on the resident map: the same text size as the meeting minutes, wrapped so they stay on screen, lifted clear of the bigger pins. */
+.lp-share .leaflet-tooltip { width: max-content; max-width: 220px; padding: 7px 11px; border-radius: 8px; white-space: normal; overflow-wrap: anywhere; font-size: 13px; font-weight: 500; line-height: 1.4; box-shadow: 0 4px 14px rgba(17, 24, 44, .3); }
+.lp-share .leaflet-tooltip-top { margin-top: -10px; }
+
+/* District boundary on the resident map: thicker, fully opaque, with a light halo. */
+.lp-share .leaflet-overlay-pane path { stroke: #2bb7d5; stroke-width: 3.5px; stroke-opacity: 1; filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
+
 /* Window frame */
-.lp-window { overflow: hidden; border: 1px solid #aeb4bc; border-radius: 4px; background: white; box-shadow: 0 32px 80px rgba(17, 24, 44, .38), 0 8px 24px rgba(17, 24, 44, .22); }
+.lp-window { overflow: hidden; border: 1px solid #aeb4bc; border-radius: 4px; background: white; box-shadow: 0 6px 16px rgba(17, 24, 44, .22), 0 1px 4px rgba(17, 24, 44, .16); }
 .lp-window-bar { height: 36px; padding: 0 14px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #e3e6ea; background: #f3f5f6; color: #626b77; font-size: 12px; }
 .lp-window-bar i { width: 11px; height: 11px; border-radius: 50%; background: #d3d8dd; }
 .lp-window-bar span { flex: 1; margin-right: 54px; text-align: center; }
@@ -57,9 +88,17 @@
 .lp-share .public-table-wrap { max-height: 420px; overflow: auto; }
 
 /* Phone */
-.lp-phone { width: 340px; max-width: 100%; padding: 10px; border: 1px solid #aeb4bc; border-radius: 36px; background: #11182c; box-shadow: 0 28px 70px rgba(17, 24, 44, .45), 0 8px 24px rgba(17, 24, 44, .25); }
-.lp-phone-screen { height: 620px; overflow: auto; border-radius: 28px; background: white; }
-.lp-phone-brand { padding: 14px 0 10px; display: flex; justify-content: center; border-bottom: 1px solid #e3e6ea; }
+.lp-phone { position: relative; width: 320px; max-width: 100%; padding: 10px; border: 3px solid #d3d6dc; border-radius: 50px; background: #15181f; box-shadow: 0 16px 28px -6px rgba(17, 24, 44, .4), 0 3px 10px rgba(17, 24, 44, .2), inset 0 0 0 1px rgba(255, 255, 255, .06); }
+/* The notch, and the side buttons on the metal frame. */
+.lp-phone::before { content: ""; position: absolute; top: 10px; left: 50%; z-index: 3; width: 138px; height: 26px; border-radius: 0 0 18px 18px; background: #15181f; transform: translateX(-50%); }
+.lp-phone::after { content: ""; position: absolute; top: 96px; left: -6px; width: 3px; height: 30px; border-radius: 2px 0 0 2px; background: #c3c6cd; box-shadow: 0 52px 0 #c3c6cd, 0 -48px 0 -1px #c3c6cd; }
+.lp-phone-status { height: 40px; padding: 4px 24px 0 28px; display: flex; align-items: center; justify-content: space-between; color: #11182c; font-size: 13px; font-weight: 700; }
+.lp-phone-icons { display: inline-flex; align-items: center; gap: 4px; }
+/* The scroll wrapper must not clip the phone's shadow into a box. */
+.lp-feature-phone .lp-backdrop-scroll { overflow: visible; padding: 0; margin: 0; }
+.lp-phone-screen { height: 620px; overflow: auto; border-radius: 40px; background: white; scrollbar-width: none; }
+.lp-phone-screen::-webkit-scrollbar { display: none; }
+.lp-phone-brand { padding: 6px 0 10px; display: flex; justify-content: center; border-bottom: 1px solid #e3e6ea; }
 .lp-phone-brand .loopback-logo { width: 36px; height: 36px; }
 .lp-phone-brand .board-logo { width: 120px; height: 48px; }
 .lp-phone-head { padding: 14px 18px; border-bottom: 1px solid #e3e6ea; }
@@ -102,24 +141,69 @@
 .lp-backdrop-scroll { min-width: 0; }
 
 @media (max-width: 900px) {
+  .lp { overflow-x: clip; }
   /* The demo is a desktop app: on a phone it keeps its width and swipes sideways inside the photo panel. */
   .lp-stage, .lp-backdrop-scroll { overflow-x: auto; }
   .lp-backdrop-scroll { padding-bottom: 50px; margin-bottom: -50px; }
-  .lp-stage { padding: 20px 12px 70px; }
-  .lp-demo { min-width: 860px; }
-  .lp-share { min-width: 700px; }
-  .lp-hero { padding-bottom: 150px; }
-  .lp-stage { margin-top: -110px; }
+  .lp-stage { width: 100%; padding: 12px 0 0; }
+  .lp-columns { height: 1000px; }
+  .lp-demo { min-width: 1280px; }
+  /* The padding leaves room for the window's shadow, which the crop would otherwise clip. */
+  .lp-fit-crop { overflow: hidden; padding: 12px 0 30px; }
+  /* Like Cursor's phone page: a watercolor panel flush with the screen's left and right edges, the window inset from its top and right with rounded right corners, cropped at the left and bottom. */
+  .lp-hero-backdrop { overflow: hidden; border-radius: 0 0 8px 8px; padding: 16px 28px 0 0; margin: 0 -8px; }
+  .lp-hero-backdrop::before, .lp-hero-backdrop::after { display: block; }
+  .lp-hero-backdrop .lp-backdrop-scroll { overflow: hidden; padding: 0; margin: 0; }
+  .lp-hero-backdrop::after { background: rgba(255, 255, 255, .15); }
+  .lp-feature-visual .lp-fit-crop { padding: 0; }
+  /* Share section, like the hero mirrored: the map leads on the left, the window is inset from the panel's top and left, cropped on the right. */
+  /* The lower panels stop short of the screen edges and end in rounded corners, so they read as their own sections. */
+  .lp-feature-visual { margin: 0 12px; border-radius: 8px; }
+  .lp-feature-visual.lp-share-backdrop { overflow: hidden; border-radius: 8px; padding: 16px 0 0 20px; }
+  .lp-share-backdrop .lp-backdrop-scroll { overflow: hidden; padding: 0; margin: 0; }
+  .lp-share-backdrop .lp-fit-crop { padding: 8px 0 30px 8px; }
+  .lp-share { border-radius: 8px; box-shadow: 0 14px 22px -6px rgba(17, 24, 44, .35), 0 3px 8px rgba(17, 24, 44, .16); }
+  .lp-share .public-layout { grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.45fr); }
+  .lp-share .leaflet-overlay-pane path { stroke-width: 7px; }
+  /* The share window is zoomed out a little more than the hero (860 vs 760), so 15px here reads the same as the minutes' 13px. */
+  .lp-share .leaflet-tooltip { max-width: 240px; padding: 8px 12px; font-size: 15px; }
+  .lp-share .leaflet-tooltip-top { margin-top: -28px; }
+  /* The tickets table is bigger too, so its text reads like the hero's after the window is shrunk. */
+  .lp-share .public-table { font-size: 18px; }
+  .lp-share .public-table th { padding: 10px 12px; font-size: 14px; }
+  .lp-share .public-table td { padding: 12px; }
+  /* Every ticket shows, one line each; whatever runs past the window's right edge is simply cropped. */
+  .lp-share .public-table-wrap { max-height: none; overflow: hidden; }
+  .lp-share .public-table td { white-space: nowrap; }
+  .lp-share .public-title { min-width: 0; }
+  .lp-share .public-table .tag.type, .lp-share .public-table .tag.status { padding: 5px 10px; font-size: 12px; }
+  .lp-share .public-table .tag.status i { width: 8px; height: 8px; }
+  /* The window is shrunk on phones, so the pins grow to stay readable. */
+  .lp-share .leaflet-marker-icon.map-place span { transform: scale(2.7); }
+  .lp-share .leaflet-marker-icon.map-place.selected span { transform: scale(3.5); }
+  .lp-share .leaflet-marker-icon.map-place.hovered span { transform: scale(3.7); }
+  .lp-share .public-map { order: -1; height: 1100px; }
+  .lp-demo { border-radius: 8px; box-shadow: 0 14px 22px -6px rgba(17, 24, 44, .35), 0 3px 8px rgba(17, 24, 44, .16); }
+  .lp-fit { width: 1280px; }
+  .lp-feature-visual .lp-fit { width: 1280px; }
+  .lp-share { min-width: 1280px; }
+  .lp-header { padding: 0 12px; }
+  /* No blue band on phones: the hero sits on the page's own background. */
+  .lp-hero { padding: 40px 12px 8px; background: transparent; color: #11182c; }
+  .lp-hero .lp-cta { background: #11182c; color: white; }
+  .lp-hero .lp-cta:hover { background: #1f2a47; }
+  .lp-hero h1 { margin-bottom: 24px; font-size: 28px; letter-spacing: -1px; }
+  .lp-stage { margin-top: 0; }
   .lp-feature-visual, .lp-feature-phone .lp-feature-visual { padding: 16px 10px; }
-  .lp-columns { height: 560px; overflow-x: auto; }
-  .lp-columns .meeting-section { flex: 0 0 min(86vw, 380px); }
-  .lp-tickets { grid-template-columns: minmax(0, 1fr); height: auto; }
-  .lp-tickets-table { max-height: 380px; border-right: 0; }
-  .lp-tickets-map { height: 320px; }
-  .lp-feature, .lp-feature-phone { grid-template-columns: minmax(0, 1fr); padding: 20px; margin-top: 48px; }
+  .lp-feature-phone .lp-feature-visual { padding-bottom: 36px; }
+  .lp-feature, .lp-feature-phone { grid-template-columns: minmax(0, 1fr); padding: 0; margin: 32px 0 0; width: 100%; gap: 16px; border: 0; border-radius: 0; background: transparent; }
+  .lp-feature-text { padding: 0 12px; }
   .lp-feature-phone .lp-feature-text { order: 0; }
   .lp-feature-phone .lp-feature-visual { order: 1; }
-  .lp-feature-text p { font-size: 18px; }
+  .lp-feature-text h2 { margin-bottom: 4px; font-size: 22px; line-height: 1.1; font-weight: 600; letter-spacing: -.6px; }
+  .lp-feature-text p { font-size: 14px; line-height: 1.35; }
+  .lp-closing { padding: 48px 20px 48px; gap: 20px; }
+  .lp-closing h2 { font-size: 36px; letter-spacing: -1.5px; }
 }
 
 /* Share table: tighter columns so Urgent and Location fit beside the map. */
