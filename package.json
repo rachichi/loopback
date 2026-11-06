@@ -17,7 +17,8 @@
     "db:seed-sql": "node scripts/make_supabase_seed.mjs",
     "evals:run": "cd evals && tsx scripts/run.ts",
     "evals:score": "cd evals && tsx scripts/score.ts",
-    "evals:log": "cd evals && tsx scripts/log.ts"
+    "evals:log": "cd evals && tsx scripts/log.ts",
+    "evals:minutes": "cd evals && tsx scripts/minutes.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.78",
