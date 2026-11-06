@@ -10,6 +10,13 @@
   </head>
   <body>
     <!-- figma:body-start -->
+    <!-- Netlify Forms reads this at build time to learn the landing page's contact form (src/features/landing).
+         The page itself submits it with fetch; this copy is never shown. -->
+    <form name="contact" data-netlify="true" netlify-honeypot="website" hidden>
+      <input name="email" />
+      <textarea name="details"></textarea>
+      <input name="website" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- figma:body-end -->

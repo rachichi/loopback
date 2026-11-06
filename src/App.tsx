@@ -27,6 +27,8 @@ import { withReviewRows } from "./features/transcript/review";
 const TranscriptPanel = lazy(() => import("./features/transcript/TranscriptPanel"));
 // The Meetings tab (meetings_tab) loads the same way, in its own chunk.
 const MeetingsPage = lazy(() => import("./features/meetings/MeetingsPage"));
+// The public landing page (/landing): fake demo data only, in its own chunk.
+const Landing = lazy(() => import("./features/landing/Landing"));
 
 type View = "home" | "tickets" | "meetings" | "submit";
 
@@ -211,6 +213,9 @@ function PortalFooter() {
 /** The token from a public share link (/share/<token>), or null on any other page. */
 const shareToken = window.location.pathname.match(/^\/share\/([A-Za-z0-9_-]{20,})\/?$/)?.[1] ?? null;
 
+/** True on the landing page. Part 1 serves it at /landing; a landing hostname comes with the rollout. */
+const landing = /^\/landing\/?$/.test(window.location.pathname);
+
 export default function App() {
   // undefined until the stored session has been read, so a signed-in user never sees the sign-in screen flash.
   const [session, setSession] = useState<Session | null | undefined>(undefined);
@@ -220,6 +225,8 @@ export default function App() {
     return () => data.subscription.unsubscribe();
   }, []);
 
+  // The landing page needs no account and never touches the database.
+  if (landing) return <Suspense fallback={null}><Landing /></Suspense>;
   // A public share link needs no account. The token is checked by the database (public_board).
   if (shareToken) return <PublicBoard token={shareToken} />;
   if (session === undefined) return null;

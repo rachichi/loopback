@@ -1,0 +1,137 @@
+/* Landing page (src/features/landing). Prefixed lp-; reuses the app's classes inside the demo windows. */
+.lp { min-height: 100vh; background: #fbfcfc; color: #11182c; font-family: 'Noto Sans', sans-serif; }
+.lp-header { height: 64px; padding: 0 max(20px, calc((100vw - 1280px) / 2)); display: flex; align-items: center; justify-content: space-between; background: white; }
+.lp-brand { display: inline-flex; align-items: center; gap: 10px; color: #11182c; text-decoration: none; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 22px; font-weight: 600; letter-spacing: -.5px; }
+.lp-brand img { width: 36px; height: 36px; border-radius: 9px; }
+.lp-signin { padding: 8px 14px; border-radius: 999px; color: #11182c; font-size: 14px; font-weight: 600; text-decoration: none; }
+.lp-signin:hover { background: #eef1f3; }
+
+/* Hero on the app's blue band; the demo window overlaps its lower edge. */
+.lp-hero { padding: 72px max(20px, calc((100vw - 1280px) / 2)) 200px; background: #2bb7d5; color: white; }
+.lp-hero-inner { max-width: 760px; }
+.lp-hero h1 { margin: 0 0 32px; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: clamp(38px, 6vw, 68px); line-height: 1.02; font-weight: 600; letter-spacing: -2px; }
+.lp-cta { height: 48px; padding: 0 22px 0 26px; display: inline-flex; align-items: center; gap: 8px; border: 0; border-radius: 999px; background: #11182c; color: white; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform .15s, background .15s; }
+.lp-cta:hover { background: #1f2a47; transform: translateY(-1px); }
+.lp-hero .lp-cta { background: white; color: #11182c; }
+.lp-hero .lp-cta:hover { background: #eef9fc; }
+.lp-stage { width: min(1280px, calc(100% - 40px)); margin: -140px auto 0; padding: 20px 0 90px; }
+
+/* Blurred photo panel. The image sits on a pseudo-element so only the photo is blurred. */
+.lp-backdrop { position: relative; isolation: isolate; overflow: hidden; border-radius: 4px; }
+.lp-backdrop::after { content: ""; position: absolute; inset: 0; z-index: -1; background: rgba(255, 255, 255, .4); }
+.lp-backdrop::before { content: ""; position: absolute; inset: -12px; z-index: -2; background: var(--lp-bg) center / cover; filter: blur(4px) saturate(1.1); }
+
+/* Window frame */
+.lp-window { overflow: hidden; border: 1px solid #aeb4bc; border-radius: 4px; background: white; box-shadow: 0 32px 80px rgba(17, 24, 44, .38), 0 8px 24px rgba(17, 24, 44, .22); }
+.lp-window-bar { height: 36px; padding: 0 14px; display: flex; align-items: center; gap: 7px; border-bottom: 1px solid #e3e6ea; background: #f3f5f6; color: #626b77; font-size: 12px; }
+.lp-window-bar i { width: 11px; height: 11px; border-radius: 50%; background: #d3d8dd; }
+.lp-window-bar span { flex: 1; margin-right: 54px; text-align: center; }
+
+/* Demo app */
+/* The app's header and nav, used as is; only the sticky, page-wide parts are reined in to fit the window. */
+.lp-demo .portal-nav { position: relative; top: auto; }
+/* Share and the account circle do nothing in the demo, so they get no hover or pointer. */
+.lp-demo .nav-share, .lp-demo .nav-profile-button { pointer-events: none; }
+.lp-demo .title-band { min-height: 92px; padding: 14px 24px; }
+.lp-demo .title-band h1 { font-size: 34px; letter-spacing: -1.2px; }
+.lp-demo .meeting-band h1 > span { font-size: 30px; }
+.lp-demo .crumb { font-size: 30px; font-weight: 600; letter-spacing: -1.2px; color: white; }
+.lp-columns { height: 600px; display: flex; border-top: 1px solid #818995; }
+.lp-columns .meeting-section:last-child { border-right: 0; }
+.lp-tickets { height: 600px; display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); border-top: 1px solid #818995; }
+.lp-tickets-table { min-width: 0; display: flex; flex-direction: column; border-right: 1px solid #aeb4bc; overflow: auto; }
+.lp-tickets-map { min-width: 0; display: flex; }
+.lp-demo .transcript-body.bare { padding-bottom: 24px; }
+
+/* Feature sections */
+.lp-feature { width: min(1280px, calc(100% - 40px)); margin: 72px auto 0; padding: 28px; display: grid; grid-template-columns: minmax(220px, 1fr) minmax(0, 2.4fr); align-items: center; gap: 32px; border: 1px solid #e3e6ea; border-radius: 4px; background: #f1f4f5; }
+.lp-feature-text h2 { margin: 0 0 10px; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 30px; font-weight: 600; letter-spacing: -.8px; }
+.lp-feature-text p { margin: 0; color: #626b77; font-size: 22px; line-height: 1.3; }
+.lp-feature-visual { min-width: 0; padding: 32px; }
+.lp-feature-phone { grid-template-columns: minmax(0, 2.4fr) minmax(220px, 1fr); }
+.lp-feature-phone .lp-feature-text { order: 2; }
+.lp-feature-phone .lp-feature-visual { order: 1; display: flex; justify-content: center; padding: 40px 32px; }
+.lp-share .public-header, .lp-share .public-main { width: calc(100% - 32px); }
+.lp-share .public-layout { align-items: stretch; }
+.lp-share .public-map { position: static; height: 420px; }
+.lp-share .public-table-wrap { max-height: 420px; overflow: auto; }
+
+/* Phone */
+.lp-phone { width: 340px; max-width: 100%; padding: 10px; border: 1px solid #aeb4bc; border-radius: 36px; background: #11182c; box-shadow: 0 28px 70px rgba(17, 24, 44, .45), 0 8px 24px rgba(17, 24, 44, .25); }
+.lp-phone-screen { height: 620px; overflow: auto; border-radius: 28px; background: white; }
+.lp-phone-brand { padding: 14px 0 10px; display: flex; justify-content: center; border-bottom: 1px solid #e3e6ea; }
+.lp-phone-brand .loopback-logo { width: 36px; height: 36px; }
+.lp-phone-brand .board-logo { width: 120px; height: 48px; }
+.lp-phone-head { padding: 14px 18px; border-bottom: 1px solid #e3e6ea; }
+.lp-phone-head h3, .lp-phone-done h3 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 20px; font-weight: 600; }
+.lp-phone-fields { padding: 14px 18px; display: flex; flex-direction: column; gap: 14px; }
+.lp-phone-fields label { display: flex; flex-direction: column; gap: 5px; color: #4c5561; font-size: 13px; font-weight: 600; }
+.lp-phone-fields em { color: #a3263c; font-size: 11px; font-style: normal; font-weight: 400; }
+.lp-phone-fields input, .lp-phone-fields select, .lp-phone-fields textarea { width: 100%; padding: 9px 10px; border: 1px solid #cfd5db; border-radius: 6px; background: white; color: #11182c; font: inherit; font-size: 14px; }
+.lp-phone-fields input:focus, .lp-phone-fields select:focus, .lp-phone-fields textarea:focus { border-color: #2bb7d5; outline: 0; box-shadow: 0 0 0 2px rgba(43, 183, 213, .15); }
+.lp-phone-fields .lp-check { flex-direction: row; align-items: center; gap: 8px; }
+.lp-phone-fields .lp-check input { width: 18px; height: 18px; accent-color: #d4364f; }
+.lp-phone-foot { padding: 12px 18px 18px; display: flex; justify-content: flex-end; border-top: 1px solid #e3e6ea; }
+.lp-phone-done { padding: 40px 22px; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.lp-phone-done p { margin: 0 0 8px; color: #626b77; font-size: 14px; }
+.lp-primary, .lp-secondary { height: 40px; padding: 0 20px; border-radius: 999px; font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; }
+.lp-primary { border: 0; background: #2bb7d5; color: white; }
+.lp-primary:hover { background: #1fa2c2; }
+.lp-secondary { border: 0; background: #e6e9ec; color: #11182c; }
+.lp-secondary:hover { background: #dce0e4; }
+
+/* Closing */
+.lp-closing { padding: 120px 20px 100px; display: flex; flex-direction: column; align-items: center; gap: 32px; text-align: center; }
+.lp-closing h2 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: clamp(48px, 9vw, 120px); line-height: 1; font-weight: 600; letter-spacing: -3px; }
+
+/* Contact popup */
+.lp-modal-backdrop { position: fixed; inset: 0; z-index: 1000; padding: 16px; display: grid; place-items: center; overflow-y: auto; background: rgba(17, 24, 44, .45); }
+.lp-modal { position: relative; width: min(640px, 100%); padding: 24px 28px 28px; display: flex; flex-direction: column; gap: 18px; border-radius: 6px; background: #f3f5f6; box-shadow: 0 18px 48px rgba(17, 24, 44, .28); }
+.lp-modal h2 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 28px; font-weight: 500; }
+.lp-modal label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.lp-modal label span { color: #d4562a; }
+.lp-modal input, .lp-modal textarea { width: 100%; padding: 11px 12px; border: 1px solid #d9dde2; border-radius: 6px; background: #f8f9fa; color: #11182c; font: inherit; font-size: 15px; }
+.lp-modal textarea { resize: vertical; }
+.lp-modal input:focus, .lp-modal textarea:focus { border-color: #2bb7d5; outline: 0; box-shadow: 0 0 0 2px rgba(43, 183, 213, .15); }
+.lp-modal-actions { display: flex; gap: 10px; }
+.lp-modal-note { margin: 0; color: #626b77; }
+.lp-modal-close { position: absolute; top: 14px; right: 14px; width: 32px; height: 32px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: #626b77; cursor: pointer; }
+.lp-modal-close:hover { background: #e6e9ec; }
+
+.lp-footer-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.lp-backdrop-scroll { min-width: 0; }
+
+@media (max-width: 900px) {
+  /* The demo is a desktop app: on a phone it keeps its width and swipes sideways inside the photo panel. */
+  .lp-stage, .lp-backdrop-scroll { overflow-x: auto; }
+  .lp-backdrop-scroll { padding-bottom: 50px; margin-bottom: -50px; }
+  .lp-stage { padding: 20px 12px 70px; }
+  .lp-demo { min-width: 860px; }
+  .lp-share { min-width: 700px; }
+  .lp-hero { padding-bottom: 150px; }
+  .lp-stage { margin-top: -110px; }
+  .lp-feature-visual, .lp-feature-phone .lp-feature-visual { padding: 16px 10px; }
+  .lp-columns { height: 560px; overflow-x: auto; }
+  .lp-columns .meeting-section { flex: 0 0 min(86vw, 380px); }
+  .lp-tickets { grid-template-columns: minmax(0, 1fr); height: auto; }
+  .lp-tickets-table { max-height: 380px; border-right: 0; }
+  .lp-tickets-map { height: 320px; }
+  .lp-feature, .lp-feature-phone { grid-template-columns: minmax(0, 1fr); padding: 20px; margin-top: 48px; }
+  .lp-feature-phone .lp-feature-text { order: 0; }
+  .lp-feature-phone .lp-feature-visual { order: 1; }
+  .lp-feature-text p { font-size: 18px; }
+}
+
+/* Share table: tighter columns so Urgent and Location fit beside the map. */
+.lp-share .public-table th, .lp-share .public-table td { padding: 7px 6px; }
+.lp-share .public-title { min-width: 120px; }
+.lp-share .public-layout { grid-template-columns: minmax(0, 1.25fr) minmax(240px, 1fr); }
+
+.lp-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.lp-modal-error { margin: 0; color: #a3263c; font-size: 14px; }
+.lp-primary:disabled { opacity: .6; cursor: progress; }
+
+/* Demo Home: the app's banner, sized to the window. */
+.lp-demo .home-view { min-height: 0; }
+.lp-demo .hero-banner { min-height: 520px; }
+.lp-demo .hero-content { min-height: 440px; }
