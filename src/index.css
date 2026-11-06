@@ -483,8 +483,12 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 .nav-hamburger { display: none; }
 @media (max-width: 850px) {
   .portal-nav.mobile { display: flex; justify-content: flex-end; }
-  .portal-nav.mobile > button:not(.nav-hamburger) { display: none; }
-  .portal-nav.mobile .nav-hamburger { display: flex; width: 48px; border-left: 1px solid var(--nav-rule); }
+  /* Home and Tickets stay in the bar; Meetings needs a wider screen. */
+  .portal-nav.mobile { justify-content: flex-start; }
+  .portal-nav.mobile > button { flex: 0 0 auto; padding: 0 16px; }
+  .portal-nav.mobile > button.nav-home { width: 48px; padding: 0; }
+  .portal-nav.mobile > button.nav-meetings { display: none; }
+  .portal-nav.mobile .nav-hamburger { display: flex; width: 48px; margin-left: auto; order: 9; border-left: 1px solid var(--nav-rule); }
   /* The share link, board switcher and account sit in a panel under the bar instead of squeezing into it. */
   .portal-nav.mobile .nav-account { display: none; position: absolute; top: 100%; left: 0; right: 0; height: auto; flex-direction: column; background: #fff; border-bottom: 1px solid var(--nav-rule); box-shadow: 0 10px 20px rgba(17, 24, 44, .12); }
   .portal-nav.mobile.menu-open .nav-account { display: flex; }
@@ -635,3 +639,45 @@ button.meeting-generate.done:disabled { cursor: not-allowed; }
 .meeting-toast .toast-close { position: absolute; top: 8px; right: 8px; padding: 4px; border: 0; background: none; color: white; cursor: pointer; }
 @media (max-width: 900px) { .meeting-band h1 > span { font-size: 28px; } .meeting-workspace { height: auto; min-height: 640px; } }
 .transcript-body.bare mark.hl { cursor: pointer; }
+
+/* Tickets on a phone: cards instead of the table. */
+.mobile-tickets { flex: 1; min-height: 60vh; background: #f4f6f8; }
+.mobile-tickets .urgency-tabs { overflow-x: auto; }
+.mobile-tickets-tools { padding: 10px 12px 0; display: flex; align-items: center; gap: 8px; }
+.mobile-tickets-tools .table-search { flex: 1; min-width: 0; height: 40px; }
+.mobile-tickets-tools .table-search input { width: 100%; min-width: 0; font-size: 16px; }
+.mobile-tickets-tools select { height: 40px; padding: 0 8px; border: 1px solid #d9dde2; border-radius: 5px; background: white; font-size: 16px; }
+.mobile-tickets-tools .new-request { width: 40px; height: 40px; display: grid; place-items: center; border: 0; border-radius: 5px; background: #2bb7d5; color: white; cursor: pointer; }
+.mobile-tickets-meta { padding: 10px 14px 4px; display: flex; justify-content: space-between; font-size: 12px; }
+.mobile-tickets-empty { margin: 0; padding: 36px 20px; color: #4c5561; font-size: 14px; text-align: center; }
+.ticket-cards { margin: 0; padding: 4px 12px 24px; display: flex; flex-direction: column; gap: 8px; list-style: none; }
+.ticket-card { width: 100%; padding: 12px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; border: 1px solid #d9dde2; border-left: 4px solid #d9dde2; border-radius: 6px; background: white; color: #1a2234; font: inherit; text-align: left; cursor: pointer; }
+.ticket-card.urgent { border-left-color: #d4364f; }
+.ticket-card.pending { border-style: dashed; border-left-color: #8a63b5; background: #faf8fc; }
+.ticket-card-top { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.ticket-card-number { color: #167b94; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ticket-card-urgent, .ticket-card-review { padding: 1px 7px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase; }
+.ticket-card-urgent { background: #fbe1e5; color: #a3263c; }
+.ticket-card-review { background: #ece4f5; color: #5b3a7a; }
+.ticket-card-title { font-size: 16px; line-height: 1.3; font-weight: 600; }
+.ticket-card-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ticket-card .tag { font-size: 11px; }
+.ticket-card-meta { display: flex; flex-direction: column; gap: 3px; color: #626b77; font-size: 12px; }
+.ticket-card-meta span { display: flex; align-items: center; gap: 5px; }
+
+/* The intake form as a whole page, and its thank-you screen. */
+.intake-backdrop.page { padding: 0; display: block; background: #f4f6f8; }
+.intake-form.page { width: min(720px, 100%); min-height: 100%; margin: 0 auto; border-radius: 0; box-shadow: none; display: flex; flex-direction: column; }
+.intake-form.page .intake-body { flex: 1; }
+.intake-form.page footer { position: sticky; bottom: 0; background: white; }
+.submit-done { position: fixed; inset: 0; z-index: 900; padding: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; background: #fff; color: #1a2234; text-align: center; }
+.submit-done h1 { margin: 0; font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 32px; }
+.submit-done p { margin: 0; color: #4c5561; }
+.submit-done .primary { height: 48px; margin-top: 12px; padding: 0 28px; border: 0; border-radius: 6px; background: #2bb7d5; color: white; font-size: 16px; font-weight: 700; cursor: pointer; }
+.submit-done .primary:hover { background: #1fa2c2; }
+.submit-done .link { border: 0; background: transparent; color: #4c5561; font-size: 14px; text-decoration: underline; cursor: pointer; }
+
+.submit-board { padding: 18px 18px 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; border-bottom: 1px solid #e3e6ea; text-align: center; }
+.submit-board img { max-width: 220px; max-height: 64px; object-fit: contain; }
+.submit-board strong { font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 18px; }
+.submit-done .submit-board { margin-bottom: 20px; padding: 0; border: 0; }

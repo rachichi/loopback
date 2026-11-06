@@ -35,7 +35,7 @@ Sent by the app, because the screens change without the address changing. Automa
 | --- | --- |
 | `page-load` (first view of the tab), then `page-change` | `url` (cleaned address), `title`, `board_id` (not on Sign in) |
 
-Screens: `/` (Home), `/tickets` (Tickets), `/sign-in` (Sign in).
+Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (the full-screen submit flow, used on phones), `/sign-in` (Sign in). A `?submit` link opens the submit flow directly; like any address with a query string, it sends nothing.
 
 ## Events
 

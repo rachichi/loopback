@@ -6,6 +6,9 @@ import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type Transc
 import { inTab, Toolbar, UrgencyTabs, type Sync, type UrgencyTab } from "./TicketFilters";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
+import Logo from "./Logo";
+import MobileTickets from "./MobileTickets";
+import SubmitFlow from "./SubmitFlow";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
 import { deleteTickets, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
@@ -26,28 +29,12 @@ const TranscriptPanel = lazy(() => import("./features/transcript/TranscriptPanel
 // The Meetings tab (meetings_tab) loads the same way, in its own chunk.
 const MeetingsPage = lazy(() => import("./features/meetings/MeetingsPage"));
 
-function Logo() {
-  const { name, logoUrl } = useBoard();
-  // A logo that fails to load (bad URL, bucket not public) falls back to the board's name.
-  const [logoFailed, setLogoFailed] = useState(false);
-  return (
-    <div className="brand-lockup" aria-label={`Loopback and ${name} branding`}>
-      <div className="loopback-logo" aria-label="Loopback">
-        <img src={loopbackLogo} alt="Loopback logo" className="loopback-logo-image" />
-      </div>
-      <span className="brand-divider" aria-hidden="true">×</span>
-      <div className="board-logo">
-        {logoUrl && !logoFailed
-          ? <img src={logoUrl} alt={`${name} logo`} className="board-logo-image" onError={() => setLogoFailed(true)} />
-          : <span className="board-logo-name">{name}</span>}
-      </div>
-    </div>
-  );
-}
+type View = "home" | "tickets" | "meetings" | "submit";
 
-type View = "home" | "tickets" | "meetings";
+/** The full-screen submit flow opens straight from a ?submit link. */
+const submitLink = new URLSearchParams(window.location.search).has("submit");
 
-/** Phones get Home and the intake form only; the table, map and transcript need a wider screen. */
+/** Phones get Home, a card list of tickets and the full-screen intake form; the table, map, transcript and meetings need a wider screen. */
 const MOBILE_QUERY = "(max-width: 850px)";
 
 /** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
@@ -136,7 +123,7 @@ function PortalHeader({ view, setView, account, mobile }: { view: View; setView:
         {mobile && <button type="button" className="nav-hamburger" aria-label={menuOpen ? "Close menu" : "Open menu"} aria-expanded={menuOpen} onClick={() => setMenuOpen((open) => !open)}>{menuOpen ? <X size={18} /> : <Menu size={18} />}</button>}
         <button className={`nav-home ${view === "home" ? "active" : ""}`} aria-label="Home" aria-current={view === "home" ? "page" : undefined} onClick={() => setView("home")}><House size={16} /></button>
         <button className={view === "tickets" ? "active" : ""} aria-current={view === "tickets" ? "page" : undefined} onClick={() => setView("tickets")}><ClipboardList size={15} /> Tickets</button>
-        {meetingsOn && <button className={view === "meetings" ? "active" : ""} aria-current={view === "meetings" ? "page" : undefined} onClick={() => setView("meetings")}><CalendarDays size={15} /> Meetings</button>}
+        {meetingsOn && <button className={`nav-meetings ${view === "meetings" ? "active" : ""}`} aria-current={view === "meetings" ? "page" : undefined} onClick={() => setView("meetings")}><CalendarDays size={15} /> Meetings</button>}
         <AccountControls account={account} />
       </nav>
       {view === "tickets" && !mobile && (
@@ -160,7 +147,10 @@ function HomeView({ mobile, onShowMap, onLookUp, onNewTicket }: {
   const { name, backgroundUrl } = useBoard();
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
-  const actions = mobile ? (intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []) : [
+  const actions = mobile ? [
+    { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
+    ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
+  ] : [
     ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
     { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
@@ -314,6 +304,7 @@ function Portal({ account }: { account: Account }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [intakeOpen, setIntakeOpen] = useState(false);
   useEffect(() => { if (intakeOpen) intakeOpenedAt.current = Date.now(); }, [intakeOpen]);
+  const markIntakeStart = useCallback(() => { intakeOpenedAt.current = Date.now(); }, []);
   const transcriptOn = useFeature("transcript_matching");
   const meetingsOn = useFeature("meetings_tab");
   // Meetings and suggestions load, and review rows exist, for either flag.
@@ -331,7 +322,7 @@ function Portal({ account }: { account: Account }) {
   const [jump, setJump] = useState<{ id: string | null; meetingId: string | null; n: number }>({ id: null, meetingId: null, n: 0 });
   const mobile = useMediaQuery(MOBILE_QUERY);
   // After picking a board in the switcher, land on its tickets (phones only have Home and the intake form).
-  const [view, setView] = useState<View>(() => (takeBoardLanding() && !window.matchMedia(MOBILE_QUERY).matches ? "tickets" : "home"));
+  const [view, setView] = useState<View>(() => (submitLink ? "submit" : takeBoardLanding() && !window.matchMedia(MOBILE_QUERY).matches ? "tickets" : "home"));
   // The ticket open in the expanded form, if any.
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const closeExpanded = useCallback(() => setExpandedId(null), []);
@@ -342,6 +333,7 @@ function Portal({ account }: { account: Account }) {
   useEffect(() => {
     if (view === "home") trackPage("/", "Home", board.id);
     else if (view === "meetings") trackPage("/meetings", "Meetings", board.id);
+    else if (view === "submit") trackPage("/submit", "Submit", board.id);
     else trackPage("/tickets", "Tickets", board.id);
   }, [view, board.id]);
 
@@ -573,17 +565,60 @@ function Portal({ account }: { account: Account }) {
     setMapFocus((current) => ({ ticketId: id, place, n: (current?.n ?? 0) + 1 }));
   };
 
+  // The full-screen submit flow: no header, table or footer. Tickets are added to the same state and saved as usual.
+  if (view === "submit" && intakeOn) {
+    return <SubmitFlow onSubmit={addTicket} onExit={() => setView("home")} onStart={markIntakeStart} />;
+  }
+
   if (view === "home" || mobile) {
+    const mobileTickets = mobile && view === "tickets";
     return (
       <div className="portal">
-        <PortalHeader view={view} setView={setView} account={account} mobile={mobile} />
-        <HomeView
-          mobile={mobile}
-          onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
-          onLookUp={() => setView("tickets")}
-          onNewTicket={() => { if (!mobile) setView("tickets"); setIntakeOpen(true); }}
-        />
-        {mobile && intakeOpen && intakeOn && <IntakeForm onSubmit={addTicket} onClose={closeIntake} />}
+        <PortalHeader view={mobile && view !== "tickets" ? "home" : view} setView={setView} account={account} mobile={mobile} />
+        {mobileTickets ? (
+          sync === "loading" || (sync === "error" && !tickets.length) ? (
+            <main className="workspace-message">
+              {sync === "loading" && "Loading tickets…"}
+              {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
+            </main>
+          ) : (
+            <MobileTickets
+              rows={rows}
+              counted={filtered}
+              urgency={urgency}
+              setUrgency={setUrgency}
+              query={query}
+              setQuery={setQuery}
+              status={status}
+              setStatus={setStatus}
+              sync={sync}
+              emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? "No tickets match this view." : "No tickets yet."}
+              inReview={inReview}
+              showReview={matchingOn}
+              onOpen={expandTicket}
+              onNew={() => setView("submit")}
+            />
+          )
+        ) : (
+          <HomeView
+            mobile={mobile}
+            onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
+            onLookUp={() => setView("tickets")}
+            // Phones get the full-screen submit flow; wider screens open the form over the ticket table.
+            onNewTicket={() => { if (mobile) { setView("submit"); } else { setView("tickets"); setIntakeOpen(true); } }}
+          />
+        )}
+        {expanded && (
+          <IntakeForm
+            ticket={expanded}
+            onChange={updateTicket}
+            onStep={{
+              prev: expandedIndex > 0 ? () => expandTicket(expandable[expandedIndex - 1]) : undefined,
+              next: expandedIndex >= 0 && expandedIndex < expandable.length - 1 ? () => expandTicket(expandable[expandedIndex + 1]) : undefined,
+            }}
+            onClose={closeExpanded}
+          />
+        )}
         <PortalFooter />
       </div>
     );
