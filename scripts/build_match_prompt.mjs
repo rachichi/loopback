@@ -6,7 +6,7 @@
 //        node scripts/build_match_prompt.mjs --check   (CI: fails if the copy is stale)
 import { readFileSync, writeFileSync } from "node:fs";
 
-const version = "v6";
+const version = "v7";
 const source = `evals/prompts/tickets/tickets-${version}.md`;
 const target = "supabase/functions/match-transcript/prompt.ts";
 const text = readFileSync(source, "utf8");

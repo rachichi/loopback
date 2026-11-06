@@ -47,7 +47,7 @@ CI runs `typecheck`, `build` and `check:bundle` on every pull request.
 ```
 evals/
   prompts/
-    tickets/        tickets-v1.md ... tickets-v6.md   ticket extraction and matching
+    tickets/        tickets-v1.md ... tickets-v7.md   ticket extraction and matching
     minutes/        minutes-v1.md                     meeting minutes
     resolutions/    resolutions-v1.md                 resolutions and the letters that send them
   data/
@@ -61,7 +61,7 @@ evals/
   lib/, scripts/    harness code; scripts/vtt_to_paragraphs.py turns YouTube captions into a transcript
 ```
 
-Prompts are versioned by kind as `prompts/<kind>/<kind>-vN.md`. Add a new version as a new file rather than editing one that runs have used. Ticket prompts keep their short labels (`v6`) in run files, `results.csv` and `suggestions.prompt_version`. The `match-transcript` Edge Function ships a copy of `tickets-v6.md`: after changing it, run `node scripts/build_match_prompt.mjs` (CI checks the copy is current).
+Prompts are versioned by kind as `prompts/<kind>/<kind>-vN.md`. Add a new version as a new file rather than editing one that runs have used. Ticket prompts keep their short labels (`v6`) in run files, `results.csv` and `suggestions.prompt_version`. The `match-transcript` Edge Function ships a copy of `tickets-v7.md`: after changing it, run `node scripts/build_match_prompt.mjs` (CI checks the copy is current).
 
 The ticket prompts used to live at `evals/prompts/v1.md` to `v6.md`. They moved into `prompts/tickets/` when the minutes and resolutions prompts were added.
 
