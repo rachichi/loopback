@@ -7,7 +7,6 @@ import { inTab, Toolbar, UrgencyTabs, type Sync, type UrgencyTab } from "./Ticke
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
 import Logo from "./Logo";
-import MobileTickets from "./MobileTickets";
 import SubmitFlow from "./SubmitFlow";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
@@ -34,7 +33,7 @@ type View = "home" | "tickets" | "meetings" | "submit";
 /** The full-screen submit flow opens straight from a ?submit link. */
 const submitLink = new URLSearchParams(window.location.search).has("submit");
 
-/** Phones get Home, a card list of tickets and the full-screen intake form; the table, map, transcript and meetings need a wider screen. */
+/** Phones get Home, the ticket table and the full-screen intake form; the table, map, transcript and meetings need a wider screen. */
 const MOBILE_QUERY = "(max-width: 850px)";
 
 /** Who is signed in, for the account menu. The name comes from auth user metadata (supabase/scripts/set_staff_names.sql). */
@@ -148,7 +147,6 @@ function HomeView({ mobile, onShowMap, onLookUp, onNewTicket }: {
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
   const actions = mobile ? [
-    { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
   ] : [
     ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
@@ -582,22 +580,14 @@ function Portal({ account }: { account: Account }) {
               {sync === "error" && "Couldn't load tickets. Check your connection and reload the page."}
             </main>
           ) : (
-            <MobileTickets
-              rows={rows}
-              counted={filtered}
-              urgency={urgency}
-              setUrgency={setUrgency}
-              query={query}
-              setQuery={setQuery}
-              status={status}
-              setStatus={setStatus}
-              sync={sync}
-              emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? "No tickets match this view." : "No tickets yet."}
-              inReview={inReview}
-              showReview={matchingOn}
-              onOpen={expandTicket}
-              onNew={() => setView("submit")}
-            />
+            // The desktop table, scrolled sideways and drawn larger (.mobile-table in index.css).
+            <main className="workspace no-map mobile-table">
+              <section className="records-pane">
+                <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} />
+                <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setView("submit")} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
+                <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? undefined : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
+              </section>
+            </main>
           )
         ) : (
           <HomeView
