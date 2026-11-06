@@ -40,6 +40,7 @@ export default function TranscriptView({
   pickerAction,
   aside,
   bare,
+  onHighlightClick,
 }: {
   /** Every meeting in the picker, newest first. Only the shown one needs its paragraphs. */
   meetings: { id: string; title: string }[];
@@ -61,6 +62,8 @@ export default function TranscriptView({
   aside?: ReactNode;
   /** The Meetings tab: no meeting picker heading and no paragraph numbers. Paragraphs are still split, for highlights. */
   bare?: boolean;
+  /** A click on a highlight, with the id of the ticket (or review row) it belongs to. Not fired by the drag handles. */
+  onHighlightClick?: (ticketId: string) => void;
 }) {
   const { paragraphs } = meeting;
   const tickets = allTickets.filter((ticket) => ticket.meetingIds.includes(meeting.id));
@@ -187,6 +190,7 @@ export default function TranscriptView({
                   className={`hl ${typeClass(owner.ticket.type)} ${owner.ticket.id === activeId ? "active" : ""} ${pendingIds?.has(owner.ticket.id) ? "pending" : ""}`}
                   title={covering.map(({ ticket }) => `${ticket.number} · ${ticket.title}`).join("\n")}
                   onMouseEnter={() => hover(owner.ticket.id)}
+                  onClick={onHighlightClick ? (event) => { if (!(event.target as HTMLElement).closest(".hl-handle")) onHighlightClick(owner.ticket.id); } : undefined}
                 >
                   {ends.filter(({ span }) => span.start === a).map((item) => handle(item, "start"))}
                   {text}

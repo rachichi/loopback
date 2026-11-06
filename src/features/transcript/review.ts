@@ -1,5 +1,5 @@
 // Pending AI suggestions as ticket rows for the Review tab. An update shows in place of its ticket, with the
-// proposed values; a new ticket shows on its own. Both stay greyed out until staff press Reviewed (approve)
+// proposed values; a new ticket shows on its own. Both stay greyed out until staff press Accept (approve)
 // or Reject. No transcript text or paragraph code here, so this module is safe for the main bundle.
 import type { Status, Ticket } from "../tickets/types";
 import type { Suggestion } from "./types";

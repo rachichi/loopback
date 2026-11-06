@@ -197,8 +197,14 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
   };
 
   const meeting: TranscriptMeeting | null = paragraphs ? { id: info.id, title: info.title, label: info.label, date: info.heldOn, paragraphs } : null;
+  // Clicking highlighted text opens the Tickets section and selects that ticket's row.
+  const openFromHighlight = (ticketId: string) => {
+    const ticket = rows.find((row) => row.id === ticketId);
+    if (ticket) onSelect(ticket);
+    setRequest((current) => ({ key: "tickets", n: (current?.n ?? 0) + 1 }));
+  };
   const transcript = meeting
-    ? <TranscriptView key={meeting.id} bare meetings={meetings} meeting={meeting} onMeetingChange={onOpenMeeting} tickets={[...tickets, ...standIns]} hoveredId={hoveredId} onHover={onHover} onSpanChange={onSpanChange} jump={jump} typeClass={typeClass} pendingIds={pendingIds} />
+    ? <TranscriptView key={meeting.id} bare meetings={meetings} meeting={meeting} onMeetingChange={onOpenMeeting} tickets={[...tickets, ...standIns]} hoveredId={hoveredId} onHover={onHover} onSpanChange={onSpanChange} jump={jump} typeClass={typeClass} pendingIds={pendingIds} onHighlightClick={openFromHighlight} />
     : <div className="transcript-empty">{loadError ?? "Loading transcript…"}</div>;
 
   const sections = [

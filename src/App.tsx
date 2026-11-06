@@ -472,7 +472,7 @@ function Portal({ account }: { account: Account }) {
     trackEvent(event === "copied" ? "minutes_copied" : "minutes_edited", { board_id: board.id });
     if (event === "edited") loadMeetings(board.id).then(setMeetings).catch((error) => console.error(error));
   };
-  // Reviewed approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
+  // Accept approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
   // is sent, with the kind, the outcome and how many fields the suggestion changed. Never its content.
   const reviewed = (outcome: "accepted" | "rejected", suggestion: Suggestion) =>
     trackEvent("suggestion_reviewed", { board_id: board.id, kind: suggestion.kind, outcome, fields_changed: Object.keys(suggestion.changes).length });

@@ -419,9 +419,9 @@ body.hl-dragging, body.hl-dragging * { cursor: ew-resize !important; user-select
 .meeting-tag.suggested { background: #ece4f5; color: #5b3a7a; box-shadow: inset 0 0 0 1px #c9b4e0; }
 .urgency-tabs button.review.active { border-bottom-color: #8a63b5; color: #5b3a7a; }
 .urgency-tabs button.review span { background: #ece4f5; color: #5b3a7a; }
-/* A suggestion waiting for review: greyed out and read only until Reviewed. */
+/* A suggestion waiting for review: greyed out and read only until Accept. */
 .review-row { background: #f6f7f8; }
-/* Review rows grow past the chosen row height to fit the Reviewed and Reject buttons, and keep their row number on hover. */
+/* Review rows grow past the chosen row height to fit the Accept and Reject buttons, and keep their row number on hover. */
 .ticket-row.review-row { height: auto; min-height: var(--row-height, 32px); }
 .ticket-row.review-row > div { padding: 5px 8px; }
 .ticket-row.review-row .row-index { display: inline; }
@@ -616,3 +616,4 @@ button.meeting-generate.done:disabled { cursor: not-allowed; }
 .meeting-toast div button:hover { background: rgba(255, 255, 255, .15); }
 .meeting-toast .toast-close { position: absolute; top: 8px; right: 8px; padding: 4px; border: 0; background: none; color: white; cursor: pointer; }
 @media (max-width: 900px) { .meeting-band h1 > span { font-size: 28px; } .meeting-workspace { height: auto; min-height: 640px; } }
+.transcript-body.bare mark.hl { cursor: pointer; }
