@@ -1,6 +1,6 @@
 # Telemetry
 
-Everything the app sends to Better Stack, and nothing else. The code is `src/lib/analytics.ts`; events are fired from `src/App.tsx`, `src/SignIn.tsx` and `src/ShareLink.tsx`. For how the tag is configured and the dashboards, see "Usage analytics" in [`architecture.md`](architecture.md). Planned additions are in WA-194.
+Everything the app sends to Better Stack, and nothing else. The code is `src/lib/analytics.ts`; events are fired from `src/App.tsx`, `src/SignIn.tsx`, `src/ShareLink.tsx` and `src/features/landing/Landing.tsx`. For how the tag is configured and the dashboards, see "Usage analytics" in [`architecture.md`](architecture.md). Planned additions are in WA-194.
 
 When you add or change an event, update this file in the same pull request.
 
@@ -35,7 +35,7 @@ Sent by the app, because the screens change without the address changing. Automa
 | --- | --- |
 | `page-load` (first view of the tab), then `page-change` | `url` (cleaned address), `title`, `board_id` (not on Sign in) |
 
-Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (the full-screen submit flow, used on phones), `/sign-in` (Sign in). A `?submit` link opens the submit flow directly; like any address with a query string, it sends nothing.
+Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (the full-screen submit flow, used on phones), `/sign-in` (Sign in), `/landing` (the public landing page, no `board_id` or `role`). A `?submit` link opens the submit flow directly; like any address with a query string, it sends nothing.
 
 ## Events
 
@@ -89,6 +89,21 @@ Page views are sent as `/meetings`.
 | `minutes_edited` | An edit to the minutes is saved | `board_id` |
 
 No meeting id, title or minutes text is sent.
+
+### Landing page (`/landing`)
+
+No one is signed in, so none of these carry `board_id` or `role`.
+
+| Event | Fired when | Fields |
+| --- | --- | --- |
+| `landing_cta_clicked` | A "Get Loopback" button or Contact us opens the contact popup | `source` (`hero`, `closing` or `footer`) |
+| `landing_signin_clicked` | Sign in in the header is clicked | none |
+| `landing_demo_tab` | The visitor switches tabs in the demo | `tab` (`home`, `tickets` or `meetings`) |
+| `landing_demo_ticket_submitted` | A ticket is added through the demo phone form | `urgent` |
+| `landing_contact_submitted` | The contact form posts successfully | none |
+| `landing_contact_failed` | The contact form post fails | none |
+
+The email and details a visitor types, and the demo ticket's text, are never sent.
 
 ## What the data can and cannot tell you
 

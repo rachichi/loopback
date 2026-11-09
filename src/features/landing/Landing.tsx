@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { BatteryFull, CalendarDays, ChevronDown, ChevronRight, ClipboardList, FileText, House, Link2, ListChecks, MapPin, NotebookText, Plus, Search, Signal, Sparkles, Wifi, X } from "lucide-react";
 import loopbackLogo from "../../assets/logo.png";
 import Logo from "../../Logo";
+import { trackEvent, trackPage } from "../../lib/analytics";
 import MapView from "../../MapView";
 import TicketTable from "../../TicketTable";
 import TranscriptView from "../../TranscriptView";
@@ -72,7 +73,9 @@ export default function Landing() {
   const [intakeOpen, setIntakeOpen] = useState(false);
   // The demo's tickets. Edits and the phone form change this copy only, and a reload starts over.
   const [tickets, setTickets] = useState<Ticket[]>(demoTickets);
-  const open = () => setIntakeOpen(true);
+  useEffect(() => { trackPage("/landing", "Landing"); }, []);
+  // `source` names the button, so the events show which one visitors use.
+  const open = (source: string) => { trackEvent("landing_cta_clicked", { source }); setIntakeOpen(true); };
 
   return (
     <div className="lp">
@@ -81,13 +84,13 @@ export default function Landing() {
           <img src={loopbackLogo} alt="" />
           <span>Loopback</span>
         </a>
-        <a className="lp-signin" href={APP_URL}>Sign in</a>
+        <a className="lp-signin" href={APP_URL} onClick={() => trackEvent("landing_signin_clicked")}>Sign in</a>
       </header>
 
       <section className="lp-hero">
         <div className="lp-hero-inner">
           <h1>Loopback is the tool for community boards.</h1>
-          <button type="button" className="lp-cta" onClick={open}>Get Loopback for your board <ChevronRight size={18} aria-hidden="true" /></button>
+          <button type="button" className="lp-cta" onClick={() => open("hero")}>Get Loopback for your board <ChevronRight size={18} aria-hidden="true" /></button>
         </div>
       </section>
 
@@ -115,7 +118,7 @@ export default function Landing() {
 
       <section className="lp-closing">
         <h2>Try Loopback now.</h2>
-        <button type="button" className="lp-cta" onClick={open}>Get Loopback for your board <ChevronRight size={18} aria-hidden="true" /></button>
+        <button type="button" className="lp-cta" onClick={() => open("closing")}>Get Loopback for your board <ChevronRight size={18} aria-hidden="true" /></button>
       </section>
 
       {/* The app's footer, with Contact us opening the same popup as the buttons. */}
@@ -125,7 +128,7 @@ export default function Landing() {
           <div className="portal-footer-contact">
             <p>Loopback for community boards.</p>
             <p>The Loopback portal was launched in 2026 by community members<br />to empower the community boards that serve them.</p>
-            <p><button type="button" className="lp-footer-link" onClick={open}>Contact us</button> for questions, feedback, or feature requests.</p>
+            <p><button type="button" className="lp-footer-link" onClick={() => open("footer")}>Contact us</button> for questions, feedback, or feature requests.</p>
           </div>
         </div>
       </footer>
@@ -148,7 +151,8 @@ function Window({ title, className = "", onPointerDown, children }: { title: str
 /** The signed-in app: a Tickets tab and the Meetings tab, which opens already generated with all three columns. */
 function DemoApp({ tickets, setTickets }: { tickets: Ticket[]; setTickets: React.Dispatch<React.SetStateAction<Ticket[]>> }) {
   const typeClass = useTypeClass();
-  const [tab, setTab] = useState<"home" | "tickets" | "meetings">("meetings");
+  const [tab, setTabState] = useState<"home" | "tickets" | "meetings">("meetings");
+  const setTab = (next: typeof tab) => { if (next !== tab) trackEvent("landing_demo_tab", { tab: next }); setTabState(next); };
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState("");
   const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
@@ -369,6 +373,7 @@ function PhoneForm({ onSubmit }: { onSubmit: (ticket: Ticket) => void }) {
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    trackEvent("landing_demo_ticket_submitted", { urgent });
     onSubmit({
       id: `demo-new-${Date.now()}`, number: "", title: title.trim(), type: type || "Other", status: "Open", location: { text: "", places: [] },
       requester: "", summary: summary.trim(), urgent, deadline, submittedBy: "Intake form", submittedAt: today(), meetingIds: [], spans: [],
@@ -442,8 +447,10 @@ function IntakeModal({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({ "form-name": "contact", email, details, website }).toString(),
       });
+      trackEvent(response.ok ? "landing_contact_submitted" : "landing_contact_failed");
       setStatus(response.ok ? "sent" : "error");
     } catch {
+      trackEvent("landing_contact_failed");
       setStatus("error");
     }
   };

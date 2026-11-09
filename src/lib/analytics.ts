@@ -124,6 +124,8 @@ type EventName =
   // Transcript matching: board_id and suggestion kind or counts only, never quotes, titles or ids.
   | "transcript_opened" | "matching_started" | "matching_run" | "matching_failed" | "suggestion_reviewed"
   // Meetings tab: board_id and durations only, never meeting ids, titles or minutes text.
+  // Landing page: which button or demo part was used, never what a visitor typed.
+  | "landing_cta_clicked" | "landing_signin_clicked" | "landing_demo_tab" | "landing_demo_ticket_submitted" | "landing_contact_submitted" | "landing_contact_failed"
   | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited";
 
 /** A named usage event. Parameters must never contain ticket content or personal details. */
