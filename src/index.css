@@ -136,6 +136,7 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .sign-in-card label { display: flex; flex-direction: column; gap: 5px; color: #4c5561; font-size: 12px; font-weight: 600; }
 .sign-in-card input { height: 38px; padding: 0 10px; border: 1px solid #aeb4bc; border-radius: 5px; color: #11182c; font-size: 14px; font-weight: 400; }
 .sign-in-card button { height: 40px; border: 0; border-radius: 5px; background: #11182c; color: #fff; font-weight: 600; cursor: pointer; }
+.sign-in-card button.sign-in-switch { height: auto; padding: 4px; background: none; color: #4c5561; font-size: 13px; font-weight: 500; text-decoration: underline; }
 .sign-in-card button:disabled { opacity: .6; cursor: progress; }
 .sign-in-card .sign-in-error { color: #a3263c; font-weight: 600; }
 .board-status { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px 16px; color: #4c5561; font-size: 14px; text-align: center; }
