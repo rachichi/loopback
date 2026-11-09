@@ -19,21 +19,35 @@ export function meetingLabel(title: string, heldOn: string): string {
 export async function loadMeetings(board: string): Promise<MeetingInfo[]> {
   const { data, error } = await db
     .from("meetings")
-    .select("id, title, held_on, matched_at, committee, minutes_generated_at, minutes_edited_at")
+    .select("id, title, held_on, matched_at, committee, folder, minutes_generated_at, minutes_edited_at")
     .eq("board", board)
     .order("held_on", { ascending: false })
     .order("title");
   if (error) throw error;
-  return ((data ?? []) as { id: string; title: string; held_on: string; matched_at: string | null; committee: string | null; minutes_generated_at: string | null; minutes_edited_at: string | null }[]).map((row) => ({
+  return ((data ?? []) as { id: string; title: string; held_on: string; matched_at: string | null; committee: string | null; folder: string; minutes_generated_at: string | null; minutes_edited_at: string | null }[]).map((row) => ({
     id: row.id,
     title: row.title,
     label: meetingLabel(row.title, row.held_on),
     heldOn: row.held_on,
     matchedAt: row.matched_at,
     committee: row.committee,
+    folder: row.folder,
     minutesAt: row.minutes_generated_at,
     minutesEditedAt: row.minutes_edited_at,
   }));
+}
+
+/** Adds an uploaded transcript as a meeting (staff only; the database checks). Returns the new meeting's id. */
+export async function addMeeting(board: string, title: string, heldOn: string, folder: string, transcript: string): Promise<string> {
+  const { data, error } = await db.rpc("add_meeting", { b: board, t: title, d: heldOn, f: folder, body: transcript });
+  if (error) throw error;
+  return data as string;
+}
+
+/** Saves the board's pinned Meetings folders, in order (staff only; the database checks). */
+export async function setPinnedFolders(board: string, pins: string[]): Promise<void> {
+  const { error } = await db.rpc("set_pinned_meeting_folders", { b: board, pins });
+  if (error) throw error;
 }
 
 /** One meeting's transcript text, one paragraph per line. */

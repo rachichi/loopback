@@ -5,19 +5,20 @@
 // minutes side by side. The ticket table is the Tickets tab's, on the same state, so approving, rejecting
 // or editing here changes the Tickets tab too.
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ChevronRight, FileText, ListChecks, NotebookText, Sparkles, X } from "lucide-react";
+import { ChevronRight, FileText, ListChecks, NotebookText, Plus, Sparkles, X } from "lucide-react";
 import TicketTable, { type ReviewRows, type RowHeight, type TranscriptColumn } from "../../TicketTable";
 import { inTab, UrgencyTabs, type UrgencyTab } from "../../TicketFilters";
 import TranscriptView from "../../TranscriptView";
 import { buildParagraphs, type Paragraph } from "../../transcript";
-import { useTypeClass } from "../../lib/board";
+import { useBoard, useTypeClass } from "../../lib/board";
 import type { EvidenceSpan, Ticket } from "../tickets/types";
 import { loadTranscript } from "../transcript/api";
 import { expectedSeconds, progressAt } from "../transcript/progress";
 import { reviewId } from "../transcript/review";
 import type { MeetingInfo, Suggestion, TranscriptMeeting } from "../transcript/types";
-import MeetingsList from "./MeetingsList";
+import MeetingsList, { folderOrder } from "./MeetingsList";
 import Sections, { type SectionKey } from "./Sections";
+import UploadTranscript, { type UploadInput } from "./UploadTranscript";
 
 const MinutesEditor = lazy(() => import("./MinutesEditor"));
 
@@ -44,6 +45,12 @@ export type MeetingsPageProps = {
   canEdit: boolean;
   /** Runs whatever of tickets and minutes is not generated yet, then refreshes the meetings. */
   onGenerate: (meetingId: string) => Promise<void>;
+  /** Folders pinned to the top of the list, in order. */
+  pinned: string[];
+  /** Pins or unpins a folder for the whole board. */
+  onPin: (folder: string, pinned: boolean) => void;
+  /** Adds an uploaded transcript as a meeting, then refreshes the meetings. Rejects with a readable message. */
+  onUpload: (input: UploadInput) => Promise<void>;
   /** The minutes were edited or copied. */
   onMinutesEvent: (event: "edited" | "copied") => void;
   /** Meetings were opened; fires once per meeting view for analytics. */
@@ -80,14 +87,22 @@ export default function MeetingsPage(props: MeetingsPageProps) {
   const { meetings, meetingId, onOpenMeeting, tickets, suggestions } = props;
   // Kept here, not in the meeting view, so a jump into another meeting survives that view mounting.
   const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
+  const [uploading, setUploading] = useState(false);
+  const { meetingFolders } = useBoard();
+  const pinnedMeetingFolders = props.pinned;
+  // The same order as the list, so the first is the pinned default. A board with no folders of its own files
+  // uploads under the folders its meetings already use.
+  const folders = meetingFolders.length ? folderOrder(meetingFolders, pinnedMeetingFolders, meetings) : [...new Set(["Committee", ...meetings.map((meeting) => meeting.folder)])];
   const info = meetings.find((meeting) => meeting.id === meetingId);
   if (!info) {
     return (
       <>
         <div className="title-band meeting-band">
           <div><h1>Meetings</h1><span>Open a meeting to see its transcript, tickets and minutes</span></div>
+          {props.canEdit && <button type="button" className="meetings-upload" onClick={() => setUploading(true)}><Plus size={14} /> Upload transcript</button>}
         </div>
-        <MeetingsList meetings={meetings} tickets={tickets} suggestions={suggestions} onOpen={onOpenMeeting} />
+        <MeetingsList boardFolders={meetingFolders} pinned={pinnedMeetingFolders} onPin={props.canEdit && meetingFolders.length ? props.onPin : undefined} meetings={meetings} tickets={tickets} suggestions={suggestions} onOpen={onOpenMeeting} />
+        {uploading && <UploadTranscript folders={folders} onClose={() => setUploading(false)} onUpload={props.onUpload} />}
       </>
     );
   }
@@ -133,7 +148,10 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
     return () => window.clearTimeout(timer);
   }, [toast]);
   const generating = running !== null;
+  // The button's glint repeats until the first click, then stays off for this visit.
+  const [clicked, setClicked] = useState(false);
   const generate = async () => {
+    setClicked(true);
     const characters = paragraphs?.reduce((total, paragraph) => total + paragraph.text.length, 0) ?? 60000;
     setRunning({ at: Date.now(), seconds: expectedSeconds(characters) });
     setError(null);
@@ -156,7 +174,7 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
   const generateButton = (label: string) => (
     <button
       type="button"
-      className={`generate meeting-generate ${generating ? "running" : ""} ${generated ? "done" : ""} ${linkedHover ? "linked-hover" : ""}`}
+      className={`generate meeting-generate ${generating ? "running" : ""} ${generated ? "done" : ""} ${clicked ? "clicked" : ""} ${linkedHover ? "linked-hover" : ""}`}
       disabled={generating || generated || !paragraphs}
       aria-busy={generating}
       onClick={generate}

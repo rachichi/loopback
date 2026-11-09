@@ -23,6 +23,10 @@ export type Board = {
   backgroundUrl: string | null;
   boundary: GeoJSON.GeoJsonObject | null;
   ticketTypes: BoardTicketType[];
+  /** Ordered Meetings tab folders (the first is the upload default); empty when the board has none of its own. */
+  meetingFolders: string[];
+  /** Folders kept at the top of the Meetings tab, in order, with a pin icon. The first is the upload default. */
+  pinnedMeetingFolders: string[];
   /** Resolved flags from board_effective_features. Read them through useFeature. */
   features: Record<string, boolean>;
   /** Null on the public share page, where nobody is signed in. */
@@ -79,7 +83,7 @@ async function loadAccess(userId: string): Promise<Access> {
 async function loadBoard(boardId: string, access: Access): Promise<Board> {
   const { data: row, error: boardError } = await db
     .from("boards")
-    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types, share_token")
+    .select("id, name, borough, logo_url, background_url, boundary_geojson, ticket_types, meeting_folders, pinned_meeting_folders, share_token")
     .eq("id", boardId)
     .single();
   if (boardError) throw boardError;
@@ -107,6 +111,8 @@ async function loadBoard(boardId: string, access: Access): Promise<Board> {
     backgroundUrl: row.background_url,
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
+    meetingFolders: Array.isArray(row.meeting_folders) ? row.meeting_folders : [],
+    pinnedMeetingFolders: Array.isArray(row.pinned_meeting_folders) ? row.pinned_meeting_folders : [],
     features,
     role,
     shareToken: row.share_token,
