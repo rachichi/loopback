@@ -120,7 +120,7 @@ export function trackPage(path: string, title: string, boardId?: string): void {
 }
 
 type EventName =
-  | "login" | "ticket_created" | "ticket_deleted" | "share_link_copied" | "share_link_replaced" | "board_switched"
+  | "login" | "magic_link_sent" | "ticket_created" | "ticket_deleted" | "share_link_copied" | "share_link_replaced" | "board_switched"
   // Transcript matching: board_id and suggestion kind or counts only, never quotes, titles or ids.
   | "transcript_opened" | "matching_started" | "matching_run" | "matching_failed" | "suggestion_reviewed"
   // Meetings tab: board_id and durations only, never meeting ids, titles or minutes text.
