@@ -149,18 +149,19 @@
   .lp-columns { height: 1000px; }
   .lp-demo { min-width: 1280px; }
   /* The padding leaves room for the window's shadow, which the crop would otherwise clip. */
-  .lp-fit-crop { overflow: hidden; padding: 12px 0 30px; }
+  .lp-fit-crop { overflow: visible; width: max-content; padding: 12px 0 30px; }
   /* Like Cursor's phone page: a watercolor panel flush with the screen's left and right edges, the window inset from its top and right with rounded right corners, cropped at the left and bottom. */
-  .lp-hero-backdrop { overflow: hidden; border-radius: 0 0 8px 8px; padding: 16px 28px 0 0; margin: 0 -8px; }
+  .lp-hero-backdrop { overflow: hidden; border-radius: 0 0 8px 8px; padding: 16px 0 0 0; margin: 0 -8px; }
   .lp-hero-backdrop::before, .lp-hero-backdrop::after { display: block; }
-  .lp-hero-backdrop .lp-backdrop-scroll { overflow: hidden; padding: 0; margin: 0; }
+  .lp-hero-backdrop .lp-backdrop-scroll { overflow-x: auto; overflow-y: hidden; padding: 0 28px; margin: 0; scrollbar-width: none; }
+  .lp-hero-backdrop .lp-backdrop-scroll::-webkit-scrollbar, .lp-share-backdrop .lp-backdrop-scroll::-webkit-scrollbar { display: none; }
   .lp-hero-backdrop::after { background: rgba(255, 255, 255, .15); }
   .lp-feature-visual .lp-fit-crop { padding: 0; }
   /* Share section, like the hero mirrored: the map leads on the left, the window is inset from the panel's top and left, cropped on the right. */
   /* The lower panels stop short of the screen edges and end in rounded corners, so they read as their own sections. */
   .lp-feature-visual { margin: 0 12px; border-radius: 8px; }
-  .lp-feature-visual.lp-share-backdrop { overflow: hidden; border-radius: 8px; padding: 16px 0 0 20px; }
-  .lp-share-backdrop .lp-backdrop-scroll { overflow: hidden; padding: 0; margin: 0; }
+  .lp-feature-visual.lp-share-backdrop { overflow: hidden; border-radius: 8px; padding: 16px 0 0 0; }
+  .lp-share-backdrop .lp-backdrop-scroll { overflow-x: auto; overflow-y: hidden; padding: 0 20px; margin: 0; scrollbar-width: none; }
   .lp-share-backdrop .lp-fit-crop { padding: 8px 0 30px 8px; }
   .lp-share { border-radius: 8px; box-shadow: 0 14px 22px -6px rgba(17, 24, 44, .35), 0 3px 8px rgba(17, 24, 44, .16); }
   .lp-share .public-layout { grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.45fr); }
