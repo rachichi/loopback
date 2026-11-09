@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus, Search } from "lucide-react";
+import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
 import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
@@ -148,21 +148,22 @@ function PortalHeader({ view, setView, account, mobile }: { view: View; setView:
   );
 }
 
-function HomeView({ mobile, onShowMap, onLookUp, onNewTicket }: {
+function HomeView({ mobile, onShowMap, onMinutes, onNewTicket }: {
   mobile: boolean;
   onShowMap: () => void;
-  onLookUp: () => void;
+  onMinutes: () => void;
   onNewTicket: () => void;
 }) {
   const { name, backgroundUrl } = useBoard();
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
+  const meetingsOn = useFeature("meetings_tab");
   const actions = mobile ? [
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
   ] : [
-    ...(mapOn ? [{ label: "See Tickets on the Map", icon: MapPin, onClick: onShowMap }] : []),
-    { label: "Look Up Tickets", icon: Search, onClick: onLookUp },
-    ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
+    ...(meetingsOn ? [{ label: "Generate Meeting Minutes", icon: FileText, onClick: onMinutes }] : []),
+    ...(intakeOn ? [{ label: "Create a new ticket", icon: Plus, onClick: onNewTicket }] : []),
+    ...(mapOn ? [{ label: "See tickets on a Map", icon: MapPin, onClick: onShowMap }] : []),
   ];
   return (
     <main className="home-view">
@@ -611,8 +612,9 @@ function Portal({ account }: { account: Account }) {
         ) : (
           <HomeView
             mobile={mobile}
-            onShowMap={() => { setSidebarOpen(true); setView("tickets"); }}
-            onLookUp={() => setView("tickets")}
+            onShowMap={() => { setPanelTab("map"); setSidebarOpen(true); setView("tickets"); }}
+            // The newest meeting; MeetingsPage opens it when meetingView is null.
+            onMinutes={() => { setMeetingView(null); setView("meetings"); }}
             // Phones get the full-screen submit flow; wider screens open the form over the ticket table.
             onNewTicket={() => { if (mobile) { setView("submit"); } else { setView("tickets"); setIntakeOpen(true); } }}
           />

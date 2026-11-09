@@ -40,6 +40,7 @@ function Backdrop({ image, className = "", children }: { image: string; classNam
 function FitWidth({ natural, show, maxHeight, anchor = "right", children }: { natural: number; show?: number; maxHeight?: number; anchor?: "left" | "right"; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
   const [fit, setFit] = useState({ zoom: 1, shift: 0 });
+  const scrolled = useRef(false);
   useEffect(() => {
     const el = ref.current?.parentElement;
     if (!el) return;
@@ -48,7 +49,13 @@ function FitWidth({ natural, show, maxHeight, anchor = "right", children }: { na
       if (window.innerWidth > 900) return setFit({ zoom: 1, shift: 0 });
       const width = el.clientWidth - pad;
       const zoom = Math.min(1, width / (show ?? natural));
-      setFit({ zoom, shift: show && anchor === "right" ? Math.max(0, natural - width / zoom) : 0 });
+      setFit({ zoom, shift: 0 });
+      // The window is scrollable sideways: start at the edge the old crop showed.
+      const scroller = el.querySelector<HTMLElement>(".lp-backdrop-scroll") ?? (el.classList.contains("lp-backdrop-scroll") ? el : null);
+      if (scroller && !scrolled.current) {
+        scrolled.current = true;
+        requestAnimationFrame(() => { scroller.scrollLeft = show && anchor === "right" ? scroller.scrollWidth : 0; });
+      }
     };
     update();
     const observer = new ResizeObserver(update);
@@ -94,7 +101,7 @@ export default function Landing() {
 
         <section className="lp-feature">
           <div className="lp-feature-text">
-            <h2>Share link for residents</h2>
+            <h2>View link for residents</h2>
             <p>Share progress on requests to residents.</p>
           </div>
           <Backdrop image={timesSquare} className="lp-feature-visual lp-share-backdrop"><FitWidth natural={1280} show={860} anchor="left"><SharePage tickets={tickets} /></FitWidth></Backdrop>

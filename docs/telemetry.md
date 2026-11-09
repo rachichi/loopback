@@ -44,6 +44,7 @@ Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (th
 | Event | Fired when | Fields |
 | --- | --- | --- |
 | `login` | Password sign-in succeeds | `method` (`password`) |
+| `magic_link_sent` | A sign-in link email is requested successfully | none |
 | `board_switched` | A platform admin switches boards | `board_id` (the board switched to) |
 
 ### Tickets
