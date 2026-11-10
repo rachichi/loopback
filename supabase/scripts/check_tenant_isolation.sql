@@ -18,6 +18,9 @@
 --   A delete B rows deleted: 0
 --   A move own ticket to B: denied (42501)
 --   B sees: <board_b>=<n>                      only board_b
+--   A attach to own ticket: allowed            A attach claiming board B: denied (42501)
+--   A upload to own board folder: allowed      A upload to board B folder: denied (42501)
+--   B sees A attachments: 0, files: 0          B delete A attachments rows deleted: 0
 --   A sees staging meetings: 0, suggestions: 0
 --   A approve staging suggestion: denied (P0002)
 --   A reject staging suggestion: denied (P0002)
@@ -85,6 +88,39 @@ begin
   perform set_config('request.jwt.claims', json_build_object('sub', ub, 'role', 'authenticated')::text, true);
   select string_agg(board || '=' || c, ',') into s from (select board, count(*) c from public.tickets group by board) x;
   r := r || E'\nB sees: ' || coalesce(s, 'nothing');
+
+  -- Attachments (ticket_attachments and the private ticket-files bucket): staff of board_a can attach to their
+  -- own ticket and upload into their own folder, not into board_b's; board_b's staff see and delete none of it.
+  -- Each step is its own block, so an unexpected error shows up as a line in the report instead of ending the run.
+  perform set_config('request.jwt.claims', json_build_object('sub', ua, 'role', 'authenticated')::text, true);
+  begin
+    insert into public.ticket_attachments (board, ticket_id, path, name, size_bytes)
+    values (board_a, 'rollback-test-1', board_a || '/rollback-test-1/rollback.pdf', 'rollback.pdf', 1);
+    r := r || E'\nA attach to own ticket: allowed';
+  exception when others then r := r || E'\nA attach to own ticket: DENIED (bad) (' || sqlstate || ')';
+  end;
+  begin
+    insert into public.ticket_attachments (board, ticket_id, path, name, size_bytes)
+    values (board_b, 'rollback-test-1', board_b || '/rollback-test-1/rollback.pdf', 'rollback.pdf', 1);
+    r := r || E'\nA attach claiming board B: ALLOWED (bad)';
+  exception when others then r := r || E'\nA attach claiming board B: denied (' || sqlstate || ')';
+  end;
+  begin
+    insert into storage.objects (bucket_id, name, owner) values ('ticket-files', board_a || '/rollback-test-1/rollback.pdf', ua);
+    r := r || E'\nA upload to own board folder: allowed';
+  exception when others then r := r || E'\nA upload to own board folder: DENIED (bad) (' || sqlstate || ')';
+  end;
+  begin
+    insert into storage.objects (bucket_id, name, owner) values ('ticket-files', board_b || '/rollback-test-1/rollback.pdf', ua);
+    r := r || E'\nA upload to board B folder: ALLOWED (bad)';
+  exception when others then r := r || E'\nA upload to board B folder: denied (' || sqlstate || ')';
+  end;
+  perform set_config('request.jwt.claims', json_build_object('sub', ub, 'role', 'authenticated')::text, true);
+  r := r || E'\nB sees A attachments: ' || (select count(*) from public.ticket_attachments)
+         || ', files: ' || (select count(*) from storage.objects where bucket_id = 'ticket-files');
+  delete from public.ticket_attachments;
+  get diagnostics n = row_count;
+  r := r || E'\nB delete A attachments rows deleted: ' || n;
 
   -- Meetings and suggestions: a staging meeting with one pending suggestion, made as postgres
   perform set_config('role', 'postgres', true);

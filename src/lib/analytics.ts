@@ -128,7 +128,9 @@ type EventName =
   | "landing_cta_clicked" | "landing_signin_clicked" | "landing_demo_tab" | "landing_demo_ticket_submitted" | "landing_contact_submitted" | "landing_contact_failed"
   | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited" | "meeting_added"
   // Location auto-pin: board_id, what triggered it and whether it found a place, never street names or addresses.
-  | "location_autopin";
+  | "location_autopin"
+  // Attachments: board_id only, never file names or ticket ids.
+  | "attachment_added" | "attachment_removed";
 
 /** A named usage event. Parameters must never contain ticket content or personal details. */
 export function trackEvent(name: EventName, params: Record<string, string | number | boolean> = {}): void {

@@ -2,6 +2,7 @@
 // their own board, the filter here only keeps a platform admin's view to one board.
 import { db } from "../../db";
 import type { Ticket } from "./types";
+import { attachmentPaths, removeFiles } from "./attachments";
 import { fromRow, toRow, type TicketRow } from "./rows";
 
 export async function loadTickets(board: string): Promise<Ticket[]> {
@@ -43,7 +44,12 @@ export async function updateTickets(tickets: Ticket[], board: string): Promise<v
 /** Deletes tickets by id and returns the ids actually deleted. Staff and platform admins only; RLS hides
  *  rows from anyone else, which shows up as fewer rows deleted rather than an error. */
 export async function deleteTickets(ids: string[]): Promise<string[]> {
+  // Attachment rows go with their ticket, but their files are in Storage, so note the paths first and remove
+  // the files of the tickets that were actually deleted.
+  const paths = await attachmentPaths(ids).catch((error) => { console.error("Couldn't list attachments before deleting", error); return new Map<string, string[]>(); });
   const { data, error } = await db.from("tickets").delete().in("id", ids).select("id");
   if (error) throw error;
-  return (data ?? []).map((row: { id: string }) => row.id);
+  const deleted = (data ?? []).map((row: { id: string }) => row.id);
+  await removeFiles(deleted.flatMap((id) => paths.get(id) ?? []));
+  return deleted;
 }
