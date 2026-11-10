@@ -721,3 +721,9 @@ button.meeting-generate.done:disabled { cursor: not-allowed; }
 .location-cell .location-text { flex: 1 1 56px; min-width: 56px; }
 .location-cell .place-add { flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .intake-map .location-cell .place-add { flex: none; }
+button.no-pin-icon { padding: 0; border: 0; background: none; cursor: pointer; }
+button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
+.location-link { padding: 0; border: 0; background: none; font-family: inherit; text-align: left; cursor: pointer; }
+.location-link:hover { color: #176b83; text-decoration: underline; }
+/* In the form the cell stacks its contents, so the meeting's wording must not take a basis of its own height. */
+.intake-map .location-cell .location-text { flex: none; align-self: flex-start; min-width: 0; max-width: 100%; font-size: 14px; color: #33404c; }

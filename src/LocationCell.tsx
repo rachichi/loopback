@@ -8,6 +8,7 @@ import { trackEvent } from "./lib/analytics";
 import { useBoard, useFeature } from "./lib/board";
 
 const NO_PIN_TEXT = "No map pin yet. Choose an address from the search so this ticket shows on the map.";
+const MISSED_TEXT = "Couldn't find that on the map. Choose an address from the search so this ticket shows on the map.";
 
 const titleCase = (text: string) => text.toLowerCase().replace(/\b([a-z])/g, (c) => c.toUpperCase());
 
@@ -21,6 +22,7 @@ export default function LocationCell({
   onChange,
   onShowOnMap,
   warningText,
+  onFix,
 }: {
   location: TicketLocation;
   /** Names what the places belong to, for the search box's accessible label. */
@@ -30,6 +32,8 @@ export default function LocationCell({
   onShowOnMap?: (placeIndex: number) => void;
   /** The ticket form sets this to show the no-pin message as red text under the box. Without it (the table) a warning icon shows, with the message on hover. */
   warningText?: boolean;
+  /** The table passes this so the warning icon can be clicked: it opens the ticket and tries to find its pin. */
+  onFix?: () => void;
 }) {
   const { id: boardId, borough, boundary } = useBoard();
   // With the map on, a location with no place is a ticket missing from the map, so it gets a warning.
@@ -57,18 +61,25 @@ export default function LocationCell({
   const latest = useRef(location);
   latest.current = location;
   const [pinning, setPinning] = useState(false);
-  // Looks up a map point for the cross streets just saved and adds it, unless the cell changed meanwhile.
-  const pinCrossStreets = async (next: TicketLocation) => {
+  // True after a lookup from the form's red message found nothing, so it can say so instead of inviting another click.
+  const [missed, setMissed] = useState(false);
+  useEffect(() => setMissed(false), [location.text, location.crossStreets?.a, location.crossStreets?.b]);
+  // Looks up a map point for the location (the cross streets just saved, or the wording from the meeting) and adds
+  // it, unless the cell changed meanwhile.
+  const pinFrom = async (next: TicketLocation, trigger: "cross_streets" | "warning_click") => {
     setPinning(true);
+    setMissed(false);
     try {
       const found = await autoPlace(next, { borough, boundary });
-      trackEvent("location_autopin", { board_id: boardId, trigger: "cross_streets", outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
+      trackEvent("location_autopin", { board_id: boardId, trigger, outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
       const now = latest.current;
-      const same = now.crossStreets?.a === next.crossStreets?.a && now.crossStreets?.b === next.crossStreets?.b;
+      const same = now.text === next.text && now.crossStreets?.a === next.crossStreets?.a && now.crossStreets?.b === next.crossStreets?.b;
       if (found && same && !now.places.length) onChange({ ...now, places: [found.place] });
+      else if (!found) setMissed(true);
     } catch (error) {
       console.error(error);
-      trackEvent("location_autopin", { board_id: boardId, trigger: "cross_streets", outcome: "error" });
+      trackEvent("location_autopin", { board_id: boardId, trigger, outcome: "error" });
+      setMissed(true);
     } finally {
       setPinning(false);
     }
@@ -84,7 +95,7 @@ export default function LocationCell({
       const next = { ...location, crossStreets: { a, b } };
       onChange(next);
       // With the map on, a location with no pin gets one automatically when the streets match a real intersection.
-      if (mapOn && !location.places.length) void pinCrossStreets(next);
+      if (mapOn && !location.places.length) void pinFrom(next, "cross_streets");
     }
     else if (!a && !b && location.crossStreets) onChange({ ...location, crossStreets: undefined });
   };
@@ -172,9 +183,18 @@ export default function LocationCell({
       />
     </span>
   );
-  const meetingText = !location.places.length && location.text.trim() && !adding && (
+  // The meeting's wording. With the map on it is a button: in the table it opens the ticket and tries to find the
+  // location (onFix); in the form it tries right there.
+  const meetingText = !location.places.length && location.text.trim() && !adding && (mapOn ? (
+    <button
+      type="button"
+      className="location-text location-link"
+      title={`From the meeting: ${location.text}\nClick to try to find it on the map.`}
+      onClick={(event) => { event.stopPropagation(); if (onFix) onFix(); else void pinFrom(location, "warning_click"); }}
+    >{location.text}</button>
+  ) : (
     <span className="location-text" title={`From the meeting: ${location.text}\nAdd a place to put it on the map.`}>{location.text}</span>
-  );
+  ));
   const placeChips = (include: (place: Place) => boolean) => location.places.map((place, index) => include(place) && (
     <span className="place-chip" key={`${place.name}-${index}`}>
       {onShowOnMap ? (
@@ -218,7 +238,13 @@ export default function LocationCell({
       <div className="location-cell">
         <div className="place-chips">
           {pinning && <span className="location-text">Finding it on the map…</span>}
-          {noPin && !pinning && !warningText && <span className="no-pin-icon" title={NO_PIN_TEXT}><AlertTriangle size={12} role="img" aria-label="No map pin" /></span>}
+          {noPin && !pinning && !warningText && (onFix
+            ? (
+              <button type="button" className="no-pin-icon" title={`${NO_PIN_TEXT} Click to open the ticket and try to find the location.`} aria-label="No map pin. Open the ticket and try to find the location" onClick={(event) => { event.stopPropagation(); onFix(); }}>
+                <AlertTriangle size={12} aria-hidden="true" />
+              </button>
+            )
+            : <span className="no-pin-icon" title={NO_PIN_TEXT}><AlertTriangle size={12} role="img" aria-label="No map pin" /></span>)}
           {crossChip}
           {crossEditor}
           {meetingText}
@@ -246,7 +272,7 @@ export default function LocationCell({
           document.body,
         )}
       </div>
-      {noPin && !pinning && warningText && <p className="no-pin-text" role="status">{NO_PIN_TEXT}</p>}
+      {noPin && !pinning && warningText && <p className="no-pin-text" role="status">{missed ? MISSED_TEXT : NO_PIN_TEXT}</p>}
     </div>
   );
 }
