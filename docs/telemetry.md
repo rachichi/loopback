@@ -53,6 +53,9 @@ Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (th
 | --- | --- | --- |
 | `ticket_created` | The database finishes inserting a new ticket | `board_id`, `source` (`manual` for tickets made in the app), `form_ms` (intake form open to submit), `save_ms` (submit to saved) |
 | `ticket_deleted` | A ticket is deleted. Once per ticket, so a bulk delete sends several | `board_id` |
+| `location_autopin` | The app tries to find a map point for a location on its own: after staff save Cross streets, or after a transcript suggestion is approved | `board_id`, `trigger` (`cross_streets` or `approved`), `outcome` (`pinned`, `pinned_nearest` for a "Near" pin when the streets almost meet, `no_match` or `error`) |
+
+`location_autopin` never carries the streets or address it looked up. The lookup itself sends the two street names, or the address wording, to NYC Open Data (street centerlines), NYC GeoSearch or Photon (photon.komoot.io, OpenStreetMap data), not to Better Stack.
 
 `form_ms` and `save_ms` are left out if the timing is unknown. `form_ms` is 0 if the form open time was not recorded.
 

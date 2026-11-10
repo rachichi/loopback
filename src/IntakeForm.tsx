@@ -147,7 +147,8 @@ export default function IntakeForm({
             </Field>
             <Field field="location" label="Map" asLabel={false}>
               <div className="intake-map">
-                <LocationCell location={values.location} label={ticket ? ticket.title || "the ticket" : "the new ticket"} onChange={(location) => set({ location })} />
+                <LocationCell warningText location={values.location} label={ticket ? ticket.title || "the ticket" : "the new ticket"} onChange={(location) => set({ location })} />
+                {!values.location.text.trim() && !values.location.crossStreets && !values.location.places.length && <p className="intake-map-hint">Add an address or cross streets so this ticket shows on the map.</p>}
               </div>
             </Field>
             <Field field="summary" label="Summary">

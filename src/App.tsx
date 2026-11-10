@@ -3,6 +3,7 @@ import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOu
 import loopbackLogo from "./assets/logo.png";
 import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
+import { nextSort, sortTickets, type Sort } from "./columnSort";
 import { inTab, Toolbar, UrgencyTabs, type Sync, type UrgencyTab } from "./TicketFilters";
 import MapView, { type MapFocus } from "./MapView";
 import IntakeForm, { type IntakeFields } from "./IntakeForm";
@@ -18,6 +19,7 @@ import { useDismiss } from "./lib/useDismiss";
 import { useMediaQuery } from "./lib/useMediaQuery";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
+import { autoPlace } from "./autoPin";
 import { addMeeting, approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes, setPinnedFolders } from "./features/transcript/api";
 import type { MeetingInfo, Suggestion } from "./features/transcript/types";
 import { withReviewRows } from "./features/transcript/review";
@@ -161,9 +163,9 @@ function HomeView({ mobile, onShowMap, onMinutes, onNewTicket }: {
   const actions = mobile ? [
     ...(intakeOn ? [{ label: "Submit a New Ticket", icon: Plus, onClick: onNewTicket }] : []),
   ] : [
-    ...(meetingsOn ? [{ label: "Generate Meeting Minutes", icon: FileText, onClick: onMinutes }] : []),
+    ...(meetingsOn ? [{ label: "Generate meeting minutes", icon: FileText, onClick: onMinutes }] : []),
     ...(intakeOn ? [{ label: "Create a new ticket", icon: Plus, onClick: onNewTicket }] : []),
-    ...(mapOn ? [{ label: "See tickets on a Map", icon: MapPin, onClick: onShowMap }] : []),
+    ...(mapOn ? [{ label: "See tickets on a map", icon: MapPin, onClick: onShowMap }] : []),
   ];
   return (
     <main className="home-view">
@@ -310,13 +312,15 @@ function Portal({ account }: { account: Account }) {
   }, [tickets, board.id, sync === "loading"]);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<"All" | Status>("All");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [sort, setSort] = useState<Sort>(null);
   const [hover, setHover] = useState<{ id: string | null; from: "table" | "map" }>({ id: null, from: "table" });
   const [mapFocus, setMapFocus] = useState<MapFocus | null>(null);
   const [urgency, setUrgency] = useState<UrgencyTab>("all");
-  // The map panel starts collapsed so the tickets get the full width.
+  // The map panel starts open; the rail's button collapses it for the full-width table.
   const mapOn = useFeature("district_map");
   const intakeOn = useFeature("manual_intake");
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [intakeOpen, setIntakeOpen] = useState(false);
   useEffect(() => { if (intakeOpen) intakeOpenedAt.current = Date.now(); }, [intakeOpen]);
   const markIntakeStart = useCallback(() => { intakeOpenedAt.current = Date.now(); }, []);
@@ -361,11 +365,12 @@ function Portal({ account }: { account: Account }) {
   // Search and status filters apply first, so each tab's count matches what it shows.
   const filtered = useMemo(() => withReview.filter((ticket) => {
     const matchesStatus = status === "All" || ticket.status === status;
+    const matchesType = typeFilter === "All" || ticket.type === typeFilter;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.summary}`.toLowerCase().includes(search);
-    return matchesStatus && matchesQuery;
-  }), [withReview, query, status]);
-  const rows = useMemo(() => filtered.filter((ticket) => inTab(ticket, urgency, inReview)), [filtered, urgency, inReview]);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary}`.toLowerCase().includes(search);
+    return matchesStatus && matchesType && matchesQuery;
+  }), [withReview, query, status, typeFilter]);
+  const rows = useMemo(() => sortTickets(filtered.filter((ticket) => inTab(ticket, urgency, inReview)), sort), [filtered, urgency, inReview, sort]);
 
   const updateTicket = useCallback((id: string, patch: Partial<Ticket>) => {
     setTickets((current) => current.map((ticket) => ticket.id === id ? { ...ticket, ...patch } : ticket));
@@ -383,6 +388,8 @@ function Portal({ account }: { account: Account }) {
     setSelectedId(ticket.id);
     setQuery("");
     setStatus("All");
+    setTypeFilter("All");
+    setSort(null);
     setUrgency("all");
     setIntakeOpen(false);
   };
@@ -523,6 +530,23 @@ function Portal({ account }: { account: Account }) {
     trackEvent(event === "copied" ? "minutes_copied" : "minutes_edited", { board_id: board.id });
     if (event === "edited") loadMeetings(board.id).then(setMeetings).catch((error) => console.error(error));
   };
+  // After a transcript suggestion is approved, a ticket with location wording but no pin gets one when the
+  // wording matches an actual place (two streets, or an exact address). One location_autopin event, never the wording.
+  const autoPin = async (ticket: Ticket) => {
+    if (!mapOn || ticket.location.places.length || (!ticket.location.text.trim() && !ticket.location.crossStreets)) return;
+    try {
+      const found = await autoPlace(ticket.location, { borough: board.borough, boundary: board.boundary });
+      trackEvent("location_autopin", { board_id: board.id, trigger: "approved", outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
+      if (!found) return;
+      // The autosave sends the change like any other edit. Skipped if staff pinned something in the meantime.
+      setTickets((current) => current.map((item) => item.id === ticket.id && !item.location.places.length
+        ? { ...item, location: { ...item.location, places: [found.place] } }
+        : item));
+    } catch (error) {
+      console.error(error);
+      trackEvent("location_autopin", { board_id: board.id, trigger: "approved", outcome: "error" });
+    }
+  };
   // Accept approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
   // is sent, with the kind, the outcome and how many fields the suggestion changed. Never its content.
   const reviewed = (outcome: "accepted" | "rejected", suggestion: Suggestion) =>
@@ -548,6 +572,7 @@ function Portal({ account }: { account: Account }) {
         setSuggestions((current) => current.filter((item) => item.id !== suggestion.id));
         if (selectedId === rowId) setSelectedId(saved.id);
         reviewed("accepted", suggestion);
+        void autoPin(saved);
       } catch (error) {
         console.error(error);
         window.alert(`Couldn't apply the suggestion. ${error instanceof Error ? error.message : ""}`);
@@ -704,8 +729,8 @@ function Portal({ account }: { account: Account }) {
       <main className={`workspace ${!panelOn ? "no-map" : sidebarOpen ? "" : "sidebar-collapsed"}`}>
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} />
-          <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} onNew={() => setIntakeOpen(true)} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
-          <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review. Open a meeting in the Transcript tab and press Generate." : tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
+          <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} type={typeFilter} setType={setTypeFilter} onNew={() => setIntakeOpen(true)} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
+          <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review. Open a meeting in the Transcript tab and press Generate." : urgency === "closed" ? "No closed tickets match." : tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} sort={sort} onSort={(key) => setSort((current) => nextSort(current, key))} />
         </section>
         {/* district_map and transcript_matching both off: no panel, no rail, and the Map cells don't open one. */}
         {!panelOn ? null : sidebarOpen ? (

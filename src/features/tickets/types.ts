@@ -18,14 +18,17 @@ export type Place = {
   lat: number;
   lng: number;
   /** "geosearch" = matched by NYC GeoSearch; "manual" = placed by hand (search pick-up, pin drag, or seed data). */
-  source: "geosearch" | "osm" | "manual";
+  source: "geosearch" | "osm" | "centerline" | "manual";
 };
 
 /** A highlight: a character range in one meeting's transcript. */
 export type EvidenceSpan = Span & { meetingId: string };
 
-/** The location as said in the meeting, plus the mapped places it refers to (zero or more). */
-export type TicketLocation = { text: string; places: Place[] };
+/** Two streets, typed by staff. Text only: it has no map point (NYC GeoSearch does not find intersections). */
+export type CrossStreets = { a: string; b: string };
+
+/** The location as said in the meeting, plus the mapped places it refers to (zero or more) and, optionally, the cross streets. */
+export type TicketLocation = { text: string; places: Place[]; crossStreets?: CrossStreets };
 
 export type Ticket = {
   id: string;

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Trash2, Type, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Trash2, Type, X, type LucideIcon } from "lucide-react";
+import type { Sort, SortKey } from "./columnSort";
 import LocationCell from "./LocationCell";
 import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard, useTypeClass } from "./lib/board";
@@ -160,6 +161,8 @@ export default function TicketTable({
   onDelete,
   transcript,
   review,
+  sort,
+  onSort,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -178,6 +181,9 @@ export default function TicketTable({
   onDelete?: (tickets: Ticket[]) => void;
   transcript?: TranscriptColumn;
   review?: ReviewRows;
+  /** The column the table is sorted by, and the click on a header that cycles it. Omitted where the table can't be sorted (the Meetings tab). */
+  sort?: Sort;
+  onSort?: (key: SortKey) => void;
 }) {
   const { ticketTypes } = useBoard();
   const typeClass = useTypeClass();
@@ -327,7 +333,17 @@ export default function TicketTable({
             <div key={column.key} className="resizable-head" title={column.fieldType}>
               <Icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
               {/* Without the map the column holds places only, so it's labelled Location. */}
-              <span className="field-label">{column.key === "location" && !onShowOnMap ? "Location" : column.label}</span>
+              {onSort && column.key !== "transcript" ? (
+                <button
+                  type="button"
+                  className={`sort-head field-label ${sort?.key === column.key ? "on" : ""}`}
+                  onClick={() => onSort(column.key as SortKey)}
+                  title={sort?.key !== column.key ? `Sort by ${column.label}` : sort.dir === "asc" ? "Sorted ascending. Click to reverse" : "Sorted descending. Click to clear the sort"}
+                >
+                  {column.key === "location" && !onShowOnMap ? "Location" : column.label}
+                  {sort?.key !== column.key ? <ArrowUpDown size={11} aria-hidden="true" /> : sort.dir === "asc" ? <ArrowUp size={11} aria-hidden="true" /> : <ArrowDown size={11} aria-hidden="true" />}
+                </button>
+              ) : <span className="field-label">{column.key === "location" && !onShowOnMap ? "Location" : column.label}</span>}
               <span
                 className="col-resizer"
                 role="separator"
