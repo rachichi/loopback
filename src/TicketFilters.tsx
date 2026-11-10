@@ -4,7 +4,7 @@ import { Filter, Plus, Search } from "lucide-react";
 import RowHeightMenu from "./RowHeightMenu";
 import type { RowHeight } from "./TicketTable";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
-import { useFeature } from "./lib/board";
+import { useBoard, useFeature } from "./lib/board";
 
 /** The state of the tickets in Supabase. */
 export type Sync = "loading" | "saving" | "saved" | "error";
@@ -21,10 +21,12 @@ export const urgencyTabs = [
   { key: "urgent", label: "Urgent" },
   { key: "non-urgent", label: "Non-urgent" },
   { key: "review", label: "Review" },
+  // Closed tickets, for reports. All still includes them; the status and type filters narrow this tab like any other.
+  { key: "closed", label: "Closed" },
 ] as const;
 export type UrgencyTab = (typeof urgencyTabs)[number]["key"];
 export const inTab = (ticket: Ticket, tab: UrgencyTab, inReview: (id: string) => boolean) =>
-  tab === "all" || (tab === "review" ? inReview(ticket.id) : ticket.urgent === (tab === "urgent"));
+  tab === "all" || (tab === "review" ? inReview(ticket.id) : tab === "closed" ? ticket.status === "Closed" : ticket.urgent === (tab === "urgent"));
 
 export function UrgencyTabs({ tab, setTab, tickets, inReview, showReview, hideNonUrgent, children }: {
   tab: UrgencyTab;
@@ -39,7 +41,7 @@ export function UrgencyTabs({ tab, setTab, tickets, inReview, showReview, hideNo
   children?: ReactNode;
 }) {
   return (
-    <div className="urgency-tabs" role="tablist" aria-label="Filter by urgency or review">
+    <div className="urgency-tabs" role="tablist" aria-label="Filter by urgency, review or closed">
       {urgencyTabs.filter((item) => (showReview || item.key !== "review") && !(hideNonUrgent && item.key === "non-urgent")).map((item) => (
         <button key={item.key} role="tab" aria-selected={tab === item.key} className={`${item.key} ${tab === item.key ? "active" : ""}`} onClick={() => setTab(item.key)}>
           {item.label} <span>{tickets.filter((ticket) => inTab(ticket, item.key, inReview)).length}</span>
@@ -56,6 +58,8 @@ export function Toolbar({
   setQuery,
   status,
   setStatus,
+  type,
+  setType,
   onNew,
   sync,
   rowHeight,
@@ -66,12 +70,16 @@ export function Toolbar({
   setQuery: (value: string) => void;
   status: "All" | Status;
   setStatus: (value: "All" | Status) => void;
+  /** "All" or one of the board's ticket type labels. */
+  type: string;
+  setType: (value: string) => void;
   onNew: () => void;
   sync: Sync;
   rowHeight: RowHeight;
   setRowHeight: (value: RowHeight) => void;
 }) {
   const intakeOn = useFeature("manual_intake");
+  const { ticketTypes } = useBoard();
   return (
     <div className="table-toolbar">
       <div className="table-meta">
@@ -84,6 +92,12 @@ export function Toolbar({
           <Filter size={14} />
           <select aria-label="Filter by status" value={status} onChange={(event) => setStatus(event.target.value as "All" | Status)}>
             <option>All</option>{statuses.map((item) => <option key={item}>{item}</option>)}
+          </select>
+        </div>
+        <div className="filter-wrap type-filter">
+          <Filter size={14} />
+          <select aria-label="Filter by type" value={type} onChange={(event) => setType(event.target.value)}>
+            <option value="All">All types</option>{ticketTypes.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}
           </select>
         </div>
         <RowHeightMenu value={rowHeight} onChange={setRowHeight} />

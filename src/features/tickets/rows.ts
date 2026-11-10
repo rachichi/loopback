@@ -14,6 +14,8 @@ export type TicketRow = {
   deadline: string | null;
   location_text: string;
   places: Ticket["location"]["places"];
+  /** Null before the cross_streets migration, or when the ticket has none. */
+  cross_streets?: Ticket["location"]["crossStreets"] | null;
   requester: string;
   summary: string;
   submitted_by: string;
@@ -42,6 +44,7 @@ export function toRow(ticket: Ticket, board: string): TicketRow {
     deadline: ticket.deadline || null,
     location_text: ticket.location.text,
     places: ticket.location.places,
+    cross_streets: ticket.location.crossStreets ?? null,
     requester: ticket.requester,
     summary: ticket.summary,
     submitted_by: ticket.submittedBy,
@@ -60,7 +63,7 @@ export function fromRow(row: TicketRow & Partial<TicketRowExtra>): Ticket {
     status: row.status as Status,
     urgent: row.urgent,
     deadline: row.deadline ?? "",
-    location: { text: row.location_text, places: row.places },
+    location: { text: row.location_text, places: row.places, ...(row.cross_streets ? { crossStreets: row.cross_streets } : {}) },
     requester: row.requester,
     summary: row.summary,
     submittedBy: row.submitted_by,

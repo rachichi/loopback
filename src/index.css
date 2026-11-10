@@ -689,3 +689,35 @@ button.meeting-generate.done:disabled { cursor: not-allowed; }
 .submit-board img { max-width: 220px; max-height: 64px; object-fit: contain; }
 .submit-board strong { font-family: 'Clash Grotesk', 'Noto Sans', sans-serif; font-size: 18px; }
 .submit-done .submit-board { margin-bottom: 20px; padding: 0; border: 0; }
+
+/* Cross streets in the location cell: two boxes side by side, and a hint under the form's Map field. */
+.cross-edit { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #626b77; }
+.cross-edit .place-search { width: 96px; }
+.intake-map { width: 100%; }
+.intake-map-hint { margin: 6px 0 0; color: #626b77; font-size: 11px; }
+.type-filter select { max-width: 120px; }
+.urgency-tabs button.closed.active { border-bottom-color: #69727e; color: #33404c; }
+
+/* A location with something in it but no map pin: a red line under the box (LocationCell NO_PIN_TEXT). */
+
+/* The form's location field: Address and Cross streets as two full-width boxes, one above the other. Either one
+   (or both) can be used. The table keeps them side by side, where row height is fixed. */
+.intake-map .place-chips { flex-direction: column; align-items: stretch; gap: 6px; }
+.intake-map .place-add { width: 100%; padding: 8px 10px; gap: 6px; justify-content: flex-start; border-radius: 6px; font-size: 12px; }
+.intake-map .place-search { width: 100%; height: auto; min-height: 34px; padding: 6px 10px; font-size: 12px; }
+.intake-map .cross-edit { width: 100%; }
+.intake-map .cross-edit .place-search { flex: 1 1 0; width: auto; min-width: 0; }
+.intake-map .place-chip { align-self: flex-start; }
+.intake-map .place-chip button, .intake-map .place-chip > span:first-child { font-size: 11px; }
+.location-wrap { width: 100%; min-width: 0; }
+.no-pin-icon { flex: none; align-self: center; display: inline-flex; color: #c42b3f; }
+.no-pin-text { margin: 6px 0 0; padding: 0 2px; color: #c42b3f; font-size: 12px; line-height: 1.25; }
+.sort-head { padding: 0; display: inline-flex; align-items: center; gap: 4px; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.sort-head:hover { color: #11182c; }
+.sort-head svg { flex: none; opacity: .55; }
+.sort-head.on svg { opacity: 1; color: #176b83; }
+/* In a short row nothing wraps. The meeting's wording keeps a readable width (the full text shows on hover) and the
+   add buttons shrink to fit, so a warning is never shown beside a cell that looks empty. */
+.location-cell .location-text { flex: 1 1 56px; min-width: 56px; }
+.location-cell .place-add { flex: 0 1 auto; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.intake-map .location-cell .place-add { flex: none; }
