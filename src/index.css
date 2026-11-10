@@ -727,3 +727,15 @@ button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
 .location-link:hover { color: #176b83; text-decoration: underline; }
 /* In the form the cell stacks its contents, so the meeting's wording must not take a basis of its own height. */
 .intake-map .location-cell .location-text { flex: none; align-self: flex-start; min-width: 0; max-width: 100%; font-size: 14px; color: #33404c; }
+
+/* Attachments in the expanded ticket form. */
+.attachments { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; width: 100%; }
+.attachment { max-width: 100%; display: inline-flex; align-items: center; border-radius: 4px; background: #eef1f3; }
+.attachment-open { min-width: 0; display: inline-flex; align-items: center; gap: 6px; padding: 5px 8px; border: 0; background: none; color: #176b83; font: inherit; font-size: 12px; cursor: pointer; }
+.attachment-open:hover .attachment-name { text-decoration: underline; }
+.attachment-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attachment-remove { padding: 5px 7px; border: 0; background: none; color: #626b77; opacity: .6; cursor: pointer; }
+.attachment-remove:hover { opacity: 1; }
+.attachment-add { flex: none; padding: 6px 10px; gap: 6px; font-size: 12px; }
+.attachments-muted { color: #7c8790; font-size: 11px; }
+.attachments-error { margin: 0; color: #c42b3f; font-size: 12px; }

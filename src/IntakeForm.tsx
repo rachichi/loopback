@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Paperclip, X } from "lucide-react";
 import LocationCell from "./LocationCell";
 import DictateButton, { canDictate } from "./DictateButton";
 import { fieldIcons, type EditableField } from "./TicketTable";
+import TicketAttachments from "./features/tickets/TicketAttachments";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard } from "./lib/board";
 
@@ -157,6 +158,12 @@ export default function IntakeForm({
                 <DictateButton label="Summary" onText={(text) => set({ summary: append(values.summary, text) })} />
               </div>
             </Field>
+            {ticket && (
+              <div className="form-field">
+                <span className="form-field-name"><Paperclip size={14} aria-hidden="true" /> Attachments</span>
+                <div className="form-field-value"><TicketAttachments ticketId={ticket.id} saved={Boolean(ticket.number)} /></div>
+              </div>
+            )}
           </div>
         </div>
         {!ticket && (
