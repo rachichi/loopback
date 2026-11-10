@@ -39,6 +39,8 @@ export type MeetingsPageProps = {
   onHover: (id: string | null) => void;
   onSelect: (ticket: Ticket) => void;
   onExpand: (ticket: Ticket) => void;
+  /** The no-pin warning in a ticket row: open the ticket and try to find its location. */
+  onFixLocation?: (ticket: Ticket) => void;
   onChange: (id: string, patch: Partial<Ticket>) => void;
   onDelete: (tickets: Ticket[]) => void;
   onSpanChange: (ticketId: string, index: number, span: EvidenceSpan) => void;
@@ -109,7 +111,7 @@ export default function MeetingsPage(props: MeetingsPageProps) {
   return <MeetingDetail key={info.id} info={info} jump={jump} setJump={setJump} {...props} />;
 }
 
-function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, rows, suggestions, review, selectedId, hoveredId, followHover, rowHeight, onHover, onSelect, onExpand, onChange, onDelete, onSpanChange, canEdit, onGenerate, onMinutesEvent, onViewed }: MeetingsPageProps & { info: MeetingInfo; jump: { id: string | null; n: number }; setJump: React.Dispatch<React.SetStateAction<{ id: string | null; n: number }>> }) {
+function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, rows, suggestions, review, selectedId, hoveredId, followHover, rowHeight, onHover, onSelect, onExpand, onFixLocation, onChange, onDelete, onSpanChange, canEdit, onGenerate, onMinutesEvent, onViewed }: MeetingsPageProps & { info: MeetingInfo; jump: { id: string | null; n: number }; setJump: React.Dispatch<React.SetStateAction<{ id: string | null; n: number }>> }) {
   const typeClass = useTypeClass();
   useEffect(onViewed, []);
 
@@ -233,7 +235,7 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
         <>
           {!ticketsReady && canEdit && <div className="section-generate">{generateButton("Generate Tickets")}</div>}
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={ticketsReady ? meetingRows : []} inReview={inReview} showReview={review !== undefined} />
-          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} />
+          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} />
         </>
       ),
     },

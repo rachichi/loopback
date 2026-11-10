@@ -163,6 +163,7 @@ export default function TicketTable({
   review,
   sort,
   onSort,
+  onFixLocation,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -184,6 +185,8 @@ export default function TicketTable({
   /** The column the table is sorted by, and the click on a header that cycles it. Omitted where the table can't be sorted (the Meetings tab). */
   sort?: Sort;
   onSort?: (key: SortKey) => void;
+  /** Clicking a row's no-pin warning: open the ticket and try to find its location on the map. */
+  onFixLocation?: (ticket: Ticket) => void;
 }) {
   const { ticketTypes } = useBoard();
   const typeClass = useTypeClass();
@@ -418,8 +421,8 @@ export default function TicketTable({
           <div>{deadline(ticket)}</div>
           {/* Clicking anywhere in the Map cell opens the map panel. */}
           {onShowOnMap
-            ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} /></div>
-            : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} /></div>}
+            ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>
+            : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>}
           <div><SummaryCell ticket={ticket} onChange={(summary) => onChange(ticket.id, { summary })} /></div>
           {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
         </div>

@@ -532,11 +532,11 @@ function Portal({ account }: { account: Account }) {
   };
   // After a transcript suggestion is approved, a ticket with location wording but no pin gets one when the
   // wording matches an actual place (two streets, or an exact address). One location_autopin event, never the wording.
-  const autoPin = async (ticket: Ticket) => {
+  const autoPin = async (ticket: Ticket, trigger: "approved" | "warning_click" = "approved") => {
     if (!mapOn || ticket.location.places.length || (!ticket.location.text.trim() && !ticket.location.crossStreets)) return;
     try {
       const found = await autoPlace(ticket.location, { borough: board.borough, boundary: board.boundary });
-      trackEvent("location_autopin", { board_id: board.id, trigger: "approved", outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
+      trackEvent("location_autopin", { board_id: board.id, trigger, outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
       if (!found) return;
       // The autosave sends the change like any other edit. Skipped if staff pinned something in the meantime.
       setTickets((current) => current.map((item) => item.id === ticket.id && !item.location.places.length
@@ -544,7 +544,7 @@ function Portal({ account }: { account: Account }) {
         : item));
     } catch (error) {
       console.error(error);
-      trackEvent("location_autopin", { board_id: board.id, trigger: "approved", outcome: "error" });
+      trackEvent("location_autopin", { board_id: board.id, trigger, outcome: "error" });
     }
   };
   // Accept approves the suggestion as shown; Reject dismisses it. Either way one suggestion_reviewed event
@@ -612,6 +612,8 @@ function Portal({ account }: { account: Account }) {
   // Expanding a row also selects it, so the row stays highlighted and the map follows. Review rows are not
   // tickets yet, so the form's previous and next skip them.
   const expandTicket = (ticket: Ticket) => { setSelectedId(ticket.id); setExpandedId(ticket.id); };
+  // The table's no-pin warning: open the ticket and try to find its location from the wording it has.
+  const fixLocation = (ticket: Ticket) => { expandTicket(ticket); void autoPin(ticket, "warning_click"); };
   const expanded = tickets.find((ticket) => ticket.id === expandedId);
   const expandable = rows.filter((ticket) => !review.has(ticket.id));
   const expandedIndex = expanded ? expandable.indexOf(expanded) : -1;
@@ -648,7 +650,7 @@ function Portal({ account }: { account: Account }) {
                 <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} hideNonUrgent>
                   {intakeOn && <button type="button" className="tabs-new" aria-label="New ticket" title="New ticket" onClick={() => setView("submit")}><Plus size={14} /> New Ticket</button>}
                 </UrgencyTabs>
-                <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? undefined : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
+                <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review." : tickets.length ? undefined : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onFixLocation={fixLocation} onChange={updateTicket} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} />
               </section>
             </main>
           )
@@ -713,6 +715,7 @@ function Portal({ account }: { account: Account }) {
             onHover={(id) => setHover({ id, from: "table" })}
             onSelect={(ticket) => setSelectedId(ticket.id)}
             onExpand={expandTicket}
+            onFixLocation={fixLocation}
             onChange={updateTicket}
             onDelete={removeTickets}
             onSpanChange={updateSpan}
@@ -730,7 +733,7 @@ function Portal({ account }: { account: Account }) {
         <section className="records-pane">
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={filtered} inReview={inReview} showReview={matchingOn} />
           <Toolbar count={rows.length} query={query} setQuery={setQuery} status={status} setStatus={setStatus} type={typeFilter} setType={setTypeFilter} onNew={() => setIntakeOpen(true)} sync={sync} rowHeight={rowHeight} setRowHeight={setRowHeight} />
-          <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review. Open a meeting in the Transcript tab and press Generate." : urgency === "closed" ? "No closed tickets match." : tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} sort={sort} onSort={(key) => setSort((current) => nextSort(current, key))} />
+          <TicketTable rows={rows} selectedId={review.has(selectedId) ? selectedId : selected?.id ?? ""} emptyMessage={urgency === "review" ? "Nothing to review. Open a meeting in the Transcript tab and press Generate." : urgency === "closed" ? "No closed tickets match." : tickets.length ? undefined : intakeOn ? "No tickets yet. Add the first one with New ticket." : "No tickets yet."} hoveredId={hover.id} followHover={hover.from !== "table"} rowHeight={rowHeight} onHover={(id) => setHover({ id, from: "table" })} onSelect={selectTicket} onExpand={expandTicket} onFixLocation={fixLocation} onChange={updateTicket} onShowOnMap={mapOn ? showOnMap : undefined} onDelete={removeTickets} transcript={transcriptColumn} review={reviewRows} sort={sort} onSort={(key) => setSort((current) => nextSort(current, key))} />
         </section>
         {/* district_map and transcript_matching both off: no panel, no rail, and the Map cells don't open one. */}
         {!panelOn ? null : sidebarOpen ? (
