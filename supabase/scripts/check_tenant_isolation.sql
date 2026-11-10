@@ -21,6 +21,7 @@
 --   A attach to own ticket: allowed            A attach claiming board B: denied (42501)
 --   A upload to own board folder: allowed      A upload to board B folder: denied (42501)
 --   B sees A attachments: 0, files: 0          B delete A attachments rows deleted: 0
+--   Public view: ordinary ticket shown=1, hidden-type ticket shown=0, hidden type listed=0
 --   A sees staging meetings: 0, suggestions: 0
 --   A approve staging suggestion: denied (P0002)
 --   A reject staging suggestion: denied (P0002)
@@ -121,6 +122,31 @@ begin
   delete from public.ticket_attachments;
   get diagnostics n = row_count;
   r := r || E'\nB delete A attachments rows deleted: ' || n;
+
+  -- Public share view: a ticket of a hidden type (Board Administration) is not returned, an ordinary one is, and the
+  -- hidden type is not listed. Needs board_a to have a share link and a type with hidden_from_public.
+  perform set_config('role', 'postgres', true);
+  declare
+    tok text := (select share_token from public.boards where id = board_a);
+    hidden_label text := (select e ->> 'label' from public.boards b, jsonb_array_elements(b.ticket_types) e
+                          where b.id = board_a and coalesce((e ->> 'hidden_from_public')::boolean, false) limit 1);
+    shown int;
+    leaked int;
+    listed int;
+  begin
+    if tok is null or hidden_label is null then
+      r := r || E'\nPublic view: skipped (board_a has no share link or no hidden type)';
+    else
+      insert into public.tickets (id, number, title, type, submitted_by, board) values ('rollback-test-pub-1', 0, 'x', hidden_label, 'test', board_a);
+      insert into public.tickets (id, number, title, type, submitted_by, board) values ('rollback-test-pub-2', 0, 'x', 'Other', 'test', board_a);
+      perform set_config('role', 'anon', true);
+      select count(*) filter (where id = 'rollback-test-pub-2'), count(*) filter (where id = 'rollback-test-pub-1')
+        into shown, leaked from public.public_board_tickets(tok);
+      select count(*) into listed from public.public_board(tok) pb, jsonb_array_elements(pb.ticket_types) e where e ->> 'label' = hidden_label;
+      perform set_config('role', 'postgres', true);
+      r := r || E'\nPublic view: ordinary ticket shown=' || shown || ', hidden-type ticket shown=' || leaked || ', hidden type listed=' || listed;
+    end if;
+  end;
 
   -- Meetings and suggestions: a staging meeting with one pending suggestion, made as postgres
   perform set_config('role', 'postgres', true);
