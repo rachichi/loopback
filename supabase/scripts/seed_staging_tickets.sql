@@ -35,7 +35,7 @@ values
   ('staging-seed-10', 'staging', 0, 'Flatbush Ave bus lanes (B41)', 'Transportation Request', 'In Progress',
    'Flatbush Ave', 'Committee', 'DOT bus lane plan for Flatbush. Members split, want DOT data on safety and ridership.', 'Board office', '2026-10-08', 'manual'),
   -- 10/14 Public Safety Committee
-  ('staging-seed-11', 'staging', 0, 'SLA questionnaire for applicants', 'Liquor License', 'In Progress',
+  ('staging-seed-11', 'staging', 0, 'SLA questionnaire for applicants', 'License - Liquor License', 'In Progress',
    '', 'Committee chair', 'Draft a standard questionnaire for liquor license applicants. Chair will email it around.', 'Board office', '2026-10-14', 'manual'),
   ('staging-seed-12', 'staging', 0, 'Bring back PAL youth programs', 'Public Safety Issue', 'Open',
    '', 'Committee member', 'Members asked about restarting PAL summer and year-round programs with the precinct.', 'Board office', '2026-10-14', 'manual'),
