@@ -11,7 +11,13 @@ import { createContext, Fragment, useCallback, useContext, useEffect, useState, 
 import { db } from "../db";
 import type { FeatureKey } from "./features";
 
-export type BoardTicketType = { label: string; css_class: string; definition: string };
+export type BoardTicketType = {
+  label: string;
+  css_class: string;
+  definition: string;
+  /** Tickets of this type are left out of the public share page, by the database (public_board_tickets). */
+  hidden_from_public?: boolean;
+};
 export type Role = "platform_admin" | "staff";
 
 export type Board = {
