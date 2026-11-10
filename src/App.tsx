@@ -540,7 +540,7 @@ function Portal({ account }: { account: Account }) {
       if (!found) return;
       // The autosave sends the change like any other edit. Skipped if staff pinned something in the meantime.
       setTickets((current) => current.map((item) => item.id === ticket.id && !item.location.places.length
-        ? { ...item, location: { ...item.location, places: [found.place] } }
+        ? { ...item, location: { ...item.location, places: [found.place], crossStreets: item.location.crossStreets ? found.streets ?? item.location.crossStreets : item.location.crossStreets } }
         : item));
     } catch (error) {
       console.error(error);

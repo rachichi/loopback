@@ -120,7 +120,7 @@ const CROSSING_METERS = 15;
 const NEAREST_METERS = 150;
 
 /** Where two streets cross, or the closest point between them; null if either is unknown or they are far apart. */
-async function findOnCenterlines(streets: CrossStreets, ctx: Context): Promise<{ place: Place; nearest: boolean } | null> {
+async function findOnCenterlines(streets: CrossStreets, ctx: Context): Promise<{ place: Place; nearest: boolean; streets: CrossStreets } | null> {
   const box = BOROUGH_BOX[ctx.borough.toLowerCase()] ?? [NYC_BOX.south, NYC_BOX.west, NYC_BOX.north, NYC_BOX.east];
   const [a, b] = await Promise.all([streetVertices(streets.a, box, ctx), streetVertices(streets.b, box, ctx)]);
   if (!a.points.length || !b.points.length) return null;
@@ -139,8 +139,9 @@ async function findOnCenterlines(streets: CrossStreets, ctx: Context): Promise<{
     }
   }
   const name = `${a.name} & ${b.name}`;
-  if (crossing) return { place: { name, lng: crossing.at[0], lat: crossing.at[1], source: "centerline" }, nearest: false };
-  if (closest && closest.gap <= NEAREST_METERS) return { place: { name: `Near ${name}`, lng: closest.at[0], lat: closest.at[1], source: "centerline" }, nearest: true };
+  const named = { a: a.name, b: b.name };
+  if (crossing) return { place: { name, lng: crossing.at[0], lat: crossing.at[1], source: "centerline" }, nearest: false, streets: named };
+  if (closest && closest.gap <= NEAREST_METERS) return { place: { name: `Near ${name}`, lng: closest.at[0], lat: closest.at[1], source: "centerline" }, nearest: true, streets: named };
   return null;
 }
 
@@ -208,22 +209,23 @@ async function findAddress(text: string, ctx: Context): Promise<Place | null> {
 
 /**
  * A place for the location, or null when nothing matches well enough. Cross streets come first, then wording
- * that reads as two streets, then an exact address or place. Throws on network errors.
+ * that reads as two streets, then an exact address or place. `streets` carries the best names for the two streets
+ * ("Utica" becomes "Utica Avenue") so callers can update typed cross streets. Throws on network errors.
  */
-export async function autoPlace(location: TicketLocation, ctx: Context): Promise<{ place: Place; via: "cross_streets" | "address"; nearest?: boolean } | null> {
+export async function autoPlace(location: TicketLocation, ctx: Context): Promise<{ place: Place; via: "cross_streets" | "address"; nearest?: boolean; streets?: CrossStreets } | null> {
   const streets = location.crossStreets ?? crossStreetsFrom(location.text);
   if (streets) {
     let failed: unknown = null;
     try {
       const found = await findOnCenterlines(streets, ctx);
-      if (found) return { place: found.place, via: "cross_streets", nearest: found.nearest };
+      if (found) return { place: found.place, via: "cross_streets", nearest: found.nearest, streets: found.streets };
     } catch (error) {
       failed = error;
     }
     // The centerline data doesn't know a street's name (or couldn't be reached): try the OpenStreetMap search.
     try {
       const place = await findIntersection(streets, ctx);
-      if (place) return { place, via: "cross_streets" };
+      if (place) return { place, via: "cross_streets", streets: { a: displayStreet(streets.a), b: displayStreet(streets.b) } };
     } catch (error) {
       if (failed) throw error;
     }
