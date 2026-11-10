@@ -12,6 +12,8 @@ export const demoBoard: Board = {
   logoUrl: boardLogo,
   backgroundUrl: null,
   boundary,
+  meetingFolders: [],
+  pinnedMeetingFolders: [],
   ticketTypes: [
     { label: "Quality of Life Complaint", css_class: "quality", definition: "Ongoing neighborhood conditions that affect daily life." },
     { label: "Public Safety Issue", css_class: "safety", definition: "Crime, policing, or hazards to personal safety." },

@@ -15,6 +15,8 @@ export type MeetingInfo = {
   matchedAt: string | null;
   /** Committee name ("Full Board" for general meetings), or null when unknown. */
   committee: string | null;
+  /** The Meetings tab folder: "Committee", "District Service Cabinet", or a name staff typed. */
+  folder: string;
   /** When generate-minutes drafted the minutes, or null if it never has. */
   minutesAt: string | null;
   /** When staff last saved edits to the minutes, or null if never. */

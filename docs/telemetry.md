@@ -87,8 +87,9 @@ Page views are sent as `/meetings`.
 | `meeting_generate_failed` | Either one errors | `board_id`, `duration_ms` |
 | `minutes_copied` | The Copy button is pressed on the minutes | `board_id` |
 | `minutes_edited` | An edit to the minutes is saved | `board_id` |
+| `meeting_added` | A transcript is uploaded from the Meetings tab | `board_id`, `folder` |
 
-No meeting id, title or minutes text is sent.
+No meeting id, title, transcript or minutes text is sent. `folder` is the folder's name (for example Committee), which staff can choose but which holds no meeting content.
 
 ### Landing page (`/landing`)
 

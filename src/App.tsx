@@ -18,7 +18,7 @@ import { useDismiss } from "./lib/useDismiss";
 import { useMediaQuery } from "./lib/useMediaQuery";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
-import { approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes } from "./features/transcript/api";
+import { addMeeting, approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes, setPinnedFolders } from "./features/transcript/api";
 import type { MeetingInfo, Suggestion } from "./features/transcript/types";
 import { withReviewRows } from "./features/transcript/review";
 
@@ -332,6 +332,7 @@ function Portal({ account }: { account: Account }) {
   const tab = !mapOn ? "transcript" : !transcriptOn ? "map" : panelTab;
   // Transcript matching: the board's meetings (no transcript text) and pending suggestions.
   const [meetings, setMeetings] = useState<MeetingInfo[]>([]);
+  const [pinnedFolders, setPinned] = useState<string[]>(board.pinnedMeetingFolders);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meetingId, setMeetingId] = useState("");
   const [jump, setJump] = useState<{ id: string | null; meetingId: string | null; n: number }>({ id: null, meetingId: null, n: 0 });
@@ -500,6 +501,23 @@ function Portal({ account }: { account: Account }) {
       throw failed.reason;
     }
     trackEvent("meeting_generate_done", { board_id: board.id, duration_ms: Date.now() - startedAt });
+  };
+  // The Meetings tab's Upload transcript form: files the transcript as a meeting, then reloads the list.
+  const uploadMeeting = async ({ title, heldOn, folder, transcript }: { title: string; heldOn: string; folder: string; transcript: string }) => {
+    await addMeeting(board.id, title, heldOn, folder, transcript);
+    trackEvent("meeting_added", { board_id: board.id, folder });
+    setMeetings(await loadMeetings(board.id));
+  };
+  // Pins or unpins a Meetings folder for the whole board. Shown at once; put back if the save fails.
+  const pinFolder = (folder: string, pin: boolean) => {
+    const before = pinnedFolders;
+    const next = pin ? [...before.filter((name) => name !== folder), folder] : before.filter((name) => name !== folder);
+    setPinned(next);
+    setPinnedFolders(board.id, next).catch((error) => {
+      console.error(error);
+      setPinned(before);
+      window.alert(`Couldn't ${pin ? "pin" : "unpin"} ${folder}. ${error instanceof Error ? error.message : ""}`);
+    });
   };
   const minutesEvent = (event: "edited" | "copied") => {
     trackEvent(event === "copied" ? "minutes_copied" : "minutes_edited", { board_id: board.id });
@@ -675,6 +693,9 @@ function Portal({ account }: { account: Account }) {
             onSpanChange={updateSpan}
             canEdit={board.role !== null}
             onGenerate={generateMeeting}
+            onUpload={uploadMeeting}
+            pinned={pinnedFolders}
+            onPin={pinFolder}
             onMinutesEvent={minutesEvent}
             onViewed={() => trackEvent("meetings_opened", { board_id: board.id })}
           />

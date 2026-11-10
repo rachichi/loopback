@@ -80,6 +80,8 @@ async function load(token: string): Promise<State> {
     backgroundUrl: row.background_url,
     boundary: row.boundary_geojson,
     ticketTypes: Array.isArray(row.ticket_types) ? row.ticket_types : [],
+    meetingFolders: [],
+    pinnedMeetingFolders: [],
     // Same rule as BoardProvider: only true counts as on. Without flags from the database (migration not
     // applied yet), fall back to the documented defaults so the map and intake stay on.
     features: row.features
