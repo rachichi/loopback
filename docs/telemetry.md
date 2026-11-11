@@ -108,7 +108,7 @@ No one is signed in, so none of these carry `board_id` or `role`.
 
 | Event | Fired when | Fields |
 | --- | --- | --- |
-| `landing_cta_clicked` | A "Get Loopback" button or Contact us opens the contact popup | `source` (`hero`, `closing` or `footer`) |
+| `landing_cta_clicked` | A "Get Loopback" button or Contact us opens the contact popup | `source` (`hero`, `closing`, `footer` or `about`) |
 | `landing_signin_clicked` | Sign in in the header is clicked | none |
 | `landing_demo_tab` | The visitor switches tabs in the demo | `tab` (`home`, `tickets` or `meetings`) |
 | `landing_demo_ticket_submitted` | A ticket is added through the demo phone form | `urgent` |
