@@ -74,7 +74,7 @@ export default function LocationCell({
       trackEvent("location_autopin", { board_id: boardId, trigger, outcome: found ? (found.nearest ? "pinned_nearest" : "pinned") : "no_match" });
       const now = latest.current;
       const same = now.text === next.text && now.crossStreets?.a === next.crossStreets?.a && now.crossStreets?.b === next.crossStreets?.b;
-      if (found && same && !now.places.length) onChange({ ...now, places: [found.place] });
+      if (found && same && !now.places.length) onChange({ ...now, places: [found.place], crossStreets: now.crossStreets ? found.streets ?? now.crossStreets : now.crossStreets });
       else if (!found) setMissed(true);
     } catch (error) {
       console.error(error);
