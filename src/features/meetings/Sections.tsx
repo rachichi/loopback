@@ -21,14 +21,22 @@ function loadLayout(): Layout {
 
 export default function Sections({ sections, request }: {
   sections: SectionDef[];
-  /** Open a section from outside (the toast). A new n repeats the request. */
-  request: { key: SectionKey; n: number } | null;
+  /** Open sections from outside (a highlight click, a finished Generate). A new n repeats the request. */
+  request: { keys: SectionKey[]; n: number } | null;
 }) {
   const [layout, setLayout] = useState(loadLayout);
   const [dragging, setDragging] = useState<SectionKey | null>(null);
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify({ order: layout.order })); }, [layout]);
+  // Sections a request has just opened grow in rather than appearing (see .opening in index.css).
+  const [opening, setOpening] = useState<SectionKey[]>([]);
   useEffect(() => {
-    if (request) setLayout((current) => current.open.includes(request.key) ? current : { ...current, open: [...current.open, request.key] });
+    if (!request) return;
+    const added = request.keys.filter((key) => !layout.open.includes(key));
+    if (!added.length) return;
+    setLayout((current) => ({ ...current, open: [...current.open, ...added.filter((key) => !current.open.includes(key))] }));
+    setOpening(added);
+    const timer = window.setTimeout(() => setOpening([]), 900);
+    return () => window.clearTimeout(timer);
   }, [request?.n]);
 
   const toggle = (key: SectionKey) => setLayout((current) => {
@@ -61,7 +69,7 @@ export default function Sections({ sections, request }: {
           onDragOver: (event: DragEvent) => { if (dragging) event.preventDefault(); },
           onDrop: (event: DragEvent) => { event.preventDefault(); dropOn(key); setDragging(null); },
         };
-        const state = `${section.locked ? "locked" : ""} ${dragging === key ? "dragging" : ""}`;
+        const state = `${section.locked ? "locked" : ""} ${dragging === key ? "dragging" : ""} ${opening.includes(key) ? "opening" : ""}`;
         if (!open) {
           return (
             <button key={key} type="button" className={`section-rail ${state}`} aria-label={`Open ${section.label}`} title={`Open ${section.label}`} onClick={() => toggle(key)} {...dragProps(key)} {...target}>
