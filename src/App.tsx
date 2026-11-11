@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { CalendarDays, ChevronDown, ClipboardList, FileText, House, Link2, LogOut, MapPin, PanelRightClose, PanelRightOpen, Plus } from "lucide-react";
 import loopbackLogo from "./assets/logo.png";
+import FeedbackForm from "./features/feedback/FeedbackForm";
 import { today, type EvidenceSpan, type Status, type Ticket } from "./features/tickets/types";
 import TicketTable, { loadRowHeight, saveRowHeight, type ReviewRows, type TranscriptColumn } from "./TicketTable";
 import { nextSort, sortTickets, type Sort } from "./columnSort";
@@ -198,6 +199,7 @@ function HomeView({ mobile, onShowMap, onMinutes, onNewTicket }: {
 
 function PortalFooter() {
   const { name } = useBoard();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   return (
     <footer className="portal-footer">
       <div className="portal-footer-inner">
@@ -205,9 +207,10 @@ function PortalFooter() {
         <div className="portal-footer-contact">
           <p>Loopback for {name}.</p>
           <p>The Loopback portal was launched in 2026 by community members<br />to empower the community boards that serve them.</p>
-          <p><strong><u>Contact us</u></strong> for questions, feedback, or feature requests.</p>
+          <p><button type="button" className="portal-footer-link" onClick={() => setFeedbackOpen(true)}>Contact us</button> to report a bug, request a feature, or share feedback.</p>
         </div>
       </div>
+      {feedbackOpen && <FeedbackForm onClose={() => setFeedbackOpen(false)} />}
     </footer>
   );
 }

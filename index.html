@@ -17,6 +17,15 @@
       <textarea name="details"></textarea>
       <input name="website" />
     </form>
+    <!-- The same for the portal footer's feedback form (src/features/feedback). -->
+    <form name="feedback" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input name="kind" />
+      <textarea name="message"></textarea>
+      <input name="board" />
+      <input name="page" />
+      <input name="from" />
+      <input name="bot-field" />
+    </form>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <!-- figma:body-end -->

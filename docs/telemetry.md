@@ -55,6 +55,8 @@ Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (th
 | `ticket_deleted` | A ticket is deleted. Once per ticket, so a bulk delete sends several | `board_id` |
 | `attachment_added` | A PDF is attached to a ticket | `board_id` |
 | `attachment_removed` | An attachment is removed | `board_id` |
+| `feedback_sent` | The footer's Contact us form is sent (by email or into the feedback table, either one counts) | `board_id`, `kind` (`bug`, `feature` or `feedback`) |
+| `feedback_failed` | Sending it fails | `board_id`, `kind` |
 | `location_autopin` | The app tries to find a map point for a location on its own: after staff save Cross streets, after a transcript suggestion is approved, or when staff click a row's no-pin warning | `board_id`, `trigger` (`cross_streets`, `approved`, or `warning_click` when staff click a row's no-pin warning), `outcome` (`pinned`, `pinned_nearest` for a "Near" pin when the streets almost meet, `no_match` or `error`) |
 
 `location_autopin` never carries the streets or address it looked up. The lookup itself sends the two street names, or the address wording, to NYC Open Data (street centerlines), NYC GeoSearch or Photon (photon.komoot.io, OpenStreetMap data), not to Better Stack.

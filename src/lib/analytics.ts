@@ -129,6 +129,8 @@ type EventName =
   | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited" | "meeting_added"
   // Location auto-pin: board_id, what triggered it and whether it found a place, never street names or addresses.
   | "location_autopin"
+  // Feedback form: board_id and the kind (bug, feature or feedback) only, never what was written.
+  | "feedback_sent" | "feedback_failed"
   // Attachments: board_id only, never file names or ticket ids.
   | "attachment_added" | "attachment_removed";
 

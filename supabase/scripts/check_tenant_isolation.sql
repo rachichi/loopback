@@ -22,6 +22,8 @@
 --   A upload to own board folder: allowed      A upload to board B folder: denied (42501)
 --   B sees A attachments: 0, files: 0          B delete A attachments rows deleted: 0
 --   Public view: ordinary ticket shown=1, hidden-type ticket shown=0, hidden type listed=0
+--   A send feedback for own board: allowed     A send feedback for board B: denied (42501)
+--   A send feedback as another user: denied (42501)   A reads feedback: 0 rows
 --   A sees staging meetings: 0, suggestions: 0
 --   A approve staging suggestion: denied (P0002)
 --   A reject staging suggestion: denied (P0002)
@@ -147,6 +149,27 @@ begin
       r := r || E'\nPublic view: ordinary ticket shown=' || shown || ', hidden-type ticket shown=' || leaked || ', hidden type listed=' || listed;
     end if;
   end;
+
+  -- Feedback (the footer form's table): staff add their own for their own board, cannot file under another board or
+  -- as another user, and cannot read any feedback. Each step is its own block.
+  perform set_config('request.jwt.claims', json_build_object('sub', ua, 'role', 'authenticated')::text, true);
+  perform set_config('role', 'authenticated', true);
+  begin
+    insert into public.feedback (board, kind, message, page) values (board_a, 'feedback', 'rollback test', '/');
+    r := r || E'\nA send feedback for own board: allowed';
+  exception when others then r := r || E'\nA send feedback for own board: DENIED (bad) (' || sqlstate || ')';
+  end;
+  begin
+    insert into public.feedback (board, kind, message, page) values (board_b, 'feedback', 'rollback test', '/');
+    r := r || E'\nA send feedback for board B: ALLOWED (bad)';
+  exception when others then r := r || E'\nA send feedback for board B: denied (' || sqlstate || ')';
+  end;
+  begin
+    insert into public.feedback (board, kind, message, user_id) values (board_a, 'feedback', 'rollback test', ub);
+    r := r || E'\nA send feedback as another user: ALLOWED (bad)';
+  exception when others then r := r || E'\nA send feedback as another user: denied (' || sqlstate || ')';
+  end;
+  r := r || E'\nA reads feedback: ' || (select count(*) from public.feedback) || ' rows';
 
   -- Meetings and suggestions: a staging meeting with one pending suggestion, made as postgres
   perform set_config('role', 'postgres', true);
