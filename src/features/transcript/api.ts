@@ -50,6 +50,33 @@ export async function setPinnedFolders(board: string, pins: string[]): Promise<v
   if (error) throw error;
 }
 
+/** Renames a meeting (staff only; the database checks). */
+export async function renameMeeting(meetingId: string, title: string): Promise<void> {
+  const { error } = await db.rpc("rename_meeting", { m: meetingId, t: title });
+  if (error) throw readable(error);
+}
+
+/** A Supabase error as a real Error, so the message reaches the alert or form that shows it. */
+const readable = (error: { message: string }) => new Error(error.message);
+
+/** Adds a folder to the board's Meetings tab (staff only; the database checks). */
+export async function addMeetingFolder(board: string, name: string): Promise<void> {
+  const { error } = await db.rpc("add_meeting_folder", { b: board, f: name });
+  if (error) throw readable(error);
+}
+
+/** Moves a meeting to another Meetings folder (staff only; the database checks). */
+export async function moveMeeting(meetingId: string, folder: string): Promise<void> {
+  const { error } = await db.rpc("move_meeting", { m: meetingId, f: folder });
+  if (error) throw readable(error);
+}
+
+/** Removes a meeting and its suggestions, and unlinks it from its tickets (staff only; the database checks). */
+export async function removeMeeting(meetingId: string): Promise<void> {
+  const { error } = await db.rpc("remove_meeting", { m: meetingId });
+  if (error) throw readable(error);
+}
+
 /** One meeting's transcript text, one paragraph per line. */
 export async function loadTranscript(meetingId: string): Promise<string> {
   const { data, error } = await db.from("meetings").select("transcript").eq("id", meetingId).single();

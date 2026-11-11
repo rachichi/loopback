@@ -126,7 +126,7 @@ type EventName =
   // Meetings tab: board_id and durations only, never meeting ids, titles or minutes text.
   // Landing page: which button or demo part was used, never what a visitor typed.
   | "landing_cta_clicked" | "landing_signin_clicked" | "landing_demo_tab" | "landing_demo_ticket_submitted" | "landing_contact_submitted" | "landing_contact_failed"
-  | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited" | "meeting_added"
+  | "meetings_opened" | "meeting_generate_started" | "meeting_generate_done" | "meeting_generate_failed" | "minutes_copied" | "minutes_edited" | "meeting_added" | "meeting_renamed" | "meeting_moved" | "meeting_removed" | "meeting_folder_added"
   // Location auto-pin: board_id, what triggered it and whether it found a place, never street names or addresses.
   | "location_autopin"
   // Feedback form: board_id and the kind (bug, feature or feedback) only, never what was written.

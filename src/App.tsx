@@ -21,7 +21,7 @@ import { useMediaQuery } from "./lib/useMediaQuery";
 import ShareLink from "./ShareLink";
 import PublicBoard from "./PublicBoard";
 import { autoPlace } from "./autoPin";
-import { addMeeting, approveSuggestion, loadMeetings, loadSuggestions, rejectSuggestion, runMatching, runMinutes, setPinnedFolders } from "./features/transcript/api";
+import { meetingLabel, addMeeting, approveSuggestion, loadMeetings, loadSuggestions, addMeetingFolder, moveMeeting, rejectSuggestion, removeMeeting, renameMeeting, runMatching, runMinutes, setPinnedFolders } from "./features/transcript/api";
 import type { MeetingInfo, Suggestion } from "./features/transcript/types";
 import { withReviewRows } from "./features/transcript/review";
 
@@ -339,6 +339,7 @@ function Portal({ account }: { account: Account }) {
   const tab = !mapOn ? "transcript" : !transcriptOn ? "map" : panelTab;
   // Transcript matching: the board's meetings (no transcript text) and pending suggestions.
   const [meetings, setMeetings] = useState<MeetingInfo[]>([]);
+  const [meetingFolderList, setMeetingFolderList] = useState<string[]>(board.meetingFolders);
   const [pinnedFolders, setPinned] = useState<string[]>(board.pinnedMeetingFolders);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [meetingId, setMeetingId] = useState("");
@@ -527,6 +528,46 @@ function Portal({ account }: { account: Account }) {
       console.error(error);
       setPinned(before);
       window.alert(`Couldn't ${pin ? "pin" : "unpin"} ${folder}. ${error instanceof Error ? error.message : ""}`);
+    });
+  };
+  // Renames a meeting from the Meetings tab. Shown at once; put back if the save fails.
+  const renameMeetingTitle = (meetingId: string, title: string) => {
+    const before = meetings;
+    setMeetings((current) => current.map((meeting) => meeting.id === meetingId ? { ...meeting, title, label: meetingLabel(title, meeting.heldOn) } : meeting));
+    renameMeeting(meetingId, title).then(() => trackEvent("meeting_renamed", { board_id: board.id })).catch((error) => {
+      console.error(error);
+      setMeetings(before);
+      window.alert(`Couldn't rename the meeting. ${error instanceof Error ? error.message : ""}`);
+    });
+  };
+  // Adds a Meetings folder for the whole board. Rejects with a readable message, which the form shows.
+  const addFolder = async (name: string) => {
+    await addMeetingFolder(board.id, name);
+    trackEvent("meeting_folder_added", { board_id: board.id });
+    setMeetingFolderList((current) => current.some((existing) => existing.toLowerCase() === name.toLowerCase()) ? current : [...current, name]);
+  };
+  // Moves a meeting to another folder. Shown at once; put back if the save fails.
+  const moveMeetingTo = (meetingId: string, folder: string) => {
+    const before = meetings;
+    setMeetings((current) => current.map((meeting) => meeting.id === meetingId ? { ...meeting, folder } : meeting));
+    moveMeeting(meetingId, folder).then(() => trackEvent("meeting_moved", { board_id: board.id })).catch((error) => {
+      console.error(error);
+      setMeetings(before);
+      window.alert(`Couldn't move the meeting. ${error instanceof Error ? error.message : ""}`);
+    });
+  };
+  // Removes a meeting. The database also unlinks it from its tickets, so the same is done to the copies here.
+  const removeMeetingById = (meetingId: string) => {
+    removeMeeting(meetingId).then(() => {
+      trackEvent("meeting_removed", { board_id: board.id });
+      setMeetings((current) => current.filter((meeting) => meeting.id !== meetingId));
+      setSuggestions((current) => current.filter((suggestion) => suggestion.meetingId !== meetingId));
+      setTickets((current) => current.map((ticket) => ticket.meetingIds.includes(meetingId) || ticket.spans.some((span) => span.meetingId === meetingId)
+        ? { ...ticket, meetingIds: ticket.meetingIds.filter((id) => id !== meetingId), spans: ticket.spans.filter((span) => span.meetingId !== meetingId) }
+        : ticket));
+    }).catch((error) => {
+      console.error(error);
+      window.alert(`Couldn't remove the meeting. ${error instanceof Error ? error.message : ""}`);
     });
   };
   const minutesEvent = (event: "edited" | "copied") => {
@@ -727,6 +768,11 @@ function Portal({ account }: { account: Account }) {
             onUpload={uploadMeeting}
             pinned={pinnedFolders}
             onPin={pinFolder}
+            boardFolders={meetingFolderList}
+            onAddFolder={addFolder}
+            onRename={renameMeetingTitle}
+            onMove={moveMeetingTo}
+            onRemove={removeMeetingById}
             onMinutesEvent={minutesEvent}
             onViewed={() => trackEvent("meetings_opened", { board_id: board.id })}
           />

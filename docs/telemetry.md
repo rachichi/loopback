@@ -95,6 +95,10 @@ Page views are sent as `/meetings`.
 | `minutes_copied` | The Copy button is pressed on the minutes | `board_id` |
 | `minutes_edited` | An edit to the minutes is saved | `board_id` |
 | `meeting_added` | A transcript is uploaded from the Meetings tab | `board_id`, `folder` |
+| `meeting_renamed` | A meeting is renamed, from the list or the meeting's title | `board_id` |
+| `meeting_moved` | A meeting is moved to another folder from the list | `board_id` |
+| `meeting_removed` | A meeting is removed from the list | `board_id` |
+| `meeting_folder_added` | A folder is added from the Meetings tab | `board_id` |
 
 No meeting id, title, transcript or minutes text is sent. `folder` is the folder's name (for example Committee), which staff can choose but which holds no meeting content.
 

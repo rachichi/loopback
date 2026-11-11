@@ -5,17 +5,18 @@
 // minutes side by side. The ticket table is the Tickets tab's, on the same state, so approving, rejecting
 // or editing here changes the Tickets tab too.
 import { lazy, Suspense, useEffect, useMemo, useState } from "react";
-import { ChevronRight, FileText, ListChecks, NotebookText, Plus, Sparkles, X } from "lucide-react";
+import { ChevronRight, FileText, Folder, ListChecks, NotebookText, Sparkles } from "lucide-react";
 import TicketTable, { type ReviewRows, type RowHeight, type TranscriptColumn } from "../../TicketTable";
 import { inTab, UrgencyTabs, type UrgencyTab } from "../../TicketFilters";
 import TranscriptView from "../../TranscriptView";
 import { buildParagraphs, type Paragraph } from "../../transcript";
 import { useBoard, useTypeClass } from "../../lib/board";
 import type { EvidenceSpan, Ticket } from "../tickets/types";
-import { loadTranscript } from "../transcript/api";
+import { loadMinutes, loadTranscript } from "../transcript/api";
 import { expectedSeconds, progressAt } from "../transcript/progress";
 import { reviewId } from "../transcript/review";
 import type { MeetingInfo, Suggestion, TranscriptMeeting } from "../transcript/types";
+import MinutesWriter from "./MinutesWriter";
 import MeetingsList, { folderOrder } from "./MeetingsList";
 import Sections, { type SectionKey } from "./Sections";
 import UploadTranscript, { type UploadInput } from "./UploadTranscript";
@@ -49,8 +50,16 @@ export type MeetingsPageProps = {
   onGenerate: (meetingId: string) => Promise<void>;
   /** Folders pinned to the top of the list, in order. */
   pinned: string[];
+  /** The board's own folders, and adding one (rejects with a readable message). */
+  boardFolders: string[];
+  onAddFolder: (name: string) => Promise<void>;
   /** Pins or unpins a folder for the whole board. */
   onPin: (folder: string, pinned: boolean) => void;
+  /** Renames a meeting. Shown at once; the caller puts the old title back if the save fails. */
+  onRename: (meetingId: string, title: string) => void;
+  /** Moves a meeting to another folder, and removes one. */
+  onMove: (meetingId: string, folder: string) => void;
+  onRemove: (meetingId: string) => void;
   /** Adds an uploaded transcript as a meeting, then refreshes the meetings. Rejects with a readable message. */
   onUpload: (input: UploadInput) => Promise<void>;
   /** The minutes were edited or copied. */
@@ -90,20 +99,19 @@ export default function MeetingsPage(props: MeetingsPageProps) {
   // Kept here, not in the meeting view, so a jump into another meeting survives that view mounting.
   const [jump, setJump] = useState<{ id: string | null; n: number }>({ id: null, n: 0 });
   const [uploading, setUploading] = useState(false);
-  const { meetingFolders } = useBoard();
+  const meetingFolders = props.boardFolders;
   const pinnedMeetingFolders = props.pinned;
-  // The same order as the list, so the first is the pinned default. A board with no folders of its own files
-  // uploads under the folders its meetings already use.
-  const folders = meetingFolders.length ? folderOrder(meetingFolders, pinnedMeetingFolders, meetings) : [...new Set(["Committee", ...meetings.map((meeting) => meeting.folder)])];
+  // The same order as the list (pinned first, then A to Z), so the first is the default for an upload.
+  const ordered = folderOrder(meetingFolders, pinnedMeetingFolders, meetings);
+  const folders = ordered.length ? ordered : ["Committee"];
   const info = meetings.find((meeting) => meeting.id === meetingId);
   if (!info) {
     return (
       <>
         <div className="title-band meeting-band">
           <div><h1>Meetings</h1><span>Open a meeting to see its transcript, tickets and minutes</span></div>
-          {props.canEdit && <button type="button" className="meetings-upload" onClick={() => setUploading(true)}><Plus size={14} /> Upload transcript</button>}
         </div>
-        <MeetingsList boardFolders={meetingFolders} pinned={pinnedMeetingFolders} onPin={props.canEdit && meetingFolders.length ? props.onPin : undefined} meetings={meetings} tickets={tickets} suggestions={suggestions} onOpen={onOpenMeeting} />
+        <MeetingsList boardFolders={meetingFolders} pinned={pinnedMeetingFolders} onPin={props.canEdit ? props.onPin : undefined} onAddFolder={props.canEdit ? props.onAddFolder : undefined} onRename={props.canEdit ? props.onRename : undefined} onMove={props.canEdit ? props.onMove : undefined} onRemove={props.canEdit ? props.onRemove : undefined} onUpload={props.canEdit ? () => setUploading(true) : undefined} meetings={meetings} tickets={tickets} suggestions={suggestions} onOpen={onOpenMeeting} />
         {uploading && <UploadTranscript folders={folders} onClose={() => setUploading(false)} onUpload={props.onUpload} />}
       </>
     );
@@ -111,9 +119,12 @@ export default function MeetingsPage(props: MeetingsPageProps) {
   return <MeetingDetail key={info.id} info={info} jump={jump} setJump={setJump} {...props} />;
 }
 
-function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, rows, suggestions, review, selectedId, hoveredId, followHover, rowHeight, onHover, onSelect, onExpand, onFixLocation, onChange, onDelete, onSpanChange, canEdit, onGenerate, onMinutesEvent, onViewed }: MeetingsPageProps & { info: MeetingInfo; jump: { id: string | null; n: number }; setJump: React.Dispatch<React.SetStateAction<{ id: string | null; n: number }>> }) {
+function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, rows, suggestions, review, selectedId, hoveredId, followHover, rowHeight, onHover, onSelect, onExpand, onFixLocation, onChange, onDelete, onSpanChange, canEdit, onGenerate, onRename, onMinutesEvent, onViewed }: MeetingsPageProps & { info: MeetingInfo; jump: { id: string | null; n: number }; setJump: React.Dispatch<React.SetStateAction<{ id: string | null; n: number }>> }) {
   const typeClass = useTypeClass();
   useEffect(onViewed, []);
+  // The title is edited in place; it follows the meeting when the name changes elsewhere (a failed save put back).
+  const [titleDraft, setTitleDraft] = useState(info.title);
+  useEffect(() => setTitleDraft(info.title), [info.title]);
 
   const [paragraphs, setParagraphs] = useState<Paragraph[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -135,8 +146,14 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
   const [running, setRunning] = useState<{ at: number; seconds: number } | null>(null);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
-  const [toast, setToast] = useState(false);
-  const [request, setRequest] = useState<{ key: SectionKey; n: number } | null>(null);
+  const [request, setRequest] = useState<{ keys: SectionKey[]; n: number } | null>(null);
+  const open = (...keys: SectionKey[]) => setRequest((current) => ({ keys, n: (current?.n ?? 0) + 1 }));
+  // After Generate finishes, what is new plays in: the sections expand, the tickets appear one by one with their
+  // highlights in the transcript, and the minutes are typed out. `go` is false while the server is still working,
+  // which keeps the new tickets hidden until it has finished.
+  const [play, setPlay] = useState<{ tickets: boolean; minutes: boolean; go: boolean } | null>(null);
+  const [revealed, setRevealed] = useState(0);
+  const [written, setWritten] = useState<string | null>(null);
   useEffect(() => {
     if (!running) return;
     const tick = () => setProgress(progressAt((Date.now() - running.at) / 1000, running.seconds));
@@ -144,11 +161,6 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
     const timer = window.setInterval(tick, 250);
     return () => window.clearInterval(timer);
   }, [running]);
-  useEffect(() => {
-    if (!toast) return;
-    const timer = window.setTimeout(() => setToast(false), 12000);
-    return () => window.clearTimeout(timer);
-  }, [toast]);
   const generating = running !== null;
   // The button's glint repeats until the first click, then stays off for this visit.
   const [clicked, setClicked] = useState(false);
@@ -157,12 +169,18 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
     const characters = paragraphs?.reduce((total, paragraph) => total + paragraph.text.length, 0) ?? 60000;
     setRunning({ at: Date.now(), seconds: expectedSeconds(characters) });
     setError(null);
+    const animate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setRevealed(0);
+    setWritten(null);
+    setPlay(animate ? { tickets: !ticketsReady, minutes: !minutesReady, go: false } : null);
     try {
       await onGenerate(info.id);
       setProgress(1);
       await new Promise((resolve) => setTimeout(resolve, 400));
-      setToast(true);
+      open("tickets", "minutes");
+      setPlay((current) => current && { ...current, go: true });
     } catch (failure) {
+      setPlay(null);
       setError(failure instanceof Error ? failure.message : "Couldn't generate this meeting.");
     } finally {
       setRunning(null);
@@ -197,10 +215,29 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
   // Tickets linked to the meeting, plus its pending suggestions. Greyed out until the AI run is done.
   const meetingRows = useMemo(() => rows.filter((ticket) => ticket.meetingIds.includes(info.id)), [rows, info.id]);
 
+  // While the new tickets play in, only the first `revealed` of them count, in the table and in the transcript.
+  const hiddenIds = useMemo(() => play?.tickets ? new Set(meetingRows.slice(play.go ? revealed : 0).map((ticket) => ticket.id)) : null, [play?.tickets, play?.go, revealed, meetingRows]);
+  const shownMeetingRows = hiddenIds ? meetingRows.filter((ticket) => !hiddenIds.has(ticket.id)) : meetingRows;
+  useEffect(() => {
+    if (!play?.go || !play.tickets) return;
+    if (revealed >= meetingRows.length) { setPlay((current) => current && { ...current, tickets: false }); return; }
+    // The first one waits for the sections to finish expanding; a long list speeds up to fit about five seconds.
+    const delay = revealed === 0 ? 700 : Math.min(450, Math.max(120, 5000 / meetingRows.length));
+    const timer = window.setTimeout(() => setRevealed((count) => count + 1), delay);
+    return () => window.clearTimeout(timer);
+  }, [play?.go, play?.tickets, revealed, meetingRows.length]);
+  useEffect(() => {
+    if (!play?.go || !play.minutes) return;
+    let cancelled = false;
+    loadMinutes(info.id).then((html) => { if (!cancelled) setWritten(html ?? ""); }).catch((error) => { console.error(error); if (!cancelled) setPlay((current) => current && { ...current, minutes: false }); });
+    return () => { cancelled = true; };
+  }, [play?.go, play?.minutes, info.id]);
+  useEffect(() => { if (play?.go && !play.tickets && !play.minutes) setPlay(null); }, [play]);
+
   // The same urgency and Review tabs as the Tickets tab, counting only this meeting's tickets.
   const [urgency, setUrgency] = useState<UrgencyTab>("all");
   const inReview = (id: string) => review?.rows.has(id) ?? false;
-  const shownRows = ticketsReady ? meetingRows.filter((ticket) => inTab(ticket, urgency, inReview)) : [];
+  const shownRows = ticketsReady ? shownMeetingRows.filter((ticket) => inTab(ticket, urgency, inReview)) : [];
   const select = (ticket: Ticket) => { onSelect(ticket); setJump((current) => ({ id: ticket.id, n: current.n + 1 })); };
   // The table's Transcript column, as on the Tickets tab: a tag per meeting the ticket was discussed in.
   // A tag for this meeting scrolls to the ticket's highlights; a tag for another meeting opens that meeting there.
@@ -221,10 +258,10 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
   const openFromHighlight = (ticketId: string) => {
     const ticket = rows.find((row) => row.id === ticketId);
     if (ticket) onSelect(ticket);
-    setRequest((current) => ({ key: "tickets", n: (current?.n ?? 0) + 1 }));
+    open("tickets");
   };
   const transcript = meeting
-    ? <TranscriptView key={meeting.id} bare meetings={meetings} meeting={meeting} onMeetingChange={onOpenMeeting} tickets={[...tickets, ...standIns]} hoveredId={hoveredId} onHover={onHover} onSpanChange={onSpanChange} jump={jump} typeClass={typeClass} pendingIds={pendingIds} onHighlightClick={openFromHighlight} />
+    ? <TranscriptView key={meeting.id} bare meetings={meetings} meeting={meeting} onMeetingChange={onOpenMeeting} tickets={[...tickets, ...standIns].filter((ticket) => !hiddenIds?.has(ticket.id))} hoveredId={hoveredId} onHover={onHover} onSpanChange={onSpanChange} jump={jump} typeClass={typeClass} pendingIds={pendingIds} onHighlightClick={openFromHighlight} />
     : <div className="transcript-empty">{loadError ?? "Loading transcript…"}</div>;
 
   const sections = [
@@ -234,14 +271,16 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
       content: (
         <>
           {!ticketsReady && canEdit && <div className="section-generate">{generateButton("Generate Tickets")}</div>}
-          <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={ticketsReady ? meetingRows : []} inReview={inReview} showReview={review !== undefined} />
+          <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={ticketsReady ? shownMeetingRows : []} inReview={inReview} showReview={review !== undefined} />
           <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} />
         </>
       ),
     },
     {
       key: "minutes" as const, label: "Minutes", icon: <NotebookText size={15} />, locked: !minutesReady,
-      content: minutesReady
+      content: play?.minutes
+        ? <MinutesWriter html={play.go ? written : null} onDone={() => setPlay((current) => current && { ...current, minutes: false })} />
+        : minutesReady
         ? <Suspense fallback={<div className="transcript-empty">Loading minutes…</div>}><MinutesEditor meetingId={info.id} canEdit={canEdit} onCopied={() => onMinutesEvent("copied")} onEdited={() => onMinutesEvent("edited")} /></Suspense>
         : <div className="minutes-placeholder">
           <h2>Meeting minutes</h2>
@@ -258,9 +297,11 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
           <h1>
             <button type="button" className="crumb" onClick={() => onOpenMeeting(null)}>Meetings</button>
             <ChevronRight className="crumb-sep" size={28} aria-hidden="true" />
-            <span title={info.title}>{info.title}</span>
+            {canEdit
+              ? <input className="meeting-title" aria-label="Meeting title" title="Click to rename" value={titleDraft} size={Math.max(8, titleDraft.length)} onChange={(event) => setTitleDraft(event.target.value)} onFocus={(event) => event.target.select()} onBlur={() => { const title = titleDraft.trim(); if (title && title !== info.title) onRename(info.id, title); else setTitleDraft(info.title); }} onKeyDown={(event) => { if (event.key === "Enter") event.currentTarget.blur(); else if (event.key === "Escape") { setTitleDraft(info.title); event.currentTarget.blur(); } }} />
+              : <span title={info.title}>{info.title}</span>}
           </h1>
-          <span>{dateLabel(info.heldOn)}{paragraphs ? ` · ${estimatedLength(paragraphs)}` : ""}</span>
+          <span>{dateLabel(info.heldOn)}{paragraphs ? ` · ${estimatedLength(paragraphs)}` : ""} · in <span className="meeting-folder" title={`Folder: ${info.folder}`}><Folder size={12} aria-hidden="true" />{info.folder}</span></span>
         </div>
         {canEdit && generateButton(generateLabel)}
         <svg width="0" height="0" aria-hidden="true" focusable="false" style={{ position: "absolute" }}>
@@ -275,17 +316,6 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
       <main className="meeting-workspace">
         <Sections sections={sections} request={request} />
       </main>
-      {toast && (
-        <div className="meeting-toast" role="status">
-          <strong>Tickets and minutes are ready.</strong>
-          <span>Check the tickets and the draft minutes before they go out.</span>
-          <div>
-            <button type="button" onClick={() => setRequest((current) => ({ key: "tickets", n: (current?.n ?? 0) + 1 }))}>Open tickets</button>
-            <button type="button" onClick={() => setRequest((current) => ({ key: "minutes", n: (current?.n ?? 0) + 1 }))}>Open minutes</button>
-          </div>
-          <button type="button" className="toast-close" aria-label="Dismiss" onClick={() => setToast(false)}><X size={14} /></button>
-        </div>
-      )}
     </>
   );
 }
