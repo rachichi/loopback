@@ -739,3 +739,15 @@ button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
 .attachment-add { flex: none; padding: 6px 10px; gap: 6px; font-size: 12px; }
 .attachments-muted { color: #7c8790; font-size: 11px; }
 .attachments-error { margin: 0; color: #c42b3f; font-size: 12px; }
+
+/* The footer's Contact us link and form. */
+.portal-footer-link { padding: 0; border: 0; background: none; color: inherit; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
+.feedback-form { width: min(520px, 100%); }
+.feedback-kinds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.feedback-kinds button { height: 32px; padding: 0 12px; border: 1px solid #cfd5db; border-radius: 999px; background: white; color: #33404c; font-size: 12px; font-weight: 600; cursor: pointer; }
+.feedback-kinds button.on { border-color: #2bb7d5; background: #e6f4f8; color: #176b83; }
+.feedback-message { width: 100%; padding: 10px 12px; border: 1px solid #cfd5db; border-radius: 6px; font: inherit; font-size: 14px; resize: vertical; }
+.feedback-message:focus { border-color: #2bb7d5; outline: 0; box-shadow: 0 0 0 2px rgba(43, 183, 213, .15); }
+.feedback-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.feedback-note { margin: 10px 0 0; color: #626b77; font-size: 12px; }
+.feedback-error { margin: 8px 0 0; color: #c42b3f; font-size: 12px; }

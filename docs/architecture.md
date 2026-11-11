@@ -55,6 +55,7 @@ The database enforces all of this. The UI only hides what a role can't use.
 | Change board settings and flags | `boards` update policy: platform admin only |
 | Public share page | `public_board(token)` and `public_board_tickets(token)`: `security definer` functions that return only the allowed columns. `anon` has no access to any table. Tickets of a type marked `hidden_from_public` in `boards.ticket_types` (Board Administration) are left out, and so is the type. |
 | Replace a share link | `rotate_share_token(b)`: checks `can_edit_board(b)` |
+| Send feedback | `feedback` insert policy: a signed-in user, as themselves, for a board they belong to. Only platform admins read or delete. A copy also goes to Netlify Forms, which emails the team. |
 | List a board's staff | `board_staff(b)` and `board_staff_named(b)` (adds the name): list a board's staff and emails to that board's staff and platform admins. Not used by the app since the Owner column was removed. |
 
 ## Data model
