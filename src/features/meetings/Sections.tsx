@@ -1,5 +1,5 @@
 // The Meetings tab's three sections side by side. Open sections share the width equally; the rest are slim
-// vertical rails. At least one stays open. Rails and headers drag to reorder. The order is remembered; the open sections are not, so each meeting opens with only the transcript.
+// vertical rails. At least one stays open. Rails and headers drag to reorder. The order is remembered; the open sections are not: a meeting opens with the transcript and whatever is already generated, so a generated meeting shows all three.
 import { useEffect, useState, type DragEvent, type ReactNode } from "react";
 import { ChevronsRight } from "lucide-react";
 
@@ -10,13 +10,14 @@ type Layout = { order: SectionKey[]; open: SectionKey[] };
 const STORAGE_KEY = "loopback.meetingSections";
 const fallback: Layout = { order: ["transcript", "tickets", "minutes"], open: ["transcript"] };
 
-/** The remembered order, with only the transcript open: every meeting starts with Tickets and Minutes collapsed. */
-function loadLayout(): Layout {
+/** The remembered order. Open to start: the transcript plus every section that is already generated (not locked). */
+function loadLayout(unlocked: SectionKey[]): Layout {
+  const open = fallback.order.filter((key) => key === "transcript" || unlocked.includes(key));
   try {
     const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "null") as Layout | null;
-    if (stored && Array.isArray(stored.order) && stored.order.length === 3 && stored.order.every((key) => fallback.order.includes(key))) return { order: stored.order, open: fallback.open };
+    if (stored && Array.isArray(stored.order) && stored.order.length === 3 && stored.order.every((key) => fallback.order.includes(key))) return { order: stored.order, open };
   } catch { /* fall back */ }
-  return fallback;
+  return { ...fallback, open };
 }
 
 export default function Sections({ sections, request }: {
@@ -24,7 +25,7 @@ export default function Sections({ sections, request }: {
   /** Open sections from outside (a highlight click, a finished Generate). A new n repeats the request. */
   request: { keys: SectionKey[]; n: number } | null;
 }) {
-  const [layout, setLayout] = useState(loadLayout);
+  const [layout, setLayout] = useState(() => loadLayout(sections.filter((section) => !section.locked).map((section) => section.key)));
   const [dragging, setDragging] = useState<SectionKey | null>(null);
   useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify({ order: layout.order })); }, [layout]);
   // Sections a request has just opened grow in rather than appearing (see .opening in index.css).
