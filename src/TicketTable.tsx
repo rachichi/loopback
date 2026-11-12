@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDown, ArrowUp, ArrowUpDown, Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Trash2, Type, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
 import type { Sort, SortKey } from "./columnSort";
 import LocationCell from "./LocationCell";
 import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
@@ -9,7 +9,7 @@ import { useDismiss } from "./lib/useDismiss";
 import type { ReviewField, ReviewRow } from "./features/transcript/review";
 
 // The ticket number is assigned by the database and fixed.
-export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "deadline" | "status";
+export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail" | "deadline" | "status";
 
 /** The icon for each field, shared by the table header and the ticket form so they agree. */
 export const fieldIcons: Record<EditableField, LucideIcon> = {
@@ -20,6 +20,10 @@ export const fieldIcons: Record<EditableField, LucideIcon> = {
   deadline: Calendar,
   location: MapPin,
   summary: Type,
+  actionsTaken: Type,
+  contactName: User,
+  contactPhone: Phone,
+  contactEmail: Mail,
 };
 
 // Resizable columns (after the fixed row number column), in pixels. The icon shows the field type, Airtable-style.
@@ -33,7 +37,11 @@ const columns: readonly { key: EditableField | "transcript"; label: string; widt
   { key: "urgent", label: "Urgent", width: 70, fieldType: "Checkbox" },
   { key: "deadline", label: "Deadline", width: 110, fieldType: "Date" },
   { key: "location", label: "Map", width: 160, fieldType: "Map locations" },
-  { key: "summary", label: "Summary", width: 320, fieldType: "Text" },
+  { key: "summary", label: "Ticket details", width: 320, fieldType: "Text" },
+  { key: "actionsTaken", label: "Actions taken", width: 280, fieldType: "Text" },
+  { key: "contactName", label: "Name", width: 150, fieldType: "Text" },
+  { key: "contactPhone", label: "Phone", width: 130, fieldType: "Phone number" },
+  { key: "contactEmail", label: "Email", width: 200, fieldType: "Email" },
   // Only with transcript_matching.
   { key: "transcript", label: "Transcript", width: 180, fieldType: "Meetings where it was discussed; click one to open its transcript" },
 ] as const;
@@ -118,8 +126,8 @@ function RowMenu({ x, y, targets, onDelete, onClose }: { x: number; y: number; t
   );
 }
 
-/** A summary cell: one clipped line in the table. Clicking it opens the full text in an editor mid-screen. */
-function SummaryCell({ ticket, onChange }: { ticket: Ticket; onChange: (summary: string) => void }) {
+/** A long-text cell (Ticket details, Actions taken): one clipped line in the table. Clicking it opens the full text in an editor mid-screen. */
+function SummaryCell({ ticket, field, label: fieldLabel, onChange }: { ticket: Ticket; field: "summary" | "actionsTaken"; label: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
   const close = useCallback(() => setOpen(false), []);
@@ -128,16 +136,16 @@ function SummaryCell({ ticket, onChange }: { ticket: Ticket; onChange: (summary:
   return (
     <div className="summary-cell">
       <div className="summary-text" tabIndex={0} title="Click to read and edit" onClick={() => setOpen(true)} onKeyDown={(event) => { if (event.key === "Enter") setOpen(true); }}>
-        {ticket.summary}
+        {ticket[field]}
       </div>
       {open && createPortal(
         <div className="cell-backdrop" onClick={(event) => event.stopPropagation()}>
-          <div className="cell-dialog" role="dialog" aria-label={`Summary for ${label}`} ref={dialogRef}>
+          <div className="cell-dialog" role="dialog" aria-label={`${fieldLabel} for ${label}`} ref={dialogRef}>
             <div className="cell-dialog-head">
-              <span>Summary</span>
+              <span>{fieldLabel}</span>
               <button type="button" aria-label="Close" onClick={close}><X size={14} /></button>
             </div>
-            <textarea autoFocus className="cell-dialog-input" value={ticket.summary} onChange={(event) => onChange(event.target.value)} />
+            <textarea autoFocus className="cell-dialog-input" value={ticket[field]} onChange={(event) => onChange(event.target.value)} />
           </div>
         </div>,
         document.body,
@@ -252,7 +260,7 @@ export default function TicketTable({
     "--row-height": `${rowHeights.find((item) => item.key === rowHeight)?.px ?? 32}px`,
   } as CSSProperties;
 
-  const text = (ticket: Ticket, field: "title", label: string) => (
+  const text = (ticket: Ticket, field: "title" | "contactName" | "contactPhone" | "contactEmail", label: string) => (
     <textarea
       className="cell-input"
       rows={1}
@@ -312,6 +320,10 @@ export default function TicketTable({
         <div className="dim read-only">{mark("deadline", ticket.deadline)}</div>
         <div className="dim read-only">{mark("location", ticket.location.text)}</div>
         <div className="dim read-only review-summary">{mark("summary", ticket.summary)}</div>
+        <div className="dim read-only" />
+        <div className="dim read-only" />
+        <div className="dim read-only" />
+        <div className="dim read-only" />
         {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript, info.suggestion.meetingId)}</div>}
       </div>
     );
@@ -423,7 +435,11 @@ export default function TicketTable({
           {onShowOnMap
             ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>
             : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>}
-          <div><SummaryCell ticket={ticket} onChange={(summary) => onChange(ticket.id, { summary })} /></div>
+          <div><SummaryCell ticket={ticket} field="summary" label="Ticket details" onChange={(summary) => onChange(ticket.id, { summary })} /></div>
+          <div><SummaryCell ticket={ticket} field="actionsTaken" label="Actions taken" onChange={(actionsTaken) => onChange(ticket.id, { actionsTaken })} /></div>
+          <div>{text(ticket, "contactName", "Name")}</div>
+          <div>{text(ticket, "contactPhone", "Phone")}</div>
+          <div>{text(ticket, "contactEmail", "Email")}</div>
           {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}

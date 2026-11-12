@@ -12,6 +12,7 @@ import Logo from "./Logo";
 import SubmitFlow from "./SubmitFlow";
 import type { Session } from "@supabase/supabase-js";
 import { db } from "./db";
+import { addAttachment } from "./features/tickets/attachments";
 import { deleteTickets, insertTicket, loadTickets, updateTickets } from "./features/tickets/api";
 import { BoardProvider, takeBoardLanding, useBoard, useBoardSwitcher, useFeature } from "./lib/board";
 import SignIn from "./SignIn";
@@ -270,6 +271,8 @@ function Portal({ account }: { account: Account }) {
   // When the intake form opened, and when each new ticket was submitted, for the ticket_created timings.
   const intakeOpenedAt = useRef(0);
   const submittedAt = useRef(new Map<string, { at: number; formMs: number }>());
+  // PDFs picked on the intake form, by ticket id. They are uploaded once the ticket exists in the database.
+  const pendingFiles = useRef(new Map<string, File[]>());
   useEffect(() => {
     loadTickets(board.id)
       .then((loaded) => {
@@ -295,6 +298,13 @@ function Portal({ account }: { account: Account }) {
             persisted.current.set(saved.id, saved);
             const timing = submittedAt.current.get(sent.id);
             submittedAt.current.delete(sent.id);
+            const queued = pendingFiles.current.get(saved.id);
+            pendingFiles.current.delete(saved.id);
+            for (const file of queued ?? []) {
+              addAttachment(board.id, saved.id, file)
+                .then(() => trackEvent("attachment_added", { board_id: board.id }))
+                .catch((error) => console.error("Couldn't attach a file to the new ticket", error));
+            }
             trackEvent("ticket_created", {
               board_id: board.id,
               source: saved.source,
@@ -374,7 +384,7 @@ function Portal({ account }: { account: Account }) {
     const matchesStatus = status === "All" || ticket.status === status;
     const matchesType = typeFilter === "All" || ticket.type === typeFilter;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary} ${ticket.actionsTaken} ${ticket.contactName} ${ticket.contactPhone} ${ticket.contactEmail}`.toLowerCase().includes(search);
     return matchesStatus && matchesType && matchesQuery;
   }), [withReview, query, status, typeFilter]);
   const rows = useMemo(() => sortTickets(filtered.filter((ticket) => inTab(ticket, urgency, inReview)), sort), [filtered, urgency, inReview, sort]);
@@ -384,12 +394,13 @@ function Portal({ account }: { account: Account }) {
   }, []);
 
   // New intake tickets go to the top, and the filters reset so the new row is in view.
-  const addTicket = (fields: IntakeFields) => {
+  const addTicket = (fields: IntakeFields, files: File[] = []) => {
     // The database assigns the number when the ticket is inserted; until then it shows blank. It also sets
     // submitted_by to the signed-in user's email. Requester is no longer collected.
     // Every board shares one table, so ids must be unique across boards, not just within this one.
     const ticket: Ticket = { ...fields, requester: "", submittedBy: "", submittedAt: today(), id: crypto.randomUUID(), number: "", meetingIds: [], spans: [], evidence: {}, ownerId: null, source: "manual", closedAt: null, createdBy: null };
     const now = Date.now();
+    if (files.length) pendingFiles.current.set(ticket.id, files);
     submittedAt.current.set(ticket.id, { at: now, formMs: intakeOpenedAt.current ? now - intakeOpenedAt.current : 0 });
     setTickets((current) => [ticket, ...current]);
     setSelectedId(ticket.id);

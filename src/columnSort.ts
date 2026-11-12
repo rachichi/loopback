@@ -2,7 +2,7 @@
 // time returns to the table's own order. Blank cells (no deadline, no summary, no location) always come last.
 import { statuses, type Ticket } from "./features/tickets/types";
 
-export type SortKey = "title" | "type" | "status" | "urgent" | "deadline" | "location" | "summary";
+export type SortKey = "title" | "type" | "status" | "urgent" | "deadline" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail";
 export type Sort = { key: SortKey; dir: "asc" | "desc" } | null;
 
 export const nextSort = (current: Sort, key: SortKey): Sort =>
@@ -21,6 +21,10 @@ function valueOf(ticket: Ticket, key: SortKey): string | number {
     case "deadline": return ticket.deadline;
     case "location": return (ticket.location.places[0]?.name ?? (ticket.location.crossStreets ? `${ticket.location.crossStreets.a} & ${ticket.location.crossStreets.b}` : ticket.location.text)).trim().toLowerCase();
     case "summary": return ticket.summary.trim().toLowerCase();
+    case "actionsTaken": return ticket.actionsTaken.trim().toLowerCase();
+    case "contactName": return ticket.contactName.trim().toLowerCase();
+    case "contactPhone": return ticket.contactPhone.trim();
+    case "contactEmail": return ticket.contactEmail.trim().toLowerCase();
   }
 }
 
