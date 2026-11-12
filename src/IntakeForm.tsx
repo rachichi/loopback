@@ -6,6 +6,7 @@ import { fieldIcons, type EditableField } from "./TicketTable";
 import TicketAttachments from "./features/tickets/TicketAttachments";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard } from "./lib/board";
+import { attachmentProblem, MAX_ATTACHMENT_BYTES } from "./features/tickets/attachments";
 
 /** The fields a person fills in. The parent sets the id and submission date; the database assigns the
  *  number and sets submitted_by to the signed-in user. */
@@ -41,8 +42,8 @@ export default function IntakeForm({
   onClose,
 }: {
   ticket?: Ticket;
-  /** New ticket only. */
-  onSubmit?: (fields: IntakeFields) => void;
+  /** New ticket only. The files are PDFs to attach once the ticket has saved. */
+  onSubmit?: (fields: IntakeFields, files: File[]) => void;
   /** Expanded ticket only. */
   onChange?: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
   /** Expanded ticket only: move to the previous or next row, or undefined at either end. */
@@ -53,7 +54,17 @@ export default function IntakeForm({
   banner?: ReactNode;
   onClose: () => void;
 }) {
-  const { ticketTypes } = useBoard();
+  const { ticketTypes, role } = useBoard();
+  // PDFs picked on a new ticket wait here; the portal uploads them once the ticket has saved.
+  const [files, setFiles] = useState<File[]>([]);
+  const [fileError, setFileError] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const pickFiles = (list: FileList | null) => {
+    const picked = Array.from(list ?? []);
+    const problem = picked.map(attachmentProblem).find(Boolean) ?? null;
+    setFileError(problem);
+    if (!problem) setFiles((current) => [...current, ...picked]);
+  };
   const [draft, setDraft] = useState<IntakeFields>(blank);
   const values: IntakeFields = ticket ?? draft;
   const set = (patch: Partial<IntakeFields>) => {
@@ -84,7 +95,7 @@ export default function IntakeForm({
       contactName: draft.contactName.trim(),
       contactPhone: draft.contactPhone.trim(),
       contactEmail: draft.contactEmail.trim(),
-    });
+    }, files);
   };
 
   return (
@@ -166,7 +177,7 @@ export default function IntakeForm({
             </Field>
             <Field field="summary" label="Ticket details">
               <div className="dictate-field">
-                <textarea rows={5} value={values.summary} onChange={(event) => set({ summary: event.target.value })} placeholder={canDictate ? "Type, or click the mic and describe the issue" : undefined} />
+                <textarea rows={3} value={values.summary} onChange={(event) => set({ summary: event.target.value })} placeholder={canDictate ? "Type, or click the mic and describe the issue" : undefined} />
                 <DictateButton label="Ticket details" onText={(text) => set({ summary: append(values.summary, text) })} />
               </div>
             </Field>
@@ -176,6 +187,27 @@ export default function IntakeForm({
                 <DictateButton label="Actions taken" onText={(text) => set({ actionsTaken: append(values.actionsTaken, text) })} />
               </div>
             </Field>
+            {!ticket && role !== null && (
+              <div className="form-field">
+                <span className="form-field-name"><Paperclip size={14} aria-hidden="true" /> Attachments</span>
+                <div className="form-field-value">
+                  <div className="attachments">
+                    {files.map((file, index) => (
+                      <div className="attachment" key={`${file.name}-${index}`}>
+                        <span className="attachment-open"><span className="attachment-name">{file.name}</span></span>
+                        <button type="button" className="attachment-remove" aria-label={`Remove ${file.name}`} onClick={() => setFiles((current) => current.filter((_, at) => at !== index))}><X size={12} /></button>
+                      </div>
+                    ))}
+                    <button type="button" className="place-add attachment-add" onClick={() => fileRef.current?.click()}>
+                      <Paperclip size={11} aria-hidden="true" /> Attach a PDF
+                    </button>
+                    <input ref={fileRef} type="file" accept="application/pdf,.pdf" multiple hidden onChange={(event) => { pickFiles(event.target.files); event.target.value = ""; }} />
+                    <span className="attachments-muted">PDF only, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB each. Only staff of this board can see attachments.</span>
+                    {fileError && <p className="attachments-error" role="alert">{fileError}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
             {ticket && (
               <div className="form-field">
                 <span className="form-field-name"><Paperclip size={14} aria-hidden="true" /> Attachments</span>

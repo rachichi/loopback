@@ -11,7 +11,7 @@ function BoardMark() {
 /** The intake form on its own full screen: fill it in, submit, then a thank-you screen with a button for the
  *  next ticket. Used on phones and for the ?submit link (a walk-in desk or a shared link). */
 export default function SubmitFlow({ onSubmit, onExit, onStart }: {
-  onSubmit: (fields: IntakeFields) => void;
+  onSubmit: (fields: IntakeFields, files: File[]) => void;
   /** Leaves the flow (Home). */
   onExit: () => void;
   /** A blank form appeared, for the form timing. */
@@ -34,5 +34,5 @@ export default function SubmitFlow({ onSubmit, onExit, onStart }: {
       </main>
     );
   }
-  return <IntakeForm key={round} page banner={<BoardMark />} onSubmit={(fields) => { onSubmit(fields); setDone(true); }} onClose={onExit} />;
+  return <IntakeForm key={round} page banner={<BoardMark />} onSubmit={(fields, files) => { onSubmit(fields, files); setDone(true); }} onClose={onExit} />;
 }
