@@ -40,6 +40,12 @@ export type Ticket = {
   location: TicketLocation;
   requester: string;
   summary: string;
+  /** Requester contact details from the intake form; each may be empty. */
+  contactName: string;
+  contactPhone: string;
+  contactEmail: string;
+  /** What has been done about the ticket so far. */
+  actionsTaken: string;
   urgent: boolean;
   /** Due date as YYYY-MM-DD, or "" for none. */
   deadline: string;

@@ -96,6 +96,7 @@ const meetingTickets = goldSets.flatMap(({ meetingId, rows, places, annotators }
       type: r.type,
       status: r.status as Status,
       location: { text: r.location_raw, places: places[r.gold_id] ?? [] },
+      contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", 
       requester: r.requester || (source?.requester ?? ""),
       summary: r.summary || (source?.summary ?? ""),
       urgent: false,

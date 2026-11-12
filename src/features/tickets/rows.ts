@@ -18,6 +18,11 @@ export type TicketRow = {
   cross_streets?: Ticket["location"]["crossStreets"] | null;
   requester: string;
   summary: string;
+  /** Absent before the ticket_contact_and_actions migration. */
+  contact_name?: string;
+  contact_phone?: string;
+  contact_email?: string;
+  actions_taken?: string;
   submitted_by: string;
   submitted_at: string;
   meeting_ids: string[];
@@ -47,6 +52,10 @@ export function toRow(ticket: Ticket, board: string): TicketRow {
     cross_streets: ticket.location.crossStreets ?? null,
     requester: ticket.requester,
     summary: ticket.summary,
+    contact_name: ticket.contactName,
+    contact_phone: ticket.contactPhone,
+    contact_email: ticket.contactEmail,
+    actions_taken: ticket.actionsTaken,
     submitted_by: ticket.submittedBy,
     submitted_at: ticket.submittedAt,
     meeting_ids: ticket.meetingIds,
@@ -66,6 +75,10 @@ export function fromRow(row: TicketRow & Partial<TicketRowExtra>): Ticket {
     location: { text: row.location_text, places: row.places, ...(row.cross_streets ? { crossStreets: row.cross_streets } : {}) },
     requester: row.requester,
     summary: row.summary,
+    contactName: row.contact_name ?? "",
+    contactPhone: row.contact_phone ?? "",
+    contactEmail: row.contact_email ?? "",
+    actionsTaken: row.actions_taken ?? "",
     submittedBy: row.submitted_by,
     submittedAt: row.submitted_at,
     meetingIds: row.meeting_ids,

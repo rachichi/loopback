@@ -775,3 +775,9 @@ button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
 .feedback-hp { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; }
 .feedback-note { margin: 10px 0 0; color: #626b77; font-size: 12px; }
 .feedback-error { margin: 8px 0 0; color: #c42b3f; font-size: 12px; }
+
+/* Contact row on the ticket form: Name, Phone and Email side by side. */
+.intake-contact { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 640px) { .intake-contact { grid-template-columns: minmax(0, 1fr); } }
+.intake-contact input { width: 100%; min-height: 36px; padding: 7px 10px; border: 1px solid #cfd5db; border-radius: 6px; background: white; color: #11182c; font: inherit; font-size: 13px; }
+.intake-contact input::placeholder { color: #7b8490; }

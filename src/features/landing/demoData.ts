@@ -59,7 +59,7 @@ export const demoTickets: Ticket[] = seeds.map((seed, index) => ({
   type: seed.type,
   status: seed.status,
   location: { text: seed.place.name, places: [seed.place] },
-  requester: "Resident",
+  requester: "Resident", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "",
   summary: seed.summary,
   urgent: seed.urgent,
   deadline: seed.deadline ?? "",

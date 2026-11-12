@@ -374,7 +374,7 @@ function Portal({ account }: { account: Account }) {
     const matchesStatus = status === "All" || ticket.status === status;
     const matchesType = typeFilter === "All" || ticket.type === typeFilter;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary} ${ticket.actionsTaken} ${ticket.contactName} ${ticket.contactPhone} ${ticket.contactEmail}`.toLowerCase().includes(search);
     return matchesStatus && matchesType && matchesQuery;
   }), [withReview, query, status, typeFilter]);
   const rows = useMemo(() => sortTickets(filtered.filter((ticket) => inTab(ticket, urgency, inReview)), sort), [filtered, urgency, inReview, sort]);

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ChevronDown, ChevronUp, Paperclip, X } from "lucide-react";
+import { ChevronDown, ChevronUp, Paperclip, User, X } from "lucide-react";
 import LocationCell from "./LocationCell";
 import DictateButton, { canDictate } from "./DictateButton";
 import { fieldIcons, type EditableField } from "./TicketTable";
@@ -14,7 +14,7 @@ export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans"
 /** Dictated text is appended, so people can speak a field in several goes or fix a typed start. */
 const append = (current: string, text: string) => (current.trim() ? `${current.trimEnd()} ${text}` : text);
 
-const blank: IntakeFields = { title: "", type: "", urgent: false, deadline: "", location: { text: "", places: [] }, summary: "", status: "Open" };
+const blank: IntakeFields = { title: "", type: "", urgent: false, deadline: "", location: { text: "", places: [] }, summary: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", status: "Open" };
 
 /** One field: its icon and name on the left, the input on the right, as in an Airtable record. */
 function Field({ field, label, children, asLabel = true }: { field: EditableField; label: string; children: ReactNode; asLabel?: boolean }) {
@@ -80,6 +80,10 @@ export default function IntakeForm({
       type: draft.type || "Other",
       location: { ...draft.location, text: draft.location.places.map((place) => place.name).join("; ") },
       summary: draft.summary.trim(),
+      actionsTaken: draft.actionsTaken.trim(),
+      contactName: draft.contactName.trim(),
+      contactPhone: draft.contactPhone.trim(),
+      contactEmail: draft.contactEmail.trim(),
     });
   };
 
@@ -127,6 +131,14 @@ export default function IntakeForm({
             </div>
           </label>
           <div className="intake-fields">
+            <div className="form-field" role="group" aria-label="Contact">
+              <span className="form-field-name"><User size={14} aria-hidden="true" /> Contact</span>
+              <div className="form-field-value intake-contact">
+                <input type="text" aria-label="Name" placeholder="Name" autoComplete="name" value={values.contactName} onChange={(event) => set({ contactName: event.target.value })} />
+                <input type="tel" aria-label="Phone" placeholder="Phone" autoComplete="tel" value={values.contactPhone} onChange={(event) => set({ contactPhone: event.target.value })} />
+                <input type="email" aria-label="Email" placeholder="Email" autoComplete="email" value={values.contactEmail} onChange={(event) => set({ contactEmail: event.target.value })} />
+              </div>
+            </div>
             <Field field="type" label="Type">
               <select value={values.type} onChange={(event) => set({ type: event.target.value })}>
                 {!ticket && <option value="">Not sure yet</option>}
@@ -152,10 +164,16 @@ export default function IntakeForm({
                 {!values.location.text.trim() && !values.location.crossStreets && !values.location.places.length && <p className="intake-map-hint">Add an address or cross streets so this ticket shows on the map.</p>}
               </div>
             </Field>
-            <Field field="summary" label="Summary">
+            <Field field="summary" label="Ticket details">
               <div className="dictate-field">
                 <textarea rows={5} value={values.summary} onChange={(event) => set({ summary: event.target.value })} placeholder={canDictate ? "Type, or click the mic and describe the issue" : undefined} />
-                <DictateButton label="Summary" onText={(text) => set({ summary: append(values.summary, text) })} />
+                <DictateButton label="Ticket details" onText={(text) => set({ summary: append(values.summary, text) })} />
+              </div>
+            </Field>
+            <Field field="actionsTaken" label="Actions taken">
+              <div className="dictate-field">
+                <textarea rows={3} value={values.actionsTaken} onChange={(event) => set({ actionsTaken: event.target.value })} placeholder={canDictate ? "Type, or click the mic and describe what has been done" : undefined} />
+                <DictateButton label="Actions taken" onText={(text) => set({ actionsTaken: append(values.actionsTaken, text) })} />
               </div>
             </Field>
             {ticket && (
