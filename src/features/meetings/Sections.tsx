@@ -1,10 +1,10 @@
 // The Meetings tab's three sections side by side. Open sections share the width equally; the rest are slim
 // vertical rails. At least one stays open. Rails and headers drag to reorder. The order is remembered; the open sections are not: a meeting opens with the transcript and whatever is already generated, so a generated meeting shows all three.
 import { useEffect, useState, type DragEvent, type ReactNode } from "react";
-import { ChevronsRight } from "lucide-react";
+import { ChevronsRight, Info } from "lucide-react";
 
 export type SectionKey = "transcript" | "tickets" | "minutes";
-export type SectionDef = { key: SectionKey; label: string; icon: ReactNode; content: ReactNode; locked: boolean; badge?: number };
+export type SectionDef = { key: SectionKey; label: string; icon: ReactNode; content: ReactNode; locked: boolean; badge?: number; info?: { text: string; href: string } };
 
 type Layout = { order: SectionKey[]; open: SectionKey[] };
 const STORAGE_KEY = "loopback.meetingSections";
@@ -83,7 +83,7 @@ export default function Sections({ sections, request }: {
         return (
           <section key={key} className={`meeting-section ${state}`} aria-label={section.label} {...target}>
             <header className="section-head" {...dragProps(key)} title="Drag to reorder">
-              <span>{section.icon} {section.label}{section.badge ? <span className="tab-count">{section.badge}</span> : null}</span>
+              <span>{section.icon} {section.label}{section.badge ? <span className="tab-count">{section.badge}</span> : null}{section.info && <a className="section-info" href={section.info.href} target="_blank" rel="noopener noreferrer" aria-label={section.info.text} title={section.info.text} onClick={(event) => event.stopPropagation()}><Info size={14} /></a>}</span>
               <button type="button" aria-label={`Collapse ${section.label}`} title={only ? "At least one section stays open" : `Collapse ${section.label}`} disabled={only} onClick={() => toggle(key)}><ChevronsRight size={15} /></button>
             </header>
             <div className="section-body">

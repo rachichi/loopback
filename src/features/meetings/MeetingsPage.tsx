@@ -265,7 +265,7 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
     : <div className="transcript-empty">{loadError ?? "Loading transcript…"}</div>;
 
   const sections = [
-    { key: "transcript" as const, label: "Transcript", icon: <FileText size={15} />, content: transcript, locked: false },
+    { key: "transcript" as const, label: "Transcript", icon: <FileText size={15} />, content: transcript, locked: false, info: { text: "See Block Party for all public community board meeting transcripts", href: "https://www.blockparty.studio/meetings" } },
     {
       key: "tickets" as const, label: "Tickets", icon: <ListChecks size={15} />, locked: !ticketsReady, badge: inMeeting.length,
       content: (
