@@ -271,7 +271,7 @@ function Portal({ account }: { account: Account }) {
   // When the intake form opened, and when each new ticket was submitted, for the ticket_created timings.
   const intakeOpenedAt = useRef(0);
   const submittedAt = useRef(new Map<string, { at: number; formMs: number }>());
-  // PDFs picked on the intake form, by ticket id. They are uploaded once the ticket exists in the database.
+  // Files picked on the intake form, by ticket id. They are uploaded once the ticket exists in the database.
   const pendingFiles = useRef(new Map<string, File[]>());
   useEffect(() => {
     loadTickets(board.id)
@@ -384,7 +384,7 @@ function Portal({ account }: { account: Account }) {
     const matchesStatus = status === "All" || ticket.status === status;
     const matchesType = typeFilter === "All" || ticket.type === typeFilter;
     const search = query.toLowerCase();
-    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary} ${ticket.actionsTaken} ${ticket.contactName} ${ticket.contactPhone} ${ticket.contactEmail}`.toLowerCase().includes(search);
+    const matchesQuery = !search || `${ticket.number} ${ticket.title} ${ticket.type} ${ticket.location.text} ${ticket.location.places.map((place) => place.name).join(" ")} ${ticket.location.crossStreets ? `${ticket.location.crossStreets.a} ${ticket.location.crossStreets.b}` : ""} ${ticket.summary} ${ticket.actionsTaken} ${ticket.contactName} ${ticket.contactPhone} ${ticket.contactEmail} ${ticket.agency} ${ticket.serviceRequestNumber}`.toLowerCase().includes(search);
     return matchesStatus && matchesType && matchesQuery;
   }), [withReview, query, status, typeFilter]);
   const rows = useMemo(() => sortTickets(filtered.filter((ticket) => inTab(ticket, urgency, inReview)), sort), [filtered, urgency, inReview, sort]);

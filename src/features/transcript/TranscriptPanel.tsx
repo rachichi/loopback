@@ -22,7 +22,7 @@ function standIn(suggestion: Suggestion, ticket: Ticket | undefined): Ticket {
     number: ticket?.number ?? "New",
     title: `Suggested: ${suggestion.changes.title ?? ticket?.title ?? ""}`,
     type: suggestion.changes.type ?? ticket?.type ?? "Other",
-    status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", summary: "", urgent: false, deadline: "",
+    status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", agency: "", serviceRequestNumber: "", dateOpened: "", summary: "", urgent: false, deadline: "",
     submittedBy: "", submittedAt: "", ownerId: null, source: "transcript", closedAt: null, createdBy: null, evidence: {},
     meetingIds: [suggestion.meetingId],
     spans: suggestion.spans,

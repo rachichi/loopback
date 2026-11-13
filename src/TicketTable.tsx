@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDown, ArrowUp, ArrowUpDown, Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Building2, Calendar, CalendarDays, Check, CircleChevronDown, FileText, Hash, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
 import type { Sort, SortKey } from "./columnSort";
 import LocationCell from "./LocationCell";
+import { agencies, agencyLabel } from "./features/tickets/agencies";
 import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
 import { useBoard, useTypeClass } from "./lib/board";
 import { useDismiss } from "./lib/useDismiss";
 import type { ReviewField, ReviewRow } from "./features/transcript/review";
 
 // The ticket number is assigned by the database and fixed.
-export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail" | "deadline" | "status";
+export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail" | "agency" | "serviceRequestNumber" | "dateOpened" | "deadline" | "status";
 
 /** The icon for each field, shared by the table header and the ticket form so they agree. */
 export const fieldIcons: Record<EditableField, LucideIcon> = {
@@ -24,6 +25,9 @@ export const fieldIcons: Record<EditableField, LucideIcon> = {
   contactName: User,
   contactPhone: Phone,
   contactEmail: Mail,
+  agency: Building2,
+  serviceRequestNumber: Hash,
+  dateOpened: CalendarDays,
 };
 
 // Resizable columns (after the fixed row number column), in pixels. The icon shows the field type, Airtable-style.
@@ -39,6 +43,9 @@ const columns: readonly { key: EditableField | "transcript"; label: string; widt
   { key: "location", label: "Map", width: 160, fieldType: "Map locations" },
   { key: "summary", label: "Ticket details", width: 320, fieldType: "Text" },
   { key: "actionsTaken", label: "Actions taken", width: 280, fieldType: "Text" },
+  { key: "agency", label: "Agency", width: 200, fieldType: "Single select" },
+  { key: "serviceRequestNumber", label: "Service Request or Work Order #", width: 190, fieldType: "Text" },
+  { key: "dateOpened", label: "Date Opened", width: 110, fieldType: "Date" },
   { key: "contactName", label: "Name", width: 150, fieldType: "Text" },
   { key: "contactPhone", label: "Phone", width: 130, fieldType: "Phone number" },
   { key: "contactEmail", label: "Email", width: 200, fieldType: "Email" },
@@ -260,7 +267,7 @@ export default function TicketTable({
     "--row-height": `${rowHeights.find((item) => item.key === rowHeight)?.px ?? 32}px`,
   } as CSSProperties;
 
-  const text = (ticket: Ticket, field: "title" | "contactName" | "contactPhone" | "contactEmail", label: string) => (
+  const text = (ticket: Ticket, field: "title" | "serviceRequestNumber" | "contactName" | "contactPhone" | "contactEmail", label: string) => (
     <textarea
       className="cell-input"
       rows={1}
@@ -277,6 +284,16 @@ export default function TicketTable({
       aria-label={`Deadline for ${ticket.number}`}
       value={ticket.deadline}
       onChange={(event) => onChange(ticket.id, { deadline: event.target.value })}
+    />
+  );
+
+  const dateOpened = (ticket: Ticket) => (
+    <input
+      type="date"
+      className="cell-input cell-date"
+      aria-label={`Date opened for ${ticket.number}`}
+      value={ticket.dateOpened}
+      onChange={(event) => onChange(ticket.id, { dateOpened: event.target.value })}
     />
   );
 
@@ -320,6 +337,9 @@ export default function TicketTable({
         <div className="dim read-only">{mark("deadline", ticket.deadline)}</div>
         <div className="dim read-only">{mark("location", ticket.location.text)}</div>
         <div className="dim read-only review-summary">{mark("summary", ticket.summary)}</div>
+        <div className="dim read-only" />
+        <div className="dim read-only" />
+        <div className="dim read-only" />
         <div className="dim read-only" />
         <div className="dim read-only" />
         <div className="dim read-only" />
@@ -437,6 +457,21 @@ export default function TicketTable({
             : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>}
           <div><SummaryCell ticket={ticket} field="summary" label="Ticket details" onChange={(summary) => onChange(ticket.id, { summary })} /></div>
           <div><SummaryCell ticket={ticket} field="actionsTaken" label="Actions taken" onChange={(actionsTaken) => onChange(ticket.id, { actionsTaken })} /></div>
+          <div>
+            <select
+              className="cell-select"
+              aria-label={`Agency for ${ticket.number}`}
+              value={ticket.agency}
+              onChange={(event) => onChange(ticket.id, { agency: event.target.value })}
+            >
+              <option value="" />
+              {agencies.map((agency) => <option key={agency.name} value={agency.name}>{agencyLabel(agency)}</option>)}
+              {/* Keep an agency the list doesn't have selectable, so the select doesn't misreport it. */}
+              {ticket.agency && !agencies.some((agency) => agency.name === ticket.agency) && <option>{ticket.agency}</option>}
+            </select>
+          </div>
+          <div>{text(ticket, "serviceRequestNumber", "Service Request or Work Order #")}</div>
+          <div>{dateOpened(ticket)}</div>
           <div>{text(ticket, "contactName", "Name")}</div>
           <div>{text(ticket, "contactPhone", "Phone")}</div>
           <div>{text(ticket, "contactEmail", "Email")}</div>

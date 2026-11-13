@@ -46,6 +46,12 @@ export type Ticket = {
   contactEmail: string;
   /** What has been done about the ticket so far. */
   actionsTaken: string;
+  /** Name of the city agency it was sent to (see agencies.ts), or "". */
+  agency: string;
+  /** 311 Service Request or work order number, typed by staff, or "". */
+  serviceRequestNumber: string;
+  /** When the request was opened with the agency, as YYYY-MM-DD, or "". */
+  dateOpened: string;
   urgent: boolean;
   /** Due date as YYYY-MM-DD, or "" for none. */
   deadline: string;

@@ -23,6 +23,9 @@ export type TicketRow = {
   contact_phone?: string;
   contact_email?: string;
   actions_taken?: string;
+  agency?: string;
+  sr_number?: string;
+  date_opened?: string | null;
   submitted_by: string;
   submitted_at: string;
   meeting_ids: string[];
@@ -56,6 +59,9 @@ export function toRow(ticket: Ticket, board: string): TicketRow {
     contact_phone: ticket.contactPhone,
     contact_email: ticket.contactEmail,
     actions_taken: ticket.actionsTaken,
+    agency: ticket.agency,
+    sr_number: ticket.serviceRequestNumber,
+    date_opened: ticket.dateOpened || null,
     submitted_by: ticket.submittedBy,
     submitted_at: ticket.submittedAt,
     meeting_ids: ticket.meetingIds,
@@ -79,6 +85,9 @@ export function fromRow(row: TicketRow & Partial<TicketRowExtra>): Ticket {
     contactPhone: row.contact_phone ?? "",
     contactEmail: row.contact_email ?? "",
     actionsTaken: row.actions_taken ?? "",
+    agency: row.agency ?? "",
+    serviceRequestNumber: row.sr_number ?? "",
+    dateOpened: row.date_opened ?? "",
     submittedBy: row.submitted_by,
     submittedAt: row.submitted_at,
     meetingIds: row.meeting_ids,

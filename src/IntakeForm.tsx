@@ -5,8 +5,9 @@ import DictateButton, { canDictate } from "./DictateButton";
 import { fieldIcons, type EditableField } from "./TicketTable";
 import TicketAttachments from "./features/tickets/TicketAttachments";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
+import { agencies, agencyLabel } from "./features/tickets/agencies";
 import { useBoard } from "./lib/board";
-import { attachmentProblem, MAX_ATTACHMENT_BYTES } from "./features/tickets/attachments";
+import { ATTACHMENT_ACCEPT, ATTACHMENT_KINDS, attachmentProblem, MAX_ATTACHMENT_BYTES } from "./features/tickets/attachments";
 
 /** The fields a person fills in. The parent sets the id and submission date; the database assigns the
  *  number and sets submitted_by to the signed-in user. */
@@ -15,7 +16,7 @@ export type IntakeFields = Omit<Ticket, "id" | "number" | "meetingIds" | "spans"
 /** Dictated text is appended, so people can speak a field in several goes or fix a typed start. */
 const append = (current: string, text: string) => (current.trim() ? `${current.trimEnd()} ${text}` : text);
 
-const blank: IntakeFields = { title: "", type: "", urgent: false, deadline: "", location: { text: "", places: [] }, summary: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", status: "Open" };
+const blank: IntakeFields = { title: "", type: "", urgent: false, deadline: "", location: { text: "", places: [] }, agency: "", serviceRequestNumber: "", dateOpened: "", summary: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", status: "Open" };
 
 /** One field: its icon and name on the left, the input on the right, as in an Airtable record. */
 function Field({ field, label, children, asLabel = true }: { field: EditableField; label: string; children: ReactNode; asLabel?: boolean }) {
@@ -42,7 +43,7 @@ export default function IntakeForm({
   onClose,
 }: {
   ticket?: Ticket;
-  /** New ticket only. The files are PDFs to attach once the ticket has saved. */
+  /** New ticket only. The files are to attach once the ticket has saved. */
   onSubmit?: (fields: IntakeFields, files: File[]) => void;
   /** Expanded ticket only. */
   onChange?: (id: string, patch: Partial<Pick<Ticket, EditableField>>) => void;
@@ -55,7 +56,7 @@ export default function IntakeForm({
   onClose: () => void;
 }) {
   const { ticketTypes, role } = useBoard();
-  // PDFs picked on a new ticket wait here; the portal uploads them once the ticket has saved.
+  // Files picked on a new ticket wait here; the portal uploads them once the ticket has saved.
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -95,6 +96,7 @@ export default function IntakeForm({
       contactName: draft.contactName.trim(),
       contactPhone: draft.contactPhone.trim(),
       contactEmail: draft.contactEmail.trim(),
+      serviceRequestNumber: draft.serviceRequestNumber.trim(),
     }, files);
   };
 
@@ -169,6 +171,20 @@ export default function IntakeForm({
             <Field field="deadline" label="Deadline">
               <input type="date" className="intake-date" value={values.deadline} onChange={(event) => set({ deadline: event.target.value })} />
             </Field>
+            <Field field="agency" label="Agency">
+              <select value={values.agency} onChange={(event) => set({ agency: event.target.value })}>
+                <option value="">Not sent to an agency</option>
+                {agencies.map((agency) => <option key={agency.name} value={agency.name}>{agencyLabel(agency)}</option>)}
+                {/* Keep an agency the list doesn't have selectable, so the select doesn't misreport it. */}
+                {values.agency && !agencies.some((agency) => agency.name === values.agency) && <option>{values.agency}</option>}
+              </select>
+            </Field>
+            <Field field="serviceRequestNumber" label="Service Request or Work Order #">
+              <input type="text" className="intake-text" value={values.serviceRequestNumber} onChange={(event) => set({ serviceRequestNumber: event.target.value })} placeholder="e.g. 311-12345678" />
+            </Field>
+            <Field field="dateOpened" label="Date Opened">
+              <input type="date" className="intake-date" value={values.dateOpened} onChange={(event) => set({ dateOpened: event.target.value })} />
+            </Field>
             <Field field="location" label="Map" asLabel={false}>
               <div className="intake-map">
                 <LocationCell warningText location={values.location} label={ticket ? ticket.title || "the ticket" : "the new ticket"} onChange={(location) => set({ location })} />
@@ -199,10 +215,10 @@ export default function IntakeForm({
                       </div>
                     ))}
                     <button type="button" className="place-add attachment-add" onClick={() => fileRef.current?.click()}>
-                      <Paperclip size={11} aria-hidden="true" /> Attach a PDF
+                      <Paperclip size={11} aria-hidden="true" /> Attach a file
                     </button>
-                    <input ref={fileRef} type="file" accept="application/pdf,.pdf" multiple hidden onChange={(event) => { pickFiles(event.target.files); event.target.value = ""; }} />
-                    <span className="attachments-muted">PDF only, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB each. Only staff of this board can see attachments.</span>
+                    <input ref={fileRef} type="file" accept={ATTACHMENT_ACCEPT} multiple hidden onChange={(event) => { pickFiles(event.target.files); event.target.value = ""; }} />
+                    <span className="attachments-muted">{ATTACHMENT_KINDS}, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB each. Only staff of this board can see attachments.</span>
                     {fileError && <p className="attachments-error" role="alert">{fileError}</p>}
                   </div>
                 </div>
