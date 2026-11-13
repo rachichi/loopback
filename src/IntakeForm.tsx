@@ -30,6 +30,18 @@ function Field({ field, label, children, asLabel = true }: { field: EditableFiel
   );
 }
 
+/** Read-only details of the chosen agency, from the bundled list: who heads it and where its contact page is. */
+function AgencyInfo({ name }: { name: string }) {
+  const agency = agencies.find((item) => item.name === name);
+  if (!agency || (!agency.head && !agency.contactUrl)) return null;
+  return (
+    <div className="agency-info" aria-label="Agency contact">
+      {agency.head && <span>{agency.head}</span>}
+      {agency.contactUrl && <a href={agency.contactUrl} target="_blank" rel="noopener noreferrer">Contact page</a>}
+    </div>
+  );
+}
+
 /** The ticket form, laid out like an Airtable record. Without a ticket it creates one (a request that arrives
  *  outside a meeting: email, call, walk-in). With a ticket it is the expanded view of that row, and every edit
  *  goes straight to the ticket, which the portal autosaves. */
@@ -178,6 +190,7 @@ export default function IntakeForm({
                 {/* Keep an agency the list doesn't have selectable, so the select doesn't misreport it. */}
                 {values.agency && !agencies.some((agency) => agency.name === values.agency) && <option>{values.agency}</option>}
               </select>
+              <AgencyInfo name={values.agency} />
             </Field>
             <Field field="serviceRequestNumber" label="Service Request or Work Order #">
               <input type="text" className="intake-text" value={values.serviceRequestNumber} onChange={(event) => set({ serviceRequestNumber: event.target.value })} placeholder="e.g. 311-12345678" />
