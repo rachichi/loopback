@@ -1,15 +1,18 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDown, ArrowUp, ArrowUpDown, Calendar, Check, CircleChevronDown, FileText, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Building2, Calendar, CalendarDays, Check, CircleChevronDown, EyeOff, FileText, Hash, Link as LinkIcon, MapPin, Maximize2, Paperclip, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
 import type { Sort, SortKey } from "./columnSort";
 import LocationCell from "./LocationCell";
+import { agencies, agencyLabel } from "./features/tickets/agencies";
 import { statusClass, statuses, type Status, type Ticket } from "./features/tickets/types";
+import { useAttachmentCounts } from "./features/tickets/attachmentCounts";
+import { useHiddenColumns } from "./hiddenColumns";
 import { useBoard, useTypeClass } from "./lib/board";
 import { useDismiss } from "./lib/useDismiss";
 import type { ReviewField, ReviewRow } from "./features/transcript/review";
 
 // The ticket number is assigned by the database and fixed.
-export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail" | "deadline" | "status";
+export type EditableField = "title" | "urgent" | "type" | "location" | "summary" | "actionsTaken" | "contactName" | "contactPhone" | "contactEmail" | "agency" | "serviceRequestNumber" | "dateOpened" | "deadline" | "status";
 
 /** The icon for each field, shared by the table header and the ticket form so they agree. */
 export const fieldIcons: Record<EditableField, LucideIcon> = {
@@ -24,10 +27,13 @@ export const fieldIcons: Record<EditableField, LucideIcon> = {
   contactName: User,
   contactPhone: Phone,
   contactEmail: Mail,
+  agency: Building2,
+  serviceRequestNumber: Hash,
+  dateOpened: CalendarDays,
 };
 
 // Resizable columns (after the fixed row number column), in pixels. The icon shows the field type, Airtable-style.
-const columns: readonly { key: EditableField | "transcript"; label: string; width: number; fieldType: string }[] = [
+export const columns: readonly { key: EditableField | "agencyHead" | "agencyContact" | "attachments" | "transcript"; label: string; width: number; fieldType: string }[] = [
   // Order from spec section 6.2. The number, source, requester, owner, submitted by and date, created_by,
   // closed_at and evidence are stored but not columns. Meeting ids show in the Transcript column when
   // transcript_matching is on.
@@ -39,14 +45,24 @@ const columns: readonly { key: EditableField | "transcript"; label: string; widt
   { key: "location", label: "Map", width: 160, fieldType: "Map locations" },
   { key: "summary", label: "Ticket details", width: 320, fieldType: "Text" },
   { key: "actionsTaken", label: "Actions taken", width: 280, fieldType: "Text" },
+  { key: "agency", label: "Agency", width: 200, fieldType: "Single select" },
+  // Read only: looked up from the agency picked, not stored on the ticket.
+  { key: "agencyHead", label: "Agency head", width: 190, fieldType: "From the agency list" },
+  { key: "agencyContact", label: "Agency contact page", width: 150, fieldType: "From the agency list" },
+  { key: "serviceRequestNumber", label: "Service Request or Work Order #", width: 190, fieldType: "Text" },
+  { key: "dateOpened", label: "Date Opened", width: 110, fieldType: "Date" },
   { key: "contactName", label: "Name", width: 150, fieldType: "Text" },
   { key: "contactPhone", label: "Phone", width: 130, fieldType: "Phone number" },
   { key: "contactEmail", label: "Email", width: 200, fieldType: "Email" },
+  // Read only here: files are added and opened in the expanded ticket.
+  { key: "attachments", label: "Attachments", width: 110, fieldType: "Number of attached files" },
   // Only with transcript_matching.
   { key: "transcript", label: "Transcript", width: 180, fieldType: "Meetings where it was discussed; click one to open its transcript" },
 ] as const;
-type ColumnKey = (typeof columns)[number]["key"];
-const columnIcons: Record<ColumnKey, LucideIcon> = { ...fieldIcons, transcript: FileText };
+export type ColumnKey = (typeof columns)[number]["key"];
+/** Columns that show something but can't be edited or sorted in the table. */
+const derivedColumns: ReadonlySet<ColumnKey> = new Set(["agencyHead", "agencyContact", "attachments", "transcript"]);
+export const columnIcons: Record<ColumnKey, LucideIcon> = { ...fieldIcons, agencyHead: User, agencyContact: LinkIcon, attachments: Paperclip, transcript: FileText };
 const MIN_WIDTH = 60;
 // Row number, or checkbox and expand button on hover.
 const LEAD_WIDTH = 64;
@@ -126,6 +142,30 @@ function RowMenu({ x, y, targets, onDelete, onClose }: { x: number; y: number; t
   );
 }
 
+/** The right-click menu on a column header: hide that column. */
+function HeaderMenu({ x, y, onHide, onClose }: { x: number; y: number; onHide: () => void; onClose: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useDismiss(ref, true, onClose);
+  useEffect(() => {
+    window.addEventListener("scroll", onClose, true);
+    window.addEventListener("resize", onClose);
+    return () => {
+      window.removeEventListener("scroll", onClose, true);
+      window.removeEventListener("resize", onClose);
+    };
+  }, [onClose]);
+  const style = { left: Math.min(x, window.innerWidth - 200), top: Math.min(y, window.innerHeight - 60) };
+  return createPortal(
+    <div className="popover-menu row-menu" role="menu" ref={ref} style={style} onContextMenu={(event) => event.preventDefault()}>
+      <button type="button" role="menuitem" onClick={() => { onClose(); onHide(); }}>
+        <EyeOff size={15} />
+        <span>Hide field</span>
+      </button>
+    </div>,
+    document.body,
+  );
+}
+
 /** A long-text cell (Ticket details, Actions taken): one clipped line in the table. Clicking it opens the full text in an editor mid-screen. */
 function SummaryCell({ ticket, field, label: fieldLabel, onChange }: { ticket: Ticket; field: "summary" | "actionsTaken"; label: string; onChange: (value: string) => void }) {
   const [open, setOpen] = useState(false);
@@ -154,6 +194,8 @@ function SummaryCell({ ticket, field, label: fieldLabel, onChange }: { ticket: T
   );
 }
 
+const agencyOf = (ticket: Ticket) => agencies.find((agency) => agency.name === ticket.agency);
+
 export default function TicketTable({
   rows,
   selectedId,
@@ -172,6 +214,7 @@ export default function TicketTable({
   sort,
   onSort,
   onFixLocation,
+  allowHiding,
 }: {
   rows: Ticket[];
   selectedId: string;
@@ -195,9 +238,15 @@ export default function TicketTable({
   onSort?: (key: SortKey) => void;
   /** Clicking a row's no-pin warning: open the ticket and try to find its location on the map. */
   onFixLocation?: (ticket: Ticket) => void;
+  /** The staff tables: columns the viewer has hidden stay hidden, a header's right-click menu hides it, and the Attachments column shows. */
+  allowHiding?: boolean;
 }) {
   const { ticketTypes } = useBoard();
   const typeClass = useTypeClass();
+  const { hidden, toggle: toggleColumn } = useHiddenColumns();
+  const attachmentCounts = useAttachmentCounts(Boolean(allowHiding));
+  const [headMenu, setHeadMenu] = useState<{ x: number; y: number; key: ColumnKey } | null>(null);
+  const closeHeadMenu = useCallback(() => setHeadMenu(null), []);
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     // Only follow hovers that start in the transcript; scrolling under the cursor would jitter.
@@ -252,7 +301,12 @@ export default function TicketTable({
     window.addEventListener("mousemove", move);
     window.addEventListener("mouseup", up);
   };
-  const shown = transcript ? columns : columns.filter((column) => column.key !== "transcript");
+  const shown = columns.filter((column) => {
+    if (column.key === "transcript") return Boolean(transcript) && !(allowHiding && hidden.has(column.key));
+    if (column.key === "attachments") return Boolean(allowHiding) && !hidden.has(column.key);
+    return !(allowHiding && hidden.has(column.key));
+  });
+  const vis = (key: ColumnKey) => shown.some((column) => column.key === key);
   const gridStyle = {
     // A trailing 1fr filler track soaks up spare width so row fills and lines run to the edge.
     "--ticket-cols": `${LEAD_WIDTH}px ${shown.map((c) => `${widths[c.key]}px`).join(" ")} minmax(0, 1fr)`,
@@ -260,7 +314,7 @@ export default function TicketTable({
     "--row-height": `${rowHeights.find((item) => item.key === rowHeight)?.px ?? 32}px`,
   } as CSSProperties;
 
-  const text = (ticket: Ticket, field: "title" | "contactName" | "contactPhone" | "contactEmail", label: string) => (
+  const text = (ticket: Ticket, field: "title" | "serviceRequestNumber" | "contactName" | "contactPhone" | "contactEmail", label: string) => (
     <textarea
       className="cell-input"
       rows={1}
@@ -277,6 +331,16 @@ export default function TicketTable({
       aria-label={`Deadline for ${ticket.number}`}
       value={ticket.deadline}
       onChange={(event) => onChange(ticket.id, { deadline: event.target.value })}
+    />
+  );
+
+  const dateOpened = (ticket: Ticket) => (
+    <input
+      type="date"
+      className="cell-input cell-date"
+      aria-label={`Date opened for ${ticket.number}`}
+      value={ticket.dateOpened}
+      onChange={(event) => onChange(ticket.id, { dateOpened: event.target.value })}
     />
   );
 
@@ -314,17 +378,15 @@ export default function TicketTable({
             <button type="button" className="reject" disabled={busy} onClick={decide(ticket.id, review!.onReject)} title="Dismiss this suggestion"><X size={12} /> Reject</button>
           </div>
         </div>
-        <div className="dim"><span className={`tag type ${typeClass(ticket.type)}`}>{mark("type", ticket.type)}</span></div>
-        <div className="dim"><span className={`tag status ${statusClass[ticket.status]}`}>{mark("status", ticket.status)}</span></div>
-        <div className="urgent-cell dim"><input type="checkbox" checked={ticket.urgent} disabled aria-label={`Urgent: ${ticket.number || ticket.title}`} /></div>
-        <div className="dim read-only">{mark("deadline", ticket.deadline)}</div>
-        <div className="dim read-only">{mark("location", ticket.location.text)}</div>
-        <div className="dim read-only review-summary">{mark("summary", ticket.summary)}</div>
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript, info.suggestion.meetingId)}</div>}
+        {vis("type") && <div className="dim"><span className={`tag type ${typeClass(ticket.type)}`}>{mark("type", ticket.type)}</span></div>}
+        {vis("status") && <div className="dim"><span className={`tag status ${statusClass[ticket.status]}`}>{mark("status", ticket.status)}</span></div>}
+        {vis("urgent") && <div className="urgent-cell dim"><input type="checkbox" checked={ticket.urgent} disabled aria-label={`Urgent: ${ticket.number || ticket.title}`} /></div>}
+        {vis("deadline") && <div className="dim read-only">{mark("deadline", ticket.deadline)}</div>}
+        {vis("location") && <div className="dim read-only">{mark("location", ticket.location.text)}</div>}
+        {vis("summary") && <div className="dim read-only review-summary">{mark("summary", ticket.summary)}</div>}
+        {/* Fields a suggestion doesn't carry stay blank, so the cells still line up with the headers. */}
+        {shown.filter((column) => !["title", "type", "status", "urgent", "deadline", "location", "summary", "transcript"].includes(column.key)).map((column) => <div className="dim read-only" key={column.key} />)}
+        {transcript && vis("transcript") && <div className="transcript-cell">{transcriptCell(ticket, transcript, info.suggestion.meetingId)}</div>}
       </div>
     );
   };
@@ -345,10 +407,15 @@ export default function TicketTable({
         {shown.map((column) => {
           const Icon = columnIcons[column.key];
           return (
-            <div key={column.key} className="resizable-head" title={column.fieldType}>
+            <div
+              key={column.key}
+              className="resizable-head"
+              title={column.fieldType}
+              onContextMenu={allowHiding && column.key !== "title" ? (event) => { event.preventDefault(); setHeadMenu({ x: event.clientX, y: event.clientY, key: column.key }); } : undefined}
+            >
               <Icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
               {/* Without the map the column holds places only, so it's labelled Location. */}
-              {onSort && column.key !== "transcript" ? (
+              {onSort && !derivedColumns.has(column.key) ? (
                 <button
                   type="button"
                   className={`sort-head field-label ${sort?.key === column.key ? "on" : ""}`}
@@ -399,50 +466,101 @@ export default function TicketTable({
             </span>
           </div>
           <div>{text(ticket, "title", "Title")}</div>
-          <div>
-            <select
-              className={`cell-select tag type ${typeClass(ticket.type)}`}
-              aria-label={`Type for ${ticket.number}`}
-              value={ticket.type}
-              onChange={(event) => onChange(ticket.id, { type: event.target.value })}
-            >
-              {ticketTypes.map((type) => <option key={type.label} title={type.definition}>{type.label}</option>)}
-              {/* Keep a type the board no longer defines selectable, so the select doesn't misreport it. */}
-              {!ticketTypes.some((type) => type.label === ticket.type) && <option>{ticket.type}</option>}
-            </select>
-          </div>
-          <div>
-            <select
-              className={`cell-select tag status ${statusClass[ticket.status]}`}
-              aria-label={`Status for ${ticket.number}`}
-              value={ticket.status}
-              onChange={(event) => onChange(ticket.id, { status: event.target.value as Status })}
-            >
-              {statuses.map((status) => <option key={status}>{status}</option>)}
-            </select>
-          </div>
-          <div className="urgent-cell">
-            <input
-              type="checkbox"
-              aria-label={`Urgent: ${ticket.number}`}
-              checked={ticket.urgent}
-              onClick={(event) => event.stopPropagation()}
-              onChange={(event) => onChange(ticket.id, { urgent: event.target.checked })}
-            />
-          </div>
-          <div>{deadline(ticket)}</div>
+          {vis("type") && (
+            <div>
+              <select
+                className={`cell-select tag type ${typeClass(ticket.type)}`}
+                aria-label={`Type for ${ticket.number}`}
+                value={ticket.type}
+                onChange={(event) => onChange(ticket.id, { type: event.target.value })}
+              >
+                {ticketTypes.map((type) => <option key={type.label} title={type.definition}>{type.label}</option>)}
+                {/* Keep a type the board no longer defines selectable, so the select doesn't misreport it. */}
+                {!ticketTypes.some((type) => type.label === ticket.type) && <option>{ticket.type}</option>}
+              </select>
+            </div>
+          )}
+          {vis("status") && (
+            <div>
+              <select
+                className={`cell-select tag status ${statusClass[ticket.status]}`}
+                aria-label={`Status for ${ticket.number}`}
+                value={ticket.status}
+                onChange={(event) => onChange(ticket.id, { status: event.target.value as Status })}
+              >
+                {statuses.map((status) => <option key={status}>{status}</option>)}
+              </select>
+            </div>
+          )}
+          {vis("urgent") && (
+            <div className="urgent-cell">
+              <input
+                type="checkbox"
+                aria-label={`Urgent: ${ticket.number}`}
+                checked={ticket.urgent}
+                onClick={(event) => event.stopPropagation()}
+                onChange={(event) => onChange(ticket.id, { urgent: event.target.checked })}
+              />
+            </div>
+          )}
+          {vis("deadline") && (
+            <div>{deadline(ticket)}</div>
+          )}
           {/* Clicking anywhere in the Map cell opens the map panel. */}
-          {onShowOnMap
-            ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>
-            : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>}
-          <div><SummaryCell ticket={ticket} field="summary" label="Ticket details" onChange={(summary) => onChange(ticket.id, { summary })} /></div>
-          <div><SummaryCell ticket={ticket} field="actionsTaken" label="Actions taken" onChange={(actionsTaken) => onChange(ticket.id, { actionsTaken })} /></div>
-          <div>{text(ticket, "contactName", "Name")}</div>
-          <div>{text(ticket, "contactPhone", "Phone")}</div>
-          <div>{text(ticket, "contactEmail", "Email")}</div>
-          {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
+          {vis("location") && (
+            <>
+            {onShowOnMap
+              ? <div className="opens-panel" onClick={(event) => { event.stopPropagation(); onShowOnMap(ticket.id, 0); }}><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onShowOnMap={(index) => onShowOnMap(ticket.id, index)} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>
+              : <div><LocationCell location={ticket.location} label={ticket.number} onChange={(location) => onChange(ticket.id, { location })} onFix={onFixLocation ? () => onFixLocation(ticket) : undefined} /></div>}
+            </>
+          )}
+          {vis("summary") && (
+            <div><SummaryCell ticket={ticket} field="summary" label="Ticket details" onChange={(summary) => onChange(ticket.id, { summary })} /></div>
+          )}
+          {vis("actionsTaken") && (
+            <div><SummaryCell ticket={ticket} field="actionsTaken" label="Actions taken" onChange={(actionsTaken) => onChange(ticket.id, { actionsTaken })} /></div>
+          )}
+          {vis("agency") && (
+            <div>
+              <select
+                className="cell-select"
+                aria-label={`Agency for ${ticket.number}`}
+                value={ticket.agency}
+                onChange={(event) => onChange(ticket.id, { agency: event.target.value })}
+              >
+                <option value="" />
+                {agencies.map((agency) => <option key={agency.name} value={agency.name}>{agencyLabel(agency)}</option>)}
+                {/* Keep an agency the list doesn't have selectable, so the select doesn't misreport it. */}
+                {ticket.agency && !agencies.some((agency) => agency.name === ticket.agency) && <option>{ticket.agency}</option>}
+              </select>
+            </div>
+          )}
+          {vis("agencyHead") && (
+            <div className="agency-cell" title={agencyOf(ticket)?.head}>{agencyOf(ticket)?.head}</div>
+          )}
+          {vis("agencyContact") && (
+            <div className="agency-cell">{agencyOf(ticket)?.contactUrl && <a href={agencyOf(ticket)!.contactUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>Contact page</a>}</div>
+          )}
+          {vis("serviceRequestNumber") && (
+            <div>{text(ticket, "serviceRequestNumber", "Service Request or Work Order #")}</div>
+          )}
+          {vis("dateOpened") && (
+            <div>{dateOpened(ticket)}</div>
+          )}
+          {vis("contactName") && (
+            <div>{text(ticket, "contactName", "Name")}</div>
+          )}
+          {vis("contactPhone") && (
+            <div>{text(ticket, "contactPhone", "Phone")}</div>
+          )}
+          {vis("contactEmail") && (
+            <div>{text(ticket, "contactEmail", "Email")}</div>
+          )}
+          {vis("attachments") && <div className="attachments-cell">{attachmentCounts.get(ticket.id) ? <><Paperclip size={11} aria-hidden="true" /> {attachmentCounts.get(ticket.id)}</> : null}</div>}
+          {transcript && vis("transcript") && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}
+      {headMenu && <HeaderMenu x={headMenu.x} y={headMenu.y} onHide={() => toggleColumn(headMenu.key)} onClose={closeHeadMenu} />}
       {menu && onDelete && <RowMenu {...menu} onDelete={onDelete} onClose={closeMenu} />}
     </div>
   );

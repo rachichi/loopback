@@ -1,10 +1,10 @@
-// The Attachments field of the expanded ticket form: the ticket's PDFs, a way to open each, and (for staff) to add
+// The Attachments field of the expanded ticket form: the ticket's files, a way to open each, and (for staff) to add
 // and remove them. Files are private; opening one asks for a link that works for a minute.
 import { useEffect, useRef, useState } from "react";
 import { FileText, Paperclip, X } from "lucide-react";
 import { trackEvent } from "../../lib/analytics";
 import { useBoard } from "../../lib/board";
-import { addAttachment, attachmentLink, attachmentProblem, loadAttachments, MAX_ATTACHMENT_BYTES, removeAttachment, type Attachment } from "./attachments";
+import { addAttachment, ATTACHMENT_ACCEPT, ATTACHMENT_KINDS, attachmentLink, attachmentProblem, loadAttachments, MAX_ATTACHMENT_BYTES, removeAttachment, type Attachment } from "./attachments";
 
 const sizeLabel = (bytes: number) => (bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`);
 
@@ -92,14 +92,14 @@ export default function TicketAttachments({ ticketId, saved }: {
         </div>
       ))}
       {saved && items?.length === 0 && <span className="attachments-muted">No attachments yet.</span>}
-      {!saved && <span className="attachments-muted">You can attach PDFs once the ticket has saved.</span>}
+      {!saved && <span className="attachments-muted">You can attach files once the ticket has saved.</span>}
       {canEdit && saved && (
         <>
           <button type="button" className="place-add attachment-add" disabled={busy} onClick={() => fileRef.current?.click()}>
-            <Paperclip size={11} aria-hidden="true" /> {busy ? "Uploading…" : "Attach a PDF"}
+            <Paperclip size={11} aria-hidden="true" /> {busy ? "Uploading…" : "Attach a file"}
           </button>
-          <input ref={fileRef} type="file" accept="application/pdf,.pdf" hidden onChange={(event) => { void upload(event.target.files); event.target.value = ""; }} />
-          <span className="attachments-muted">PDF only, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB. Only staff of this board can see attachments.</span>
+          <input ref={fileRef} type="file" accept={ATTACHMENT_ACCEPT} hidden onChange={(event) => { void upload(event.target.files); event.target.value = ""; }} />
+          <span className="attachments-muted">{ATTACHMENT_KINDS}, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB. Only staff of this board can see attachments.</span>
         </>
       )}
       {error && <p className="attachments-error" role="alert">{error}</p>}

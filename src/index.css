@@ -355,7 +355,7 @@ body.col-resizing, body.col-resizing * { cursor: col-resize !important; user-sel
 .form-field .form-field-name { min-height: 36px; }
 .form-field-value { min-width: 0; min-height: 36px; display: flex; align-items: center; }
 .form-field-value > * { flex: 1; min-width: 0; }
-.intake-fields select, .intake-fields .intake-date, .intake-fields textarea { width: 100%; min-height: 36px; padding: 7px 10px; border: 1px solid #cfd5db; border-radius: 6px; background: white; color: #11182c; font: inherit; font-size: 13px; }
+.intake-fields select, .intake-fields .intake-text, .intake-fields .intake-date, .intake-fields textarea { width: 100%; min-height: 36px; padding: 7px 10px; border: 1px solid #cfd5db; border-radius: 6px; background: white; color: #11182c; font: inherit; font-size: 13px; }
 .intake-fields .intake-date { flex: 0 0 auto; width: 200px; }
 .intake-fields textarea { resize: vertical; }
 /* A text field with a mic button inset at its right edge (top edge for the summary). */
@@ -783,3 +783,35 @@ button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
 @media (max-width: 640px) { .intake-contact { grid-template-columns: minmax(0, 1fr); } }
 .intake-contact input { width: 100%; min-height: 36px; padding: 7px 10px; border: 1px solid #cfd5db; border-radius: 6px; background: white; color: #11182c; font: inherit; font-size: 13px; }
 .intake-contact input::placeholder { color: #7b8490; }
+
+/* Read-only head of agency and contact page, beside the Agency picker. */
+.form-field-value > .agency-info { flex: 0 1 auto; display: flex; flex-direction: column; gap: 2px; margin-left: 10px; padding: 4px 10px; border: 1px solid #e3e7eb; border-radius: 6px; background: #f6f7f9; color: #4c5561; font-size: 12px; line-height: 1.35; }
+.agency-info a { color: #176b83; }
+
+/* Read-only agency head and contact page columns in the table. */
+.agency-cell { padding: 3px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #4c5561; }
+.agency-cell a { color: #176b83; }
+
+/* Attachments column: a paperclip and the file count. */
+.attachments-cell { display: flex; align-items: center; gap: 4px; color: #4c5561; }
+
+/* Hide fields button and menu, Airtable-style. */
+.hide-fields { position: relative; }
+.hide-fields-button { height: 30px; display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; border: 0; border-radius: 4px; background: transparent; color: #626b77; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.hide-fields-button:hover, .hide-fields-button[aria-expanded="true"] { background: #eef1f3; }
+.hide-fields-button.active { background: #e8f6fa; color: #176b83; }
+.hide-fields-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 30; width: 300px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+.hide-fields-search { width: 100%; padding: 6px 8px; border: 0; border-bottom: 2px solid #e3e7eb; font: inherit; font-size: 13px; }
+.hide-fields-search:focus { outline: 0; border-bottom-color: #2bb7d5; }
+.hide-fields-list { max-height: 320px; overflow-y: auto; display: flex; flex-direction: column; }
+.hide-fields-row { display: flex; align-items: center; gap: 10px; padding: 6px 4px; font-size: 13px; color: #1a2234; cursor: pointer; }
+.hide-fields-row.locked { opacity: .55; cursor: default; }
+.hide-fields-row input[role="switch"] { appearance: none; flex: 0 0 auto; width: 26px; height: 16px; margin: 0; border-radius: 8px; background: #c3cad2; position: relative; cursor: inherit; transition: background .12s; }
+.hide-fields-row input[role="switch"]::after { content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: white; transition: transform .12s; }
+.hide-fields-row input[role="switch"]:checked { background: #2d7ff9; }
+.hide-fields-row input[role="switch"]:checked::after { transform: translateX(10px); }
+.hide-fields-row input[role="switch"]:focus-visible { outline: 2px solid #2bb7d5; outline-offset: 2px; }
+.hide-fields-none { margin: 8px 4px; color: #7b8490; font-size: 12px; }
+.hide-fields-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hide-fields-actions button { padding: 7px 0; border: 0; border-radius: 4px; background: #f1f3f5; color: #4c5561; font: inherit; font-size: 12px; cursor: pointer; }
+.hide-fields-actions button:hover { background: #e6e9ec; }

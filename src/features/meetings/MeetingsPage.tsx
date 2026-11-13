@@ -75,7 +75,7 @@ function standIn(suggestion: Suggestion, ticket: Ticket | undefined): Ticket {
     number: ticket?.number ?? "New",
     title: `Suggested: ${suggestion.changes.title ?? ticket?.title ?? ""}`,
     type: suggestion.changes.type ?? ticket?.type ?? "Other",
-    status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", summary: "", urgent: false, deadline: "",
+    status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", agency: "", serviceRequestNumber: "", dateOpened: "", summary: "", urgent: false, deadline: "",
     submittedBy: "", submittedAt: "", ownerId: null, source: "transcript", closedAt: null, createdBy: null, evidence: {},
     meetingIds: [suggestion.meetingId],
     spans: suggestion.spans,
@@ -272,7 +272,7 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
         <>
           {!ticketsReady && canEdit && <div className="section-generate">{generateButton("Generate Tickets")}</div>}
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={ticketsReady ? shownMeetingRows : []} inReview={inReview} showReview={review !== undefined} />
-          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} />
+          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} allowHiding />
         </>
       ),
     },

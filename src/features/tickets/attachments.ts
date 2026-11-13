@@ -1,10 +1,29 @@
-// PDF attachments on tickets. Files are in the private Storage bucket `ticket-files` (<board>/<ticket>/<id>.pdf)
+// File attachments on tickets (PDFs, photos, common documents). Files are in the private Storage bucket `ticket-files` (<board>/<ticket>/<id>.<ext>)
 // and listed in ticket_attachments. RLS decides who can read, add and delete; nothing here is public.
 import { db } from "../../db";
+import { ATTACHMENTS_CHANGED } from "./attachmentCounts";
 
 const BUCKET = "ticket-files";
 /** The bucket enforces the same limit; this just fails fast with a clear message. */
 export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024;
+
+/** The file types that can be attached, by extension. Must match the bucket's allowed_mime_types. HTML and SVG are
+ *  left out on purpose: opened from a link they can run scripts. */
+const FILE_TYPES: Record<string, string> = {
+  pdf: "application/pdf",
+  jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", gif: "image/gif", webp: "image/webp", heic: "image/heic", heif: "image/heif",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  txt: "text/plain", csv: "text/csv",
+};
+/** For the file picker's accept attribute. Phones then offer the camera and photo library. */
+export const ATTACHMENT_ACCEPT = ["image/*", ...Object.keys(FILE_TYPES).map((ext) => `.${ext}`)].join(",");
+/** For help text. */
+export const ATTACHMENT_KINDS = "PDFs, photos, Word and Excel files, text and CSV";
+
+const extensionOf = (name: string) => name.split(".").pop()?.toLowerCase() ?? "";
 
 export type Attachment = { id: string; ticketId: string; path: string; name: string; size: number; createdAt: string };
 
@@ -19,19 +38,21 @@ export async function loadAttachments(ticketId: string): Promise<Attachment[]> {
 
 /** A reason this file can't be attached, or null if it can. */
 export function attachmentProblem(file: File): string | null {
-  if (file.type !== "application/pdf" && !/\.pdf$/i.test(file.name)) return "Only PDF files can be attached.";
+  if (!FILE_TYPES[extensionOf(file.name)]) return `That file type can't be attached. Use ${ATTACHMENT_KINDS}.`;
   if (file.size === 0) return "That file is empty.";
   if (file.size > MAX_ATTACHMENT_BYTES) return `That file is over ${MAX_ATTACHMENT_BYTES / 1024 / 1024} MB.`;
   return null;
 }
 
-/** Uploads a PDF and records it. If recording fails the upload is removed, so no file is left unlisted. */
+/** Uploads a file and records it. If recording fails the upload is removed, so no file is left unlisted. */
 export async function addAttachment(board: string, ticketId: string, file: File): Promise<Attachment> {
   const problem = attachmentProblem(file);
   if (problem) throw new Error(problem);
   const id = crypto.randomUUID();
-  const path = `${board}/${ticketId}/${id}.pdf`;
-  const { error: uploadError } = await db.storage.from(BUCKET).upload(path, file, { contentType: "application/pdf", upsert: false });
+  const ext = extensionOf(file.name);
+  const path = `${board}/${ticketId}/${id}.${ext}`;
+  // The type comes from the extension, not the browser: some report HEIC photos as "" or application/octet-stream.
+  const { error: uploadError } = await db.storage.from(BUCKET).upload(path, file, { contentType: FILE_TYPES[ext], upsert: false });
   if (uploadError) throw uploadError;
   const { data, error } = await db
     .from("ticket_attachments")
@@ -42,6 +63,7 @@ export async function addAttachment(board: string, ticketId: string, file: File)
     await db.storage.from(BUCKET).remove([path]);
     throw error;
   }
+  window.dispatchEvent(new Event(ATTACHMENTS_CHANGED));
   return fromRow(data as AttachmentRow);
 }
 
@@ -49,6 +71,7 @@ export async function addAttachment(board: string, ticketId: string, file: File)
 export async function removeAttachment(attachment: Attachment): Promise<void> {
   const { error } = await db.from("ticket_attachments").delete().eq("id", attachment.id);
   if (error) throw error;
+  window.dispatchEvent(new Event(ATTACHMENTS_CHANGED));
   const { error: storageError } = await db.storage.from(BUCKET).remove([attachment.path]);
   if (storageError) console.error("Couldn't remove an attachment's file", storageError);
 }

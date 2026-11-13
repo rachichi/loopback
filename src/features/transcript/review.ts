@@ -20,7 +20,7 @@ export type ReviewRow = {
 };
 
 const blank: Ticket = {
-  id: "", number: "", title: "", type: "Other", status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "",
+  id: "", number: "", title: "", type: "Other", status: "Open", location: { text: "", places: [] }, requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", agency: "", serviceRequestNumber: "", dateOpened: "",
   summary: "", urgent: false, deadline: "", submittedBy: "", submittedAt: "", meetingIds: [], spans: [], ownerId: null,
   source: "transcript", closedAt: null, createdBy: null, evidence: {},
 };

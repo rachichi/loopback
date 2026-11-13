@@ -380,7 +380,7 @@ function PhoneForm({ onSubmit }: { onSubmit: (ticket: Ticket) => void }) {
     trackEvent("landing_demo_ticket_submitted", { urgent });
     onSubmit({
       id: `demo-new-${Date.now()}`, number: "", title: title.trim(), type: type || "Other", status: "Open", location: { text: "", places: [] },
-      requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", summary: summary.trim(), urgent, deadline, submittedBy: "Intake form", submittedAt: today(), meetingIds: [], spans: [],
+      requester: "", contactName: "", contactPhone: "", contactEmail: "", actionsTaken: "", agency: "", serviceRequestNumber: "", dateOpened: "", summary: summary.trim(), urgent, deadline, submittedBy: "Intake form", submittedAt: today(), meetingIds: [], spans: [],
       ownerId: null, source: "manual", closedAt: null, createdBy: null, evidence: {},
     });
     setSent(true);

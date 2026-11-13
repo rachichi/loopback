@@ -53,7 +53,7 @@ Screens: `/` (Home), `/tickets` (Tickets), `/meetings` (Meetings), `/submit` (th
 | --- | --- | --- |
 | `ticket_created` | The database finishes inserting a new ticket | `board_id`, `source` (`manual` for tickets made in the app), `form_ms` (intake form open to submit), `save_ms` (submit to saved) |
 | `ticket_deleted` | A ticket is deleted. Once per ticket, so a bulk delete sends several | `board_id` |
-| `attachment_added` | A PDF is attached to a ticket | `board_id` |
+| `attachment_added` | A file is attached to a ticket | `board_id` |
 | `attachment_removed` | An attachment is removed | `board_id` |
 | `feedback_sent` | The footer's Contact us form is sent (by email or into the feedback table, either one counts) | `board_id`, `kind` (`bug`, `feature` or `feedback`) |
 | `feedback_failed` | Sending it fails | `board_id`, `kind` |
