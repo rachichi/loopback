@@ -143,7 +143,7 @@ function RowMenu({ x, y, targets, onDelete, onClose }: { x: number; y: number; t
 }
 
 /** The right-click menu on a column header: hide that column. */
-function HeaderMenu({ x, y, label, onHide, onClose }: { x: number; y: number; label: string; onHide: () => void; onClose: () => void }) {
+function HeaderMenu({ x, y, onHide, onClose }: { x: number; y: number; onHide: () => void; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   useDismiss(ref, true, onClose);
   useEffect(() => {
@@ -159,7 +159,7 @@ function HeaderMenu({ x, y, label, onHide, onClose }: { x: number; y: number; la
     <div className="popover-menu row-menu" role="menu" ref={ref} style={style} onContextMenu={(event) => event.preventDefault()}>
       <button type="button" role="menuitem" onClick={() => { onClose(); onHide(); }}>
         <EyeOff size={15} />
-        <span>Hide {label}</span>
+        <span>Hide field</span>
       </button>
     </div>,
     document.body,
@@ -245,7 +245,7 @@ export default function TicketTable({
   const typeClass = useTypeClass();
   const { hidden, toggle: toggleColumn } = useHiddenColumns();
   const attachmentCounts = useAttachmentCounts(Boolean(allowHiding));
-  const [headMenu, setHeadMenu] = useState<{ x: number; y: number; key: ColumnKey; label: string } | null>(null);
+  const [headMenu, setHeadMenu] = useState<{ x: number; y: number; key: ColumnKey } | null>(null);
   const closeHeadMenu = useCallback(() => setHeadMenu(null), []);
   const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -411,7 +411,7 @@ export default function TicketTable({
               key={column.key}
               className="resizable-head"
               title={column.fieldType}
-              onContextMenu={allowHiding && column.key !== "title" ? (event) => { event.preventDefault(); setHeadMenu({ x: event.clientX, y: event.clientY, key: column.key, label: column.label }); } : undefined}
+              onContextMenu={allowHiding && column.key !== "title" ? (event) => { event.preventDefault(); setHeadMenu({ x: event.clientX, y: event.clientY, key: column.key }); } : undefined}
             >
               <Icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
               {/* Without the map the column holds places only, so it's labelled Location. */}
@@ -560,7 +560,7 @@ export default function TicketTable({
           {transcript && vis("transcript") && <div className="transcript-cell">{transcriptCell(ticket, transcript)}</div>}
         </div>
       )) : <div className="empty-results">{emptyMessage}</div>}
-      {headMenu && <HeaderMenu {...headMenu} onHide={() => toggleColumn(headMenu.key)} onClose={closeHeadMenu} />}
+      {headMenu && <HeaderMenu x={headMenu.x} y={headMenu.y} onHide={() => toggleColumn(headMenu.key)} onClose={closeHeadMenu} />}
       {menu && onDelete && <RowMenu {...menu} onDelete={onDelete} onClose={closeMenu} />}
     </div>
   );
