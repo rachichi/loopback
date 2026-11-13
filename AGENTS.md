@@ -40,5 +40,6 @@ CI runs `typecheck`, `build` and `check:bundle` on every pull request. All must 
 - Analytics (`src/lib/analytics.ts`) must never carry ticket content, names, emails, user ids or share tokens.
 - Before a major feature is turned on for any board other than `staging`, update telemetry: add events for it in `src/lib/analytics.ts`, and list them in `docs/telemetry.md` in the same pull request. Staging is exempt, so features can be tried there first.
 - Use double quotes for strings containing apostrophes. Export components as default exports.
+- Every field on the intake form is also a column in the Tickets table, and every new intake field gets its column in the same pull request. Columns start shown. Viewers can hide them (Hide fields menu, or right-click a header); the title can never be hidden. Hiding is a per-viewer browser preference (`src/hiddenColumns.ts`), not something the code or the database removes.
 - No em dashes in code comments, docs or commit messages.
 - Secrets live in `.env.local` (git-ignored), Netlify and GitHub secrets.

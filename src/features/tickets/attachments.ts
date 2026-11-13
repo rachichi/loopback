@@ -1,6 +1,7 @@
 // File attachments on tickets (PDFs, photos, common documents). Files are in the private Storage bucket `ticket-files` (<board>/<ticket>/<id>.<ext>)
 // and listed in ticket_attachments. RLS decides who can read, add and delete; nothing here is public.
 import { db } from "../../db";
+import { ATTACHMENTS_CHANGED } from "./attachmentCounts";
 
 const BUCKET = "ticket-files";
 /** The bucket enforces the same limit; this just fails fast with a clear message. */
@@ -62,6 +63,7 @@ export async function addAttachment(board: string, ticketId: string, file: File)
     await db.storage.from(BUCKET).remove([path]);
     throw error;
   }
+  window.dispatchEvent(new Event(ATTACHMENTS_CHANGED));
   return fromRow(data as AttachmentRow);
 }
 
@@ -69,6 +71,7 @@ export async function addAttachment(board: string, ticketId: string, file: File)
 export async function removeAttachment(attachment: Attachment): Promise<void> {
   const { error } = await db.from("ticket_attachments").delete().eq("id", attachment.id);
   if (error) throw error;
+  window.dispatchEvent(new Event(ATTACHMENTS_CHANGED));
   const { error: storageError } = await db.storage.from(BUCKET).remove([attachment.path]);
   if (storageError) console.error("Couldn't remove an attachment's file", storageError);
 }

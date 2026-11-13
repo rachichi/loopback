@@ -1,6 +1,7 @@
 // The Tickets tab's urgency tabs and toolbar, shared with the Meetings tab's ticket section.
 import type { ReactNode } from "react";
 import { Filter, Plus, Search } from "lucide-react";
+import HideFieldsMenu from "./HideFieldsMenu";
 import RowHeightMenu from "./RowHeightMenu";
 import type { RowHeight } from "./TicketTable";
 import { statuses, type Status, type Ticket } from "./features/tickets/types";
@@ -100,6 +101,7 @@ export function Toolbar({
             <option value="All">All types</option>{ticketTypes.map((item) => <option key={item.label} value={item.label}>{item.label}</option>)}
           </select>
         </div>
+        <HideFieldsMenu />
         <RowHeightMenu value={rowHeight} onChange={setRowHeight} />
         {intakeOn && <button type="button" className="new-request" onClick={onNew}><Plus size={14} /> New ticket</button>}
       </div>

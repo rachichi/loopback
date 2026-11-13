@@ -272,7 +272,7 @@ function MeetingDetail({ info, jump, setJump, onOpenMeeting, meetings, tickets, 
         <>
           {!ticketsReady && canEdit && <div className="section-generate">{generateButton("Generate Tickets")}</div>}
           <UrgencyTabs tab={urgency} setTab={setUrgency} tickets={ticketsReady ? shownMeetingRows : []} inReview={inReview} showReview={review !== undefined} />
-          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} />
+          <TicketTable rows={shownRows} selectedId={selectedId} emptyMessage={urgency === "review" ? "Nothing to review from this meeting." : "No tickets from this meeting yet."} hoveredId={hoveredId} followHover={followHover} rowHeight={rowHeight} onHover={onHover} onSelect={select} onExpand={onExpand} onFixLocation={onFixLocation} onChange={onChange} onDelete={onDelete} transcript={transcriptColumn} review={review} allowHiding />
         </>
       ),
     },

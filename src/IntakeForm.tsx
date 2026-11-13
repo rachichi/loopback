@@ -42,7 +42,9 @@ function AgencyInfo({ name }: { name: string }) {
   );
 }
 
-/** The ticket form, laid out like an Airtable record. Without a ticket it creates one (a request that arrives
+/** Rule (AGENTS.md): every field in this form is also a column in TicketTable. Add the column when you add a field here.
+ *
+ *  The ticket form, laid out like an Airtable record. Without a ticket it creates one (a request that arrives
  *  outside a meeting: email, call, walk-in). With a ticket it is the expanded view of that row, and every edit
  *  goes straight to the ticket, which the portal autosaves. */
 export default function IntakeForm({
