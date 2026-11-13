@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
-import { ArrowDown, ArrowUp, ArrowUpDown, Building2, Calendar, CalendarDays, Check, CircleChevronDown, FileText, Hash, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Building2, Calendar, CalendarDays, Check, CircleChevronDown, FileText, Hash, Link as LinkIcon, MapPin, Maximize2, Rows2, Rows3, Rows4, Square, SquareCheck, Mail, Phone, Trash2, Type, User, X, type LucideIcon } from "lucide-react";
 import type { Sort, SortKey } from "./columnSort";
 import LocationCell from "./LocationCell";
 import { agencies, agencyLabel } from "./features/tickets/agencies";
@@ -31,7 +31,7 @@ export const fieldIcons: Record<EditableField, LucideIcon> = {
 };
 
 // Resizable columns (after the fixed row number column), in pixels. The icon shows the field type, Airtable-style.
-const columns: readonly { key: EditableField | "transcript"; label: string; width: number; fieldType: string }[] = [
+const columns: readonly { key: EditableField | "agencyHead" | "agencyContact" | "transcript"; label: string; width: number; fieldType: string }[] = [
   // Order from spec section 6.2. The number, source, requester, owner, submitted by and date, created_by,
   // closed_at and evidence are stored but not columns. Meeting ids show in the Transcript column when
   // transcript_matching is on.
@@ -44,6 +44,9 @@ const columns: readonly { key: EditableField | "transcript"; label: string; widt
   { key: "summary", label: "Ticket details", width: 320, fieldType: "Text" },
   { key: "actionsTaken", label: "Actions taken", width: 280, fieldType: "Text" },
   { key: "agency", label: "Agency", width: 200, fieldType: "Single select" },
+  // Read only: looked up from the agency picked, not stored on the ticket.
+  { key: "agencyHead", label: "Agency head", width: 190, fieldType: "From the agency list" },
+  { key: "agencyContact", label: "Agency contact page", width: 150, fieldType: "From the agency list" },
   { key: "serviceRequestNumber", label: "Service Request or Work Order #", width: 190, fieldType: "Text" },
   { key: "dateOpened", label: "Date Opened", width: 110, fieldType: "Date" },
   { key: "contactName", label: "Name", width: 150, fieldType: "Text" },
@@ -53,7 +56,7 @@ const columns: readonly { key: EditableField | "transcript"; label: string; widt
   { key: "transcript", label: "Transcript", width: 180, fieldType: "Meetings where it was discussed; click one to open its transcript" },
 ] as const;
 type ColumnKey = (typeof columns)[number]["key"];
-const columnIcons: Record<ColumnKey, LucideIcon> = { ...fieldIcons, transcript: FileText };
+const columnIcons: Record<ColumnKey, LucideIcon> = { ...fieldIcons, agencyHead: User, agencyContact: LinkIcon, transcript: FileText };
 const MIN_WIDTH = 60;
 // Row number, or checkbox and expand button on hover.
 const LEAD_WIDTH = 64;
@@ -160,6 +163,8 @@ function SummaryCell({ ticket, field, label: fieldLabel, onChange }: { ticket: T
     </div>
   );
 }
+
+const agencyOf = (ticket: Ticket) => agencies.find((agency) => agency.name === ticket.agency);
 
 export default function TicketTable({
   rows,
@@ -337,13 +342,7 @@ export default function TicketTable({
         <div className="dim read-only">{mark("deadline", ticket.deadline)}</div>
         <div className="dim read-only">{mark("location", ticket.location.text)}</div>
         <div className="dim read-only review-summary">{mark("summary", ticket.summary)}</div>
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
-        <div className="dim read-only" />
+        {Array.from({ length: 9 }, (_, index) => <div className="dim read-only" key={index} />)}
         {transcript && <div className="transcript-cell">{transcriptCell(ticket, transcript, info.suggestion.meetingId)}</div>}
       </div>
     );
@@ -368,7 +367,7 @@ export default function TicketTable({
             <div key={column.key} className="resizable-head" title={column.fieldType}>
               <Icon className="field-icon" size={11} strokeWidth={2} aria-hidden="true" />
               {/* Without the map the column holds places only, so it's labelled Location. */}
-              {onSort && column.key !== "transcript" ? (
+              {onSort && column.key !== "transcript" && column.key !== "agencyHead" && column.key !== "agencyContact" ? (
                 <button
                   type="button"
                   className={`sort-head field-label ${sort?.key === column.key ? "on" : ""}`}
@@ -470,6 +469,8 @@ export default function TicketTable({
               {ticket.agency && !agencies.some((agency) => agency.name === ticket.agency) && <option>{ticket.agency}</option>}
             </select>
           </div>
+          <div className="agency-cell" title={agencyOf(ticket)?.head}>{agencyOf(ticket)?.head}</div>
+          <div className="agency-cell">{agencyOf(ticket)?.contactUrl && <a href={agencyOf(ticket)!.contactUrl} target="_blank" rel="noopener noreferrer" onClick={(event) => event.stopPropagation()}>Contact page</a>}</div>
           <div>{text(ticket, "serviceRequestNumber", "Service Request or Work Order #")}</div>
           <div>{dateOpened(ticket)}</div>
           <div>{text(ticket, "contactName", "Name")}</div>

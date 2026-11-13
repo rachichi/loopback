@@ -787,3 +787,7 @@ button.no-pin-icon:hover { color: #9d1f31; transform: scale(1.15); }
 /* Read-only head of agency and contact page, beside the Agency picker. */
 .form-field-value > .agency-info { flex: 0 1 auto; display: flex; flex-direction: column; gap: 2px; margin-left: 10px; padding: 4px 10px; border: 1px solid #e3e7eb; border-radius: 6px; background: #f6f7f9; color: #4c5561; font-size: 12px; line-height: 1.35; }
 .agency-info a { color: #176b83; }
+
+/* Read-only agency head and contact page columns in the table. */
+.agency-cell { padding: 3px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #4c5561; }
+.agency-cell a { color: #176b83; }
